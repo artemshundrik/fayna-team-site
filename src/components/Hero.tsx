@@ -78,6 +78,9 @@ const Buttons = styled.div`
     border: none;
     box-shadow: 0 0 12px rgba(255, 22, 149, 0.5), 0 0 24px rgba(255, 22, 149, 0.3);
     overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   a.btn-primary::after {
