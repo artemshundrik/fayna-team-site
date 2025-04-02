@@ -5,7 +5,7 @@ const HeaderWrapper = styled.header`
   display: grid;
   grid-template-columns: auto auto 1fr;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0.5rem 2rem;
   background-color: white;
   position: sticky;
   top: 0;

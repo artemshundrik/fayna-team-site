@@ -3,13 +3,15 @@ import styled from 'styled-components';
 
 const Section = styled.section`
   position: relative;
-  height: 100vh;
+  height: 100svh;
+  box-sizing: border-box;
   background-image: url('/images/hero-team-photo.webp');
   background-size: cover;
   background-position: center;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 1rem 6rem;
 
   &::before {
     content: '';
@@ -38,8 +40,7 @@ const Content = styled.div`
   z-index: 10;
   opacity: 0;
   animation: fadeInUp 1s ease-out 0.3s forwards;
-  margin-top: 25rem;
-  margin-bottom: 6rem;
+  margin-bottom: 2rem;
 `;
 
 const Logo = styled.div`
