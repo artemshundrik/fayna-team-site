@@ -36,6 +36,7 @@ const Logo = styled.div`
   display: flex;
   justify-content: center;
   margin-right: 2rem;
+  z-index: 3;
 
   img {
     height: 72px;
