@@ -203,12 +203,12 @@ const Hero: React.FC = () => {
           <a href="#players" className="btn btn-secondary">Склад команди</a>
         </Buttons>
         <Social>
-          <SocialBox href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+        <SocialBox href="https://www.youtube.com/@FCFAYNATEAM" target="_blank" rel="noopener noreferrer">
             <img src="/images/icons/youtube-default.svg" className="default" alt="YouTube" />
             <img src="/images/icons/youtube-hover.svg" className="hover" alt="YouTube" />
           </SocialBox>
           <Divider />
-          <SocialBox href="https://instagram.com/faynateam" target="_blank" rel="noopener noreferrer" $bigger>
+          <SocialBox href="https://www.instagram.com/fc_fayna_team/?igsh=MWx4eXRlMW54NWR2eg%3D%3D&utm_source=qr#" target="_blank" rel="noopener noreferrer">
             <img src="/images/icons/instagram-default.svg" className="default" alt="Instagram" />
             <img src="/images/icons/instagram-hover.svg" className="hover" alt="Instagram" />
           </SocialBox>

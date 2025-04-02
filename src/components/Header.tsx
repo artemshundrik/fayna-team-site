@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const HeaderWrapper = styled.header`
   display: grid;
   grid-template-columns: auto auto 1fr;
   align-items: center;
+  justify-content: space-between;
   padding: 0.5rem 2rem;
   background-color: white;
   position: sticky;
@@ -14,10 +15,82 @@ const HeaderWrapper = styled.header`
   border-bottom: 1px solid #e0e0e0;
 `;
 
+const MobileMenuToggle = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 100;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
+
+  span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: black;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+  }
+`;
+
+const MobileMenu = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+
+  &.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  a {
+    font-size: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: black;
+  }
+
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+`;
+
 const Sponsors = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 
   img {
     height: 24px;
@@ -47,6 +120,10 @@ const Nav = styled.nav`
   display: flex;
   justify-content: flex-start;
   gap: 1rem;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 
   a {
     position: relative;
@@ -99,6 +176,8 @@ const Nav = styled.nav`
 `;
 
 const Header = () => {
+  const [isMenuOpen, setMenuOpen] = useState(false);
+
   return (
     <HeaderWrapper>
       <Logo>
@@ -106,6 +185,7 @@ const Header = () => {
           <img src="/images/logo-fayna.svg" alt="FAYNA TEAM logo" />
         </a>
       </Logo>
+
       <Nav>
         <a href="#" className="active">Головна</a>
         <a href="#">Склад</a>
@@ -113,13 +193,35 @@ const Header = () => {
         <a href="#">Фаншоп</a>
         <a href="#">Галерея</a>
         <a href="#">Про нас</a>
-        
       </Nav>
+
       <Sponsors>
-        <img src="/images/sponsors/logo-sponsor-tosho.svg" alt="ToSho logo" />
-        <img src="/images/sponsors/logo-sponsor-wookie.svg" alt="Wookie logo" />
-        <img src="/images/sponsors/logo-sponsor-minimal.svg" alt="Minimal logo" />
+        <a href="https://tosho.agency/" target="_blank" rel="noopener noreferrer">
+          <img src="/images/sponsors/logo-sponsor-tosho.svg" alt="ToSho logo" />
+        </a>
+        <a href="https://wookie.com.ua/ua/" target="_blank" rel="noopener noreferrer">
+          <img src="/images/sponsors/logo-sponsor-wookie.svg" alt="Wookie logo" />
+        </a>
+        <a href="https://www.instagram.com/minimal_coffeeroom/" target="_blank" rel="noopener noreferrer">
+          <img src="/images/sponsors/logo-sponsor-minimal.svg" alt="Minimal logo" />
+        </a>
       </Sponsors>
+
+      <MobileMenuToggle onClick={() => setMenuOpen(!isMenuOpen)}>
+        <span />
+        <span />
+        <span />
+      </MobileMenuToggle>
+
+      <MobileMenu className={isMenuOpen ? 'open' : ''}>
+        <CloseButton onClick={() => setMenuOpen(false)}>×</CloseButton>
+        <a href="#">Головна</a>
+        <a href="#">Склад</a>
+        <a href="#">Матчі</a>
+        <a href="#">Фаншоп</a>
+        <a href="#">Галерея</a>
+        <a href="#">Про нас</a>
+      </MobileMenu>
     </HeaderWrapper>
   );
 };
