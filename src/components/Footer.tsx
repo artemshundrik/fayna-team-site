@@ -125,19 +125,6 @@ const Footer = () => {
         padding: '2rem 1rem'
       }}>
         <div>
-          <img src="/images/logo-fayna-full-white.svg" alt="FAYNA TEAM" height="48" />
-          <p style={{ marginTop: '1rem' }}>Засновано 2024. Віддані досконалості у футзалі.</p>
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <a href="https://www.instagram.com/fc_fayna_team/?igsh=MWx4eXRlMW54NWR2eg%3D%3D&utm_source=qr#" target="_blank" rel="noopener noreferrer">
-              <Instagram size={28} strokeWidth={1.5} />
-            </a>
-            <a href="https://www.youtube.com/@FCFAYNATEAM" target="_blank" rel="noopener noreferrer">
-              <Youtube size={28} strokeWidth={1.5} />
-            </a>
-          </div>
-        </div>
-
-        <div>
           <h4 style={{ textTransform: 'uppercase', fontSize: '1.25rem', marginBottom: '1rem' }}>Швидкі посилання</h4>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <a href="/">Головна</a>
@@ -163,6 +150,19 @@ const Footer = () => {
               <Mail size={18} />
               <a href="mailto:info@faynateam.com">info@faynateam.com</a>
             </div>
+          </div>
+        </div>
+
+        <div style={{ alignSelf: 'start', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', textAlign: 'left' }}>
+          <img src="/images/logo-fayna-full-white.svg" alt="FAYNA TEAM" height="48" />
+          <p style={{ marginTop: '1rem' }}>Засновано 2024. Віддані досконалості у футзалі.</p>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <a href="https://www.instagram.com/fc_fayna_team/?igsh=MWx4eXRlMW54NWR2eg%3D%3D&utm_source=qr#" target="_blank" rel="noopener noreferrer">
+              <Instagram size={28} strokeWidth={1.5} />
+            </a>
+            <a href="https://www.youtube.com/@FCFAYNATEAM" target="_blank" rel="noopener noreferrer">
+              <Youtube size={28} strokeWidth={1.5} />
+            </a>
           </div>
         </div>
       </div>
