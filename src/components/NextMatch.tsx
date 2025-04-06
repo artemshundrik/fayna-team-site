@@ -242,6 +242,7 @@ const NextMatch = () => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -340,7 +341,7 @@ const NextMatch = () => {
                 padding: '0.5rem 1.25rem',
                 borderRadius: '8px',
                 color: 'white',
-              fontSize: '2.5rem',
+                fontSize: '2.5rem',
                 fontWeight: 'bold',
                 textAlign: 'center',
               }}
@@ -369,31 +370,32 @@ const NextMatch = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.75rem',
-              padding: '0.8rem 1.6rem',
-              border: '2px solid white',
-              borderRadius: '0',
+              padding: '0.75rem 1.6rem',
+              background: 'linear-gradient(90deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.1))',
+              border: '1px solid rgba(255, 0, 0, 0.6)',
+              borderRadius: '6px',
               color: 'white',
               textDecoration: 'none',
               fontWeight: 'bold',
               textTransform: 'uppercase',
-              fontSize: '1rem',
-              transition: 'background 0.3s ease, color 0.3s ease',
+              fontSize: '0.9rem',
+              transition: 'background 0.3s ease, border 0.3s ease',
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'white';
-              (e.currentTarget as HTMLAnchorElement).style.color = '#111';
+              e.currentTarget.style.background = 'linear-gradient(90deg, rgb(255, 0, 0), rgb(255, 0, 0))';
+              setIsHovered(true);
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
-              (e.currentTarget as HTMLAnchorElement).style.color = 'white';
+              e.currentTarget.style.background = 'linear-gradient(90deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.1))';
+              setIsHovered(false);
             }}
           >
+            ДИВИТИСЬ ТРАНСЛЯЦІЮ НА YOUTUBE
             <img
-              src="/images/icons/youtube.svg"
+              src={isHovered ? "/images/icons/youtube_white.svg" : "/images/icons/youtube.svg"}
               alt="YouTube"
-              style={{ width: '22px', height: '22px' }}
+              style={{ width: '20px', height: '20px' }}
             />
-            Дивитись трансляцію
           </a>
         </div>
       </Wrapper>
