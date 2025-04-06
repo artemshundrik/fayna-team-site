@@ -63,19 +63,54 @@ const ButtonWrapper = styled.div`
 `;
 
 const Button = styled.a`
-  background: #FF1695;
-  color: #fff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0;
-  font-weight: 600;
-  text-decoration: none;
-  font-family: 'Cuprum', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 4vw, 2rem);
+  font-size: clamp(1rem, 2vw, 1.4rem);
   text-transform: uppercase;
+  font-family: 'Cuprum', sans-serif;
+  text-decoration: none;
+  position: relative;
+  background: linear-gradient(135deg, #FF1695, #ff6ac1);
+  color: white;
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 0 12px rgba(255, 22, 149, 0.5), 0 0 24px rgba(255, 22, 149, 0.3);
+  overflow: hidden;
   transition: background 0.3s;
 
-  &:hover {
-    background: #e6007e;
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: all 0.75s ease;
   }
+
+  &:hover::after {
+    left: 100%;
+  }
+
+  &:hover {
+    background: white;
+    color: #FF1695;
+    box-shadow: 0 6px 16px rgba(255, 22, 149, 0.5);
+  }
+`;
+
+const ScoreBox = styled.div<{ isActive?: boolean }>`
+  background: ${({ isActive }) => (isActive ? '#1e1f22' : '#e9e9e9')};
+  color: ${({ isActive }) => (isActive ? '#fff' : '#6e6e6e')};
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-width: 2.2rem;
+  text-align: center;
 `;
 
 const Fixtures = () => {
@@ -112,7 +147,7 @@ const Fixtures = () => {
               <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
               <strong>BARCELONA</strong>
             </Teams>
-            <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>1 - 0</div>
+            <ScoreBox isActive>1 - 0</ScoreBox>
             <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
           </Card>
 
@@ -126,7 +161,7 @@ const Fixtures = () => {
               <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
               <strong>BARCELONA</strong>
             </Teams>
-            <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>2 - 2</div>
+            <ScoreBox isActive>2 - 2</ScoreBox>
             <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
           </Card>
 
@@ -140,7 +175,7 @@ const Fixtures = () => {
               <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
               <strong>BARCELONA</strong>
             </Teams>
-            <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>22:00</div>
+            <ScoreBox>22:00</ScoreBox>
             <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
           </Card>
         </Grid>
