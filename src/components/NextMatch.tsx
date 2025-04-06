@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
-import { motion } from 'framer-motion';
 
 const GlobalStyle = createGlobalStyle`
   @keyframes shine {
@@ -91,43 +90,8 @@ const FlipUnit = styled.div`
   flex-direction: column;
   align-items: center;
 
-  .flip-card {
-    perspective: 1000px;
-    width: 60px;
-    height: 60px;
-    position: relative;
-  }
-
-  .flip-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.7s ease-in-out;
-  }
-
-  .flip-front,
-  .flip-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    background: #222;
-    color: white;
-    font-size: 2rem;
-    font-weight: bold;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .flip-back {
-    transform: rotateX(180deg);
-  }
-
   .label {
-    margin-top: 0.4rem;
+    margin-top: 0;
     font-size: 0.75rem;
     color: #aaa;
     text-transform: uppercase;
@@ -215,7 +179,7 @@ const TournamentInfo = styled.div`
   margin-bottom: 1.5rem;
 
   img {
-    height: 40px;
+    height: 80px;
     margin-bottom: 0.3rem;
   }
 
@@ -231,7 +195,7 @@ const TournamentInfo = styled.div`
     }
 
     .meta {
-      font-size: 0.9rem;
+      font-size: 1.3rem;
       color: #aaa;
     }
   }
@@ -239,6 +203,7 @@ const TournamentInfo = styled.div`
 
 const NextMatch = () => {
   const matchDate = new Date('2025-04-07T19:00:00');
+  const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -247,9 +212,20 @@ const NextMatch = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
+      const matchDateOnly = new Date(matchDate);
+      matchDateOnly.setHours(0, 0, 0, 0);
+      const nowDateOnly = new Date(now);
+      nowDateOnly.setHours(0, 0, 0, 0);
+      const isSameDay = matchDateOnly.getTime() === nowDateOnly.getTime();
+      const isPast = now > matchDate;
+      let calculatedDays = Math.floor((matchDateOnly.getTime() - nowDateOnly.getTime()) / (1000 * 60 * 60 * 24));
+      if (isSameDay || isPast) {
+        calculatedDays = 0;
+      }
       const distance = matchDate.getTime() - now.getTime();
 
       if (distance <= 0) {
+        setDays(0);
         setHours(0);
         setMinutes(0);
         setSeconds(0);
@@ -260,7 +236,7 @@ const NextMatch = () => {
       const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const s = Math.floor((distance % (1000 * 60)) / 1000);
-
+      setDays(calculatedDays);
       setHours(h);
       setMinutes(m);
       setSeconds(s);
@@ -273,62 +249,41 @@ const NextMatch = () => {
     <>
       <GlobalStyle />
       <Wrapper>
-        <Title>Наступний матч</Title>
-        <DateText>Неділя, 6 квітня 2025</DateText>
+        <TournamentInfo>
+          <a href="https://r-cup.com.ua/tournament/1025060" target="_blank" rel="noopener noreferrer">
+            <img src="/images/matches/logo-tournament.png" alt="Турнір" />
+          </a>
+          <div className="text">
+            <div className="meta">Перша Ліга • Тур 5</div>
+          </div>
+        </TournamentInfo>
         <Countdown>
           <FlipUnit>
-            <div className="flip-card">
-              <motion.div
-                className="flip-inner"
-                key={hours}
-                initial={{ rotateX: 180 }}
-                animate={{ rotateX: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="flip-front">{String(hours).padStart(2, '0')}</div>
-                <div className="flip-back">{String(hours).padStart(2, '0')}</div>
-              </motion.div>
+            <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+              {String(days).padStart(2, '0')}
+            </div>
+            <div className="label">дні</div>
+          </FlipUnit>
+          <FlipUnit>
+            <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+              {String(hours).padStart(2, '0')}
             </div>
             <div className="label">год</div>
           </FlipUnit>
           <FlipUnit>
-            <div className="flip-card">
-              <motion.div
-                className="flip-inner"
-                key={minutes}
-                initial={{ rotateX: 180 }}
-                animate={{ rotateX: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="flip-front">{String(minutes).padStart(2, '0')}</div>
-                <div className="flip-back">{String(minutes).padStart(2, '0')}</div>
-              </motion.div>
+            <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+              {String(minutes).padStart(2, '0')}
             </div>
             <div className="label">хв</div>
           </FlipUnit>
           <FlipUnit>
-            <div className="flip-card">
-              <motion.div
-                className="flip-inner"
-                key={seconds}
-                initial={{ rotateX: 180 }}
-                animate={{ rotateX: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="flip-front">{String(seconds).padStart(2, '0')}</div>
-                <div className="flip-back">{String(seconds).padStart(2, '0')}</div>
-              </motion.div>
+            <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+              {String(seconds).padStart(2, '0')}
             </div>
             <div className="label">сек</div>
           </FlipUnit>
         </Countdown>
-        <TournamentInfo>
-          <img src="/images/matches/logo-tournament.png" alt="Турнір" />
-          <div className="text">
-            <div className="name">R-Cup</div>
-            <div className="meta">Перша Ліга • Тур 5</div>
-          </div>
-        </TournamentInfo>
+        <DateText>Неділя, 6 квітня</DateText>
         <MatchBox>
           <div className="team">
             <span>FAYNA TEAM</span>
@@ -351,11 +306,11 @@ const NextMatch = () => {
           </div>
           <div className="team">
             <img src="/images/matches/logo-opponent-match.svg" alt="Manchester United" />
-            <span>MANCHESTER UNITED</span>
+            <span>BARCELONA</span>
           </div>
         </MatchBox>
         <Stadium>
-          <div className="venue">МАНЕЖ REJO-ВДНХ №1</div>
+          <div className="venue">🏟️ МАНЕЖ REJO-ВДНХ №1</div>
           <div className="address">
             <span className="icon">📍</span>
             <span>Київ, проспект Академіка Глушкова, 1</span>
