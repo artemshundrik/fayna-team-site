@@ -2,11 +2,16 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
-const Section = styled.section`
+const Section = styled(motion.section)`
   padding: 4rem 1rem;
   background-color: #f7f7f7;
   color: black;
   font-family: 'Cuprum', sans-serif;
+`;
+
+const ContentWrapper = styled(motion.div)`
+  max-width: 1200px;
+  margin: 0 auto;
 `;
 
 const Heading = styled(motion.h2)`
@@ -76,67 +81,74 @@ const Button = styled.a`
 const Fixtures = () => {
   return (
     <Section>
-      <Heading
-        initial={{ opacity: 0, y: 30 }}
+      <ContentWrapper
+        initial={{ opacity: 0, y: 60 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
       >
-        Розклад матчів
-      </Heading>
+        <Heading
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          Розклад матчів
+        </Heading>
 
-      <Grid
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-      >
-        <Card>
-          <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Понеділок, 1 квітня, 22:00</div>
-          <Teams>
-            <strong>FAYNA TEAM</strong>
-            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
-            <span>vs</span>
-            <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
-            <strong>BARCELONA</strong>
-          </Teams>
-          <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>1 - 0</div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
-        </Card>
+        <Grid
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <Card>
+            <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
+            <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Понеділок, 1 квітня, 22:00</div>
+            <Teams>
+              <strong>FAYNA TEAM</strong>
+              <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
+              <span>vs</span>
+              <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
+              <strong>BARCELONA</strong>
+            </Teams>
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>1 - 0</div>
+            <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
+          </Card>
 
-        <Card>
-          <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Субота, 6 квітня, 18:30</div>
-          <Teams>
-            <strong>FAYNA TEAM</strong>
-            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
-            <span>vs</span>
-            <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
-            <strong>BARCELONA</strong>
-          </Teams>
-          <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>2 - 2</div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
-        </Card>
+          <Card>
+            <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
+            <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Субота, 6 квітня, 18:30</div>
+            <Teams>
+              <strong>FAYNA TEAM</strong>
+              <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
+              <span>vs</span>
+              <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
+              <strong>BARCELONA</strong>
+            </Teams>
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>2 - 2</div>
+            <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
+          </Card>
 
-        <Card>
-          <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Середа, 10 квітня, 22:00</div>
-          <Teams>
-            <strong>FAYNA TEAM</strong>
-            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
-            <span>vs</span>
-            <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
-            <strong>BARCELONA</strong>
-          </Teams>
-          <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>22:00</div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
-        </Card>
-      </Grid>
+          <Card>
+            <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
+            <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Середа, 10 квітня, 22:00</div>
+            <Teams>
+              <strong>FAYNA TEAM</strong>
+              <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
+              <span>vs</span>
+              <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
+              <strong>BARCELONA</strong>
+            </Teams>
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>22:00</div>
+            <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
+          </Card>
+        </Grid>
 
-      <ButtonWrapper>
-        <Button href="/calendar">Повний календар</Button>
-      </ButtonWrapper>
+        <ButtonWrapper>
+          <Button href="/calendar">Повний календар</Button>
+        </ButtonWrapper>
+      </ContentWrapper>
     </Section>
   );
 };
