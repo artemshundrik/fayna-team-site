@@ -58,11 +58,28 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const Wrapper = styled.section`
-  background-color: #111;
+  background: url('/images/matches/next-match-bg.png') no-repeat center center;
+  background-size: cover;
+  position: relative;
   padding: 4rem 1rem;
   text-align: center;
   color: white;
   font-family: 'Cuprum', sans-serif;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(12px);
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 `;
 
 const Title = styled.h2`
@@ -195,8 +212,9 @@ const TournamentInfo = styled.div`
     }
 
     .meta {
-      font-size: 1.3rem;
-      color: #aaa;
+      font-size: 1rem;
+      color: white;
+      font-weight: 400;
     }
   }
 `;
@@ -254,7 +272,7 @@ const NextMatch = () => {
             <img src="/images/matches/logo-tournament.png" alt="Турнір" />
           </a>
           <div className="text">
-            <div className="meta">Перша Ліга • Тур 5</div>
+            <div className="meta">ПЕРША ЛІГА • ТУР 5</div>
           </div>
         </TournamentInfo>
         <Countdown>
@@ -290,19 +308,20 @@ const NextMatch = () => {
             <img src="/images/matches/logo-fayna-match.svg" alt="Fayna Team" />
           </div>
           <div className="vs">
-            <div
-              style={{
-                background: '#222',
-                padding: '0.5rem 1.25rem',
-                borderRadius: '8px',
-                color: 'white',
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}
-            >
-              19:00
-            </div>
+          <div
+            style={{
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(8px)',
+              padding: '0.5rem 1.25rem',
+              borderRadius: '8px',
+              color: 'white',
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}
+          >
+            19:00
+          </div>
           </div>
           <div className="team">
             <img src="/images/matches/logo-opponent-match.svg" alt="Manchester United" />
