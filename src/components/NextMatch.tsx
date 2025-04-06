@@ -275,7 +275,7 @@ const NextMatch = () => {
       >
         <TournamentInfo>
           <a href="https://r-cup.com.ua/tournament/1025060" target="_blank" rel="noopener noreferrer">
-            <img src="/images/matches/logo-tournament.png" alt="Турнір" />
+            <img src="/images/matches/logo-rejo.png" alt="Турнір" />
           </a>
           <div className="text">
             <div className="meta">ПЕРША ЛІГА • ТУР 5</div>
@@ -330,7 +330,7 @@ const NextMatch = () => {
           </div>
           </div>
           <div className="team">
-            <img src="/images/matches/logo-opponent-match.svg" alt="Manchester United" />
+            <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" />
             <span>BARCELONA</span>
           </div>
         </MatchBox>
