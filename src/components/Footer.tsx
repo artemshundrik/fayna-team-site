@@ -104,14 +104,14 @@ const Footer = () => {
           maxWidth: '1200px',
           margin: '0 auto'
         }}>
+          <a href="https://tosho.agency/" target="_blank" rel="noopener noreferrer">
+            <img src="/images/sponsors/logo-sponsor-tosho-white.svg" alt="Tosho" height="32" style={{ opacity: 0.8, transition: 'opacity 0.3s' }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'} onMouseOut={(e) => e.currentTarget.style.opacity = '0.8'} />
+          </a>
           <a href="https://wookie.com.ua/ua/" target="_blank" rel="noopener noreferrer">
             <img src="/images/sponsors/logo-sponsor-wookie-white.svg" alt="Wookie" height="32" style={{ opacity: 0.8, transition: 'opacity 0.3s' }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'} onMouseOut={(e) => e.currentTarget.style.opacity = '0.8'} />
           </a>
-          <a href="https://minimal_coffeeroom/" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.instagram.com/minimal_coffeeroom" target="_blank" rel="noopener noreferrer">
             <img src="/images/sponsors/logo-sponsor-minimal-white.svg" alt="Minimal" height="32" style={{ opacity: 0.8, transition: 'opacity 0.3s' }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'} onMouseOut={(e) => e.currentTarget.style.opacity = '0.8'} />
-          </a>
-          <a href="https://tosho.agency/" target="_blank" rel="noopener noreferrer">
-            <img src="/images/sponsors/logo-sponsor-tosho-white.svg" alt="Tosho" height="32" style={{ opacity: 0.8, transition: 'opacity 0.3s' }} onMouseOver={(e) => e.currentTarget.style.opacity = '1'} onMouseOut={(e) => e.currentTarget.style.opacity = '0.8'} />
           </a>
         </div>
       </div>

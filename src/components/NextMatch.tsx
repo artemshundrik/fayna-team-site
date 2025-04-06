@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import styled, { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -266,7 +267,12 @@ const NextMatch = () => {
   return (
     <>
       <GlobalStyle />
-      <Wrapper>
+      <Wrapper as={motion.section}
+        initial={{ opacity: 0, y: 80 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.9, ease: 'easeOut' }}
+      >
         <TournamentInfo>
           <a href="https://r-cup.com.ua/tournament/1025060" target="_blank" rel="noopener noreferrer">
             <img src="/images/matches/logo-tournament.png" alt="Турнір" />
@@ -329,7 +335,7 @@ const NextMatch = () => {
           </div>
         </MatchBox>
         <Stadium>
-          <div className="venue">🏟️ МАНЕЖ REJO-ВДНХ №1</div>
+          <div className="venue">🏟 МАНЕЖ REJO-ВДНХ №1</div>
           <div className="address">
             <span className="icon">📍</span>
             <span>Київ, проспект Академіка Глушкова, 1</span>
