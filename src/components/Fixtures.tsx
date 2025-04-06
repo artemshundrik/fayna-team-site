@@ -46,22 +46,26 @@ const Card = styled.div`
 const Teams = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
 `;
 
 const ButtonWrapper = styled.div`
   text-align: center;
-  margin-top: 2rem;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
 `;
 
 const Button = styled.a`
   background: #FF1695;
   color: #fff;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 0;
   font-weight: 600;
   text-decoration: none;
   font-family: 'Cuprum', sans-serif;
+  text-transform: uppercase;
   transition: background 0.3s;
 
   &:hover {
@@ -89,44 +93,44 @@ const Fixtures = () => {
       >
         <Card>
           <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>1 квітня, 22:00</div>
+          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Понеділок, 1 квітня, 22:00</div>
           <Teams>
-            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA" height="36" />
-            <strong>FAYNA</strong>
+            <strong>FAYNA TEAM</strong>
+            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
             <span>vs</span>
-            <strong>BARCELONA</strong>
             <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
+            <strong>BARCELONA</strong>
           </Teams>
           <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>1 - 0</div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>R-Cup • The City Ground</div>
+          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
         </Card>
 
         <Card>
           <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>6 квітня, 18:30</div>
+          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Субота, 6 квітня, 18:30</div>
           <Teams>
-            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA" height="36" />
-            <strong>FAYNA</strong>
+            <strong>FAYNA TEAM</strong>
+            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
             <span>vs</span>
-            <strong>BARCELONA</strong>
             <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
+            <strong>BARCELONA</strong>
           </Teams>
           <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>2 - 2</div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>R-Cup • Old Trafford</div>
+          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
         </Card>
 
         <Card>
           <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>10 квітня, 22:00</div>
+          <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Середа, 10 квітня, 22:00</div>
           <Teams>
-            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA" height="36" />
-            <strong>FAYNA</strong>
+            <strong>FAYNA TEAM</strong>
+            <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
             <span>vs</span>
-            <strong>BARCELONA</strong>
             <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
+            <strong>BARCELONA</strong>
           </Teams>
           <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>22:00</div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>R-Cup • Groupama Stadium</div>
+          <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
         </Card>
       </Grid>
 
