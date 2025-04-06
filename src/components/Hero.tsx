@@ -13,6 +13,7 @@ const Section = styled.section`
   justify-content: flex-end;
   padding: 0 1rem 6rem;
   overflow: hidden;
+  border-radius: 8px;
 
   @media (max-width: 768px) {
     height: 90vh;
@@ -31,6 +32,7 @@ const Section = styled.section`
     z-index: 0;
     transition: transform 1.5s ease;
     animation: zoomOut 1.5s ease forwards;
+    border-radius: 8px;
   }
 `;
 

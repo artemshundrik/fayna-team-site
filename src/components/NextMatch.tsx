@@ -353,7 +353,7 @@ const NextMatch = () => {
               padding: '0.75rem 1.6rem',
               background: 'linear-gradient(90deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.1))',
               border: '1px solid rgba(255, 0, 0, 0.6)',
-              borderRadius: '6px',
+              borderRadius: '0px',
               color: 'white',
               textDecoration: 'none',
               fontWeight: 'bold',
