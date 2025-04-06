@@ -12,6 +12,12 @@ const Section = styled.section`
   flex-direction: column;
   justify-content: flex-end;
   padding: 0 1rem 6rem;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    height: 90vh;
+    padding-bottom: 4rem;
+  }
 
   &::before {
     content: '';
@@ -20,7 +26,8 @@ const Section = styled.section`
     background-image: inherit;
     background-size: cover;
     background-position: center;
-    transform: scale(1.1);
+    transform: scale(1.1) translateY(-2%);
+    will-change: transform;
     z-index: 0;
     transition: transform 1.5s ease;
     animation: zoomOut 1.5s ease forwards;
@@ -30,8 +37,12 @@ const Section = styled.section`
 const Overlay = styled.div`
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.85) 100%);
   z-index: 1;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 70%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 70%, black 100%);
 `;
 
 const Content = styled.div`
@@ -44,7 +55,7 @@ const Content = styled.div`
 `;
 
 const Logo = styled.div`
-  max-width: 320px;
+  max-width: 256px;
   width: 90%;
   height: auto;
   margin: 0 auto 3rem;
