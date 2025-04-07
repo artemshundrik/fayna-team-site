@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const HeaderWrapper = styled.header`
@@ -181,16 +182,16 @@ const Header = () => {
   return (
     <HeaderWrapper>
       <Logo>
-        <a href="/">
+        <Link to="/">
           <img src="/images/logo-fayna.svg" alt="FAYNA TEAM logo" />
-        </a>
+        </Link>
       </Logo>
 
       <Nav>
-        <a href="#" className="active">Головна</a>
+        <Link to="/" className="active">Головна</Link>
         <a href="#">Склад</a>
+        <Link to="/fanshop">Фаншоп</Link>
         <a href="#">Матчі</a>
-        <a href="#">Фаншоп</a>
         <a href="#">Галерея</a>
         <a href="#">Про нас</a>
       </Nav>
@@ -215,10 +216,10 @@ const Header = () => {
 
       <MobileMenu className={isMenuOpen ? 'open' : ''}>
         <CloseButton onClick={() => setMenuOpen(false)}>×</CloseButton>
-        <a href="#">Головна</a>
+        <Link to="/" onClick={() => setMenuOpen(false)}>Головна</Link>
         <a href="#">Склад</a>
+        <Link to="/fanshop" onClick={() => setMenuOpen(false)}>Фаншоп</Link>
         <a href="#">Матчі</a>
-        <a href="#">Фаншоп</a>
         <a href="#">Галерея</a>
         <a href="#">Про нас</a>
       </MobileMenu>

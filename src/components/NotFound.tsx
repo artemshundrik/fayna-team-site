@@ -79,16 +79,16 @@ const ContentWrapper = styled.div`
   padding: 2rem;
 `;
 
-function Fanshop() {
+export default function NotFound() {
   return (
     <PageWrapper>
       <Header />
       <ContentWrapper>
         <div style={{ maxWidth: '600px', width: '100%' }}>
           <AnimatedWrapper>
-            <div style={{ fontSize: '8rem', marginBottom: '1rem' }}>🛍️</div>
-            <h1>Фаншоп скоро відкриється!</h1>
-            <p style={{ fontSize: '1.5rem', marginTop: '0rem' }}>Ми готуємо для вас класний мерч 💙💛</p>
+            <div style={{ fontSize: '8rem', marginBottom: '1rem' }}>🚫</div>
+            <h1 style={{ marginBottom: '0.5rem' }}>Сторінку не знайдено</h1>
+            <p style={{ fontSize: '1.5rem', marginTop: '0' }}>Ой! Схоже ця сторінка відправлена у аут.</p>
             <StyledLink to="/">Повернутись на головну</StyledLink>
           </AnimatedWrapper>
         </div>
@@ -96,5 +96,3 @@ function Fanshop() {
     </PageWrapper>
   );
 }
-
-export default Fanshop;

@@ -1,16 +1,16 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import NotFound from "./components/NotFound";
 import Home from './pages/Home';
-// import Team from './pages/Team';
-// import Fanshop from './pages/Fanshop';
+import Fanshop from './pages/Fanshop';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* <Route path="/team" element={<Team />} /> */}
-        {/* <Route path="/fanshop" element={<Fanshop />} /> */}
+        <Route path="/fanshop" element={<Fanshop />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
