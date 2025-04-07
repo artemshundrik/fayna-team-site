@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <title>404 – Поле не знайдено</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: 'Cuprum', sans-serif;
+        background: #f9f9f9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5vh 2rem;
+        text-align: center;
+      }
+      img {
+        max-width: 100%;
+        width: 420px;
+        margin-bottom: 2rem;
+      }
+      h1 {
+        font-size: 3rem;
+        margin: 0;
+        font-family: 'Cuprum', sans-serif;
+      }
+      p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        font-family: 'Cuprum', sans-serif;
+      }
+      a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 4vw, 2rem);
+        font-size: clamp(1rem, 2vw, 1.4rem);
+        text-transform: uppercase;
+        font-family: 'Cuprum', sans-serif;
+        text-decoration: none;
+        position: relative;
+        background: black;
+        color: white;
+        border: none;
+        border-radius: 0;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.4), 0 0 24px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        transition: background 0.3s;
+      }
+
+      a::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: all 0.75s ease;
+      }
+
+      a:hover::after {
+        left: 100%;
+      }
+
+      a:hover {
+        background: white;
+        color: black;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <img src="/404.svg" alt="404" />
+    <h1>404 – Поле не знайдено</h1>
+    <p>Можливо, м’яч вилетів за межі майданчика або сторінка втекла на заміну.</p>
+    <a href="/">на головну</a>
+  </body>
+</html>
