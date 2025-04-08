@@ -191,7 +191,7 @@ const Header = () => {
         <Link to="/" className="active">Головна</Link>
         <a href="#">Склад</a>
         <Link to="/fanshop">Фаншоп</Link>
-        <a href="#">Матчі</a>
+        <Link to="/matches">Матчі</Link>
         <a href="#">Галерея</a>
         <a href="#">Про нас</a>
       </Nav>
@@ -219,7 +219,7 @@ const Header = () => {
         <Link to="/" onClick={() => setMenuOpen(false)}>Головна</Link>
         <a href="#">Склад</a>
         <Link to="/fanshop" onClick={() => setMenuOpen(false)}>Фаншоп</Link>
-        <a href="#">Матчі</a>
+        <Link to="/matches" onClick={() => setMenuOpen(false)}>Матчі</Link>
         <a href="#">Галерея</a>
         <a href="#">Про нас</a>
       </MobileMenu>

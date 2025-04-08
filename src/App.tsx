@@ -4,6 +4,7 @@ import NotFound from "./components/NotFound";
 import Home from './pages/Home';
 import Fanshop from './pages/Fanshop';
 import PasswordGate from './PasswordGate';
+import Matches from './pages/Matches';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/fanshop" element={<Fanshop />} />
+          <Route path="/matches" element={<Matches />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

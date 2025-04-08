@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://fayna.team/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://fayna.team/matches</loc>
+  </url>
+  <url>
+    <loc>https://fayna.team/team</loc>
+  </url>
+  <url>
+    <loc>https://fayna.team/stats</loc>
+  </url>
+  <url>
+    <loc>https://fayna.team/about</loc>
+  </url>
+</urlset>
