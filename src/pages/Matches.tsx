@@ -47,14 +47,14 @@ const MatchesList = styled.div`
   gap: 1rem;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 0;
+  padding: 1rem 2rem;
 `;
 
 const MatchesGrid = styled.div`
   display: flex;
   justify-content: space-between;
   flex-wrap: nowrap;
-  gap: 2rem;
+  gap: 1rem;
   max-width: 1200px;
   margin: 0 auto 2rem;
 `;
@@ -118,25 +118,18 @@ const CenterContentWrapper = styled.div`
   margin-left: -11rem;
 `;
 
-const Tabs = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin: 2rem 0 1rem;
-`;
-
 const Tab = styled.button<{ active: boolean }>`
+  font-size: 1.25rem;
+  text-transform: uppercase;
   background: none;
   border: none;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  color: ${({ active }) => (active ? '#111' : '#888')};
-  border-bottom: ${({ active }) => (active ? '2px solid #111' : 'none')};
+  color: ${({ active }) => (active ? '#FF1695' : '#111')};
   padding-bottom: 0.5rem;
-
+  text-align: left;
   &:hover {
-    color: #000;
+    color: #FF1695;
   }
 `;
 
@@ -248,7 +241,7 @@ const Matches: React.FC = () => {
           {lastMatch && (
             <FixtureTile>
               <Badge variant="last">Минула гра</Badge>
-              <img src="/images/matches/logo-rejo.png" alt="Rejo" height="80" style={{ marginBottom: '1rem' }} />
+              <img src="/images/matches/logo-rejo.png" alt="Rejo" height="64" style={{ marginBottom: '0.25rem' }} />
               <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>{formatDateWithTime(lastMatch.date, lastMatch.time)}</div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
                 <strong style={{ fontSize: '1.1rem' }}>{lastMatch.teams.split(' проти ')[0]}</strong>
@@ -264,7 +257,7 @@ const Matches: React.FC = () => {
           {nextMatch && (
             <FixtureTile>
               <Badge variant="next">Наступна гра</Badge>
-              <img src="/images/matches/logo-rejo.png" alt="Rejo" height="80" style={{ marginBottom: '1rem' }} />
+              <img src="/images/matches/logo-rejo.png" alt="Rejo" height="64" style={{ marginBottom: '0.25rem' }} />
               <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>{formatDateWithTime(nextMatch.date, nextMatch.time)}</div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
                 <strong style={{ fontSize: '1.1rem' }}>{nextMatch.teams.split(' проти ')[0]}</strong>
@@ -278,12 +271,12 @@ const Matches: React.FC = () => {
           )}
         </MatchesGrid>
 
-        <Tabs>
-          <Tab active={activeTab === 'upcoming'} onClick={() => setActiveTab('upcoming')}>Майбутні</Tab>
-          <Tab active={activeTab === 'past'} onClick={() => setActiveTab('past')}>Зіграні</Tab>
-        </Tabs>
-        
         <MatchesList>
+          <div style={{ display: 'flex', gap: '2rem', marginBottom: '1rem' }}>
+            <Tab active={activeTab === 'upcoming'} onClick={() => setActiveTab('upcoming')}>Майбутні</Tab>
+            <Tab active={activeTab === 'past'} onClick={() => setActiveTab('past')}>Зіграні</Tab>
+          </div>
+          
           {(activeTab === 'upcoming' ? futureMatches : pastMatches).map((match, index) => (
             <MatchStripe key={index}>
               <LeftColumn>
@@ -291,7 +284,7 @@ const Matches: React.FC = () => {
                   <img
                     src={match.tournamentLogo}
                     alt="Логотип турніру"
-                    style={{ height: '80px' }}
+                    style={{ height: '64px' }}
                   />
                   <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>ПЕРША ЛІГА • ТУР {index + 1}</span>
                 </div>
@@ -299,7 +292,7 @@ const Matches: React.FC = () => {
 
               <CenterColumn>
                 <CenterContentWrapper>
-                  <p style={{ fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 0.5rem 0' }}>{formatDateWithTime(match.date, match.time)}</p>
+                  <p style={{ fontSize: '1.1rem', opacity: 0.8, margin: '0 0 0.5rem 0' }}>{formatDateWithTime(match.date, match.time)}</p>
                   {(() => {
                     const teamsArray = match.teams.split(' проти ');
                     return (
