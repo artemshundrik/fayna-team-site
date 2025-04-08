@@ -1,12 +1,31 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Header from '../components/Header';
+import Layout from '../layout/Layout';
+
+const formatDateWithTime = (dateStr: string, time: string) => {
+  const date = new Date(dateStr);
+
+  const days = [
+    'Неділя',
+    'Понеділок',
+    'Вівторок',
+    'Середа',
+    'Четвер',
+    'Пʼятниця',
+    'Субота',
+  ];
+
+  const dayOfWeek = days[date.getDay()];
+  const day = date.getDate();
+  const month = date.toLocaleDateString('uk-UA', { month: 'long' });
+
+  return `${dayOfWeek}, ${day} ${month}, ${time}`;
+};
 
 const Wrapper = styled.div`
   font-family: 'Cuprum', sans-serif;
   min-height: 100vh;
   padding: 2rem;
-  margin-top: 80px;
   background: #f7f7f7;
   color: #111;
   text-align: center;
@@ -22,14 +41,6 @@ const Paragraph = styled.p`
   color: #555;
 `;
 
-const HeaderWrapper = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-`;
-
 const MatchesList = styled.div`
   display: flex;
   flex-direction: column;
@@ -37,6 +48,15 @@ const MatchesList = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem 0;
+`;
+
+const MatchesGrid = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
 `;
 
 const MatchStripe = styled.div`
@@ -48,8 +68,19 @@ const MatchStripe = styled.div`
 `;
 
 const ScoreBox = styled.div`
-  background: #1e1f22; /* dark background */
-  color: #fff;        /* white text */
+  background: #1e1f22;
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-width: 2.2rem;
+  text-align: center;
+`;
+
+const TimeBox = styled.div`
+  background: #e9e9e9;
+  color: #6e6e6e;
   padding: 0.4rem 0.8rem;
   border-radius: 0.4rem;
   font-size: 1.1rem;
@@ -110,16 +141,36 @@ const Tab = styled.button<{ active: boolean }>`
 `;
 
 const FixtureTile = styled.div`
+  position: relative;
   background: #fff;
-  border-radius: 0.5rem;
-  padding: 1rem 1.5rem;
+  border-radius: 0;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  align-items: flex-start;
-  max-width: 500px;
-  margin: 0 auto 1rem;
-  text-align: left;
+  gap: 1rem;
+  align-items: center;
+  width: 48%;
+  text-align: center;
+  box-shadow: none;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const Badge = styled.div<{ variant?: 'last' | 'next' }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: ${({ variant }) => (variant === 'next' ? '#000' : '#e9e9e9')};
+  color: ${({ variant }) => (variant === 'next' ? '#fff' : '#6e6e6e')};
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 0.4rem 1rem;
+  border-radius: 0;
+  z-index: 10;
 `;
 
 const Matches: React.FC = () => {
@@ -188,89 +239,44 @@ const Matches: React.FC = () => {
   const nextMatch = futureMatches[0];
 
   return (
-    <>
-      <HeaderWrapper>
-        <Header />
-      </HeaderWrapper>
+    <Layout>
       <Wrapper>
         <Heading>Матчі</Heading>
         <Paragraph>Незабаром тут буде розклад, результати та статистика матчів команди FAYNA TEAM.</Paragraph>
         
-        {lastMatch && (
-          <MatchStripe>
-            <LeftColumn>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>LAST MATCH</span>
+        <MatchesGrid>
+          {lastMatch && (
+            <FixtureTile>
+              <Badge variant="last">Минула гра</Badge>
+              <img src="/images/matches/logo-rejo.png" alt="Rejo" height="80" style={{ marginBottom: '1rem' }} />
+              <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>{formatDateWithTime(lastMatch.date, lastMatch.time)}</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+                <strong style={{ fontSize: '1.1rem' }}>{lastMatch.teams.split(' проти ')[0]}</strong>
+                <img src={lastMatch.team1Logo} alt="Команда 1" style={{ height: '40px' }} />
+                <ScoreBox>{lastMatch.score}</ScoreBox>
+                <img src={lastMatch.team2Logo} alt="Команда 2" style={{ height: '40px' }} />
+                <strong style={{ fontSize: '1.1rem' }}>{lastMatch.teams.split(' проти ')[1]}</strong>
               </div>
-            </LeftColumn>
+              <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>{lastMatch.stadium}</div>
+            </FixtureTile>
+          )}
 
-            <CenterColumn>
-              <CenterContentWrapper>
-                <p style={{ fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 0.5rem 0' }}>
-                  {new Date(lastMatch.date).toLocaleDateString('uk-UA', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
-                {(() => {
-                  const teamsArray = lastMatch.teams.split(' проти ');
-                  return (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <strong style={{ fontSize: '1.1rem' }}>{teamsArray[0]}</strong>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <img src={lastMatch.team1Logo} alt="Логотип команди 1" style={{ height: '40px' }} />
-                        <ScoreBox>{lastMatch.score}</ScoreBox>
-                        <img src={lastMatch.team2Logo} alt="Логотип команди 2" style={{ height: '40px' }} />
-                      </div>
-                      <strong style={{ fontSize: '1.1rem' }}>{teamsArray[1]}</strong>
-                    </div>
-                  );
-                })()}
-                <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: '#666' }}>{lastMatch.stadium}</p>
-              </CenterContentWrapper>
-            </CenterColumn>
-          </MatchStripe>
-        )}
-
-        {nextMatch && (
-          <MatchStripe>
-            <LeftColumn>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>NEXT MATCH</span>
+          {nextMatch && (
+            <FixtureTile>
+              <Badge variant="next">Наступна гра</Badge>
+              <img src="/images/matches/logo-rejo.png" alt="Rejo" height="80" style={{ marginBottom: '1rem' }} />
+              <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>{formatDateWithTime(nextMatch.date, nextMatch.time)}</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+                <strong style={{ fontSize: '1.1rem' }}>{nextMatch.teams.split(' проти ')[0]}</strong>
+                <img src={nextMatch.team1Logo} alt="Команда 1" style={{ height: '40px' }} />
+                <TimeBox>{nextMatch.time}</TimeBox>
+                <img src={nextMatch.team2Logo} alt="Команда 2" style={{ height: '40px' }} />
+                <strong style={{ fontSize: '1.1rem' }}>{nextMatch.teams.split(' проти ')[1]}</strong>
               </div>
-            </LeftColumn>
-
-            <CenterColumn>
-              <CenterContentWrapper>
-                <p style={{ fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 0.5rem 0' }}>
-                  {new Date(nextMatch.date).toLocaleDateString('uk-UA', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
-                {(() => {
-                  const teamsArray = nextMatch.teams.split(' проти ');
-                  return (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <strong style={{ fontSize: '1.1rem' }}>{teamsArray[0]}</strong>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <img src={nextMatch.team1Logo} alt="Логотип команди 1" style={{ height: '40px' }} />
-                        <ScoreBox>{nextMatch.time}</ScoreBox>
-                        <img src={nextMatch.team2Logo} alt="Логотип команди 2" style={{ height: '40px' }} />
-                      </div>
-                      <strong style={{ fontSize: '1.1rem' }}>{teamsArray[1]}</strong>
-                    </div>
-                  );
-                })()}
-                <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: '#666' }}>{nextMatch.stadium}</p>
-              </CenterContentWrapper>
-            </CenterColumn>
-          </MatchStripe>
-        )}
+              <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>{nextMatch.stadium}</div>
+            </FixtureTile>
+          )}
+        </MatchesGrid>
 
         <Tabs>
           <Tab active={activeTab === 'upcoming'} onClick={() => setActiveTab('upcoming')}>Майбутні</Tab>
@@ -293,16 +299,11 @@ const Matches: React.FC = () => {
 
               <CenterColumn>
                 <CenterContentWrapper>
-                  <p style={{ fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 0.5rem 0' }}>{new Date(match.date).toLocaleDateString('uk-UA', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}</p>
+                  <p style={{ fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 0.5rem 0' }}>{formatDateWithTime(match.date, match.time)}</p>
                   {(() => {
                     const teamsArray = match.teams.split(' проти ');
                     return (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <strong style={{ fontSize: '1.1rem' }}>{teamsArray[0]}</strong>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                           <img
@@ -310,7 +311,11 @@ const Matches: React.FC = () => {
                             alt="Логотип команди 1"
                             style={{ height: '40px' }}
                           />
-                          <ScoreBox>{activeTab === 'past' ? match.score : match.time}</ScoreBox>
+                          {activeTab === 'past' ? (
+                            <ScoreBox>{match.score}</ScoreBox>
+                          ) : (
+                            <TimeBox>{match.time}</TimeBox>
+                          )}
                           <img
                             src={match.team2Logo}
                             alt="Логотип команди 2"
@@ -328,7 +333,7 @@ const Matches: React.FC = () => {
           ))}
         </MatchesList>
       </Wrapper>
-    </>
+    </Layout>
   );
 };
 
