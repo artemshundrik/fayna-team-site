@@ -17,7 +17,7 @@ const formatDateWithTime = (dateStr: string, time: string) => {
 
   const dayOfWeek = days[date.getDay()];
   const day = date.getDate();
-  const month = date.toLocaleDateString('uk-UA', { month: 'long' });
+  const month = date.toLocaleDateString('uk-UA', { month: 'long' }).replace('травень', 'травня').replace('червень', 'червня').replace('липень', 'липня').replace('вересень', 'вересня').replace('жовтень', 'жовтня').replace('грудень', 'грудня').replace('січень', 'січня').replace('лютий', 'лютого').replace('березень', 'березня').replace('квітень', 'квітня').replace('серпень', 'серпня').replace('листопад', 'листопада');
 
   return `${dayOfWeek}, ${day} ${month}, ${time}`;
 };
@@ -60,11 +60,17 @@ const MatchesGrid = styled.div`
 `;
 
 const MatchStripe = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   background: #fff;
   padding: 1rem 2rem;
+  gap: 1rem;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const ScoreBox = styled.div`
@@ -90,46 +96,39 @@ const TimeBox = styled.div`
 `;
 
 const LeftColumn = styled.div`
-  flex: 1;
-  text-align: left;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 0.5rem;
+  align-items: center;
 `;
 
 const CenterColumn = styled.div`
-  flex: 2;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 0.25rem;
-  padding-left: 0;
+  text-align: center;
+  justify-self: center;
 `;
 
 const CenterContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
-  margin-left: -11rem;
 `;
 
 const Tab = styled.button<{ active: boolean }>`
+  font-family: 'Cuprum', sans-serif;
   font-size: 1.25rem;
+  font-weight: 600;
   text-transform: uppercase;
   background: none;
   border: none;
-  font-weight: 600;
   cursor: pointer;
   color: ${({ active }) => (active ? '#FF1695' : '#111')};
-  padding-bottom: 0.5rem;
+  padding: 0;
   text-align: left;
+  transition: color 0.3s ease, transform 0.3s ease;
+
   &:hover {
     color: #FF1695;
+    transform: translateY(-2px);
   }
 `;
 
@@ -166,20 +165,17 @@ const Badge = styled.div<{ variant?: 'last' | 'next' }>`
   z-index: 10;
 `;
 
+const RightColumn = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+`;
+
 const Matches: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [expandedMatchIndex, setExpandedMatchIndex] = useState<number | null>(null);
 
   const matchData = [
-    {
-      date: '2025-04-09',
-      time: '22:00',
-      teams: 'FAYNA TEAM проти BARCELONA',
-      competition: 'Чвертьфінал Ліги Чемпіонів УЄФА',
-      stadium: 'Манеж REJO-ВДНХ №1',
-      tournamentLogo: '/images/matches/logo-rejo.png',
-      team1Logo: '/images/matches/logo-fayna-match-black.svg',
-      team2Logo: '/images/matches/logo-barcelona.svg',
-    },
     {
       date: '2025-04-12',
       time: '22:00',
@@ -278,51 +274,133 @@ const Matches: React.FC = () => {
           </div>
           
           {(activeTab === 'upcoming' ? futureMatches : pastMatches).map((match, index) => (
-            <MatchStripe key={index}>
-              <LeftColumn>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <img
-                    src={match.tournamentLogo}
-                    alt="Логотип турніру"
-                    style={{ height: '64px' }}
-                  />
-                  <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>ПЕРША ЛІГА • ТУР {index + 1}</span>
-                </div>
-              </LeftColumn>
+            <React.Fragment key={index}>
+              <MatchStripe
+                onClick={() =>
+                  activeTab === 'past'
+                    ? setExpandedMatchIndex(expandedMatchIndex === index ? null : index)
+                    : null
+                }
+                style={{ cursor: activeTab === 'past' ? 'pointer' : 'default' }}
+              >
+                <LeftColumn>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <img
+                      src={match.tournamentLogo}
+                      alt="Логотип турніру"
+                      style={{ height: '64px' }}
+                    />
+                    <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>ПЕРША ЛІГА • ТУР {index + 1}</span>
+                  </div>
+                </LeftColumn>
 
-              <CenterColumn>
-                <CenterContentWrapper>
-                  <p style={{ fontSize: '1.1rem', opacity: 0.8, margin: '0 0 0.5rem 0' }}>{formatDateWithTime(match.date, match.time)}</p>
-                  {(() => {
-                    const teamsArray = match.teams.split(' проти ');
-                    return (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <strong style={{ fontSize: '1.1rem' }}>{teamsArray[0]}</strong>
+                <CenterColumn>
+                  <CenterContentWrapper>
+                    <p style={{ fontSize: '1.1rem', opacity: 0.8, margin: '0 0 0.5rem 0' }}>{formatDateWithTime(match.date, match.time)}</p>
+                    {(() => {
+                      const teamsArray = match.teams.split(' проти ');
+                      return (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                          <img
-                            src={match.team1Logo}
-                            alt="Логотип команди 1"
-                            style={{ height: '40px' }}
-                          />
-                          {activeTab === 'past' ? (
-                            <ScoreBox>{match.score}</ScoreBox>
-                          ) : (
-                            <TimeBox>{match.time}</TimeBox>
-                          )}
-                          <img
-                            src={match.team2Logo}
-                            alt="Логотип команди 2"
-                            style={{ height: '40px' }}
-                          />
+                          <strong style={{ fontSize: '1.1rem' }}>{teamsArray[0]}</strong>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <img
+                              src={match.team1Logo}
+                              alt="Логотип команди 1"
+                              style={{ height: '40px' }}
+                            />
+                            {activeTab === 'past' && match.score ? (
+                              <ScoreBox>{match.score}</ScoreBox>
+                            ) : (
+                              <TimeBox>{match.time}</TimeBox>
+                            )}
+                            <img
+                              src={match.team2Logo}
+                              alt="Логотип команди 2"
+                              style={{ height: '40px' }}
+                            />
+                          </div>
+                          <strong style={{ fontSize: '1.1rem' }}>{teamsArray[1]}</strong>
                         </div>
-                        <strong style={{ fontSize: '1.1rem' }}>{teamsArray[1]}</strong>
-                      </div>
-                    );
-                  })()}
-                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: '#666' }}>{match.stadium}</p>
-                </CenterContentWrapper>
-              </CenterColumn>
-            </MatchStripe>
+                      );
+                    })()}
+                    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: '#666' }}>{match.stadium}</p>
+                  </CenterContentWrapper>
+                </CenterColumn>
+
+                {activeTab === 'past' && (
+                  <RightColumn>
+                    <a
+                      href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" // Заміни на свій лінк
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.6rem',
+                        color: '#FF0000',
+                        textDecoration: 'underline',
+                        fontWeight: 'bold',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <img
+                          src="/images/icons/youtube.svg"
+                          alt="YouTube"
+                          style={{ width: '20px', height: '20px' }}
+                        />
+                        Дивитись огляд
+                      </span>
+                    </a>
+                  </RightColumn>
+                )}
+              </MatchStripe>
+
+              {activeTab === 'past' && expandedMatchIndex === index && (
+                <div
+                  style={{
+                    background: '#fff',
+                    borderTop: '1px solid #ddd',
+                    padding: '2rem 0 2rem 11rem',
+                    marginBottom: '0',
+                    fontSize: '0.95rem',
+                    color: '#333',
+                  }}
+                >
+                  <div
+                    style={{
+                      maxWidth: '900px',
+                      margin: '0 auto',
+                      display: 'flex',
+                      gap: '3rem',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    {/* LEFT COLUMN */}
+                    <div style={{ flex: '1', minWidth: '260px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {/* GOALS */}
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <li>Іванов, 17' ⚽</li>
+                        <li>Петров, 54' ⚽</li>
+                      </ul>
+
+                      {/* CARDS */}
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                        <li>Сидоренко, 22' 🟨</li>
+                      </ul>
+
+                      {/* Гравець матчу */}
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                        <li>Іванов ⭐</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </React.Fragment>
           ))}
         </MatchesList>
       </Wrapper>
