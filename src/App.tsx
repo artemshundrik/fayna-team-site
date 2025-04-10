@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Fanshop from './pages/Fanshop';
 import PasswordGate from './PasswordGate';
 import Matches from './pages/Matches';
+import Squad from './pages/Squad';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/fanshop" element={<Fanshop />} />
           <Route path="/matches" element={<Matches />} />
+          <Route path="/squad" element={<Squad />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

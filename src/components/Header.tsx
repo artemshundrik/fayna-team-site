@@ -189,7 +189,7 @@ const Header = () => {
 
       <Nav>
         <Link to="/" className="active">Головна</Link>
-        <a href="#">Склад</a>
+        <Link to="/squad">Склад</Link>
         <Link to="/fanshop">Фаншоп</Link>
         <Link to="/matches">Матчі</Link>
         <a href="#">Галерея</a>
@@ -217,7 +217,7 @@ const Header = () => {
       <MobileMenu className={isMenuOpen ? 'open' : ''}>
         <CloseButton onClick={() => setMenuOpen(false)}>×</CloseButton>
         <Link to="/" onClick={() => setMenuOpen(false)}>Головна</Link>
-        <a href="#">Склад</a>
+        <Link to="/squad" onClick={() => setMenuOpen(false)}>Склад</Link>
         <Link to="/fanshop" onClick={() => setMenuOpen(false)}>Фаншоп</Link>
         <Link to="/matches" onClick={() => setMenuOpen(false)}>Матчі</Link>
         <a href="#">Галерея</a>

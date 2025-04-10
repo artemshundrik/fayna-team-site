@@ -70,17 +70,18 @@ const columns = [
   { key: 'wins', label: 'В', width: '2.5rem', align: 'right' },
   { key: 'draws', label: 'Н', width: '2.5rem', align: 'right' },
   { key: 'losses', label: 'П', width: '2.5rem', align: 'right' },
-  { key: 'goals', label: '+/-', width: '3.5rem', align: 'right' },
+  { key: 'goals', label: 'МЗ/МП', width: '3.5rem', align: 'right' },
   { key: 'form', label: 'ФОРМА', width: 'auto', align: 'left' },
 ];
 
 const headerRowStyle = {
   display: 'flex',
-  padding: '1rem',
+  padding: '1rem 1rem 1rem 0.5rem',
   backgroundColor: '#f6f6f6',
   fontSize: '0.9rem',
   color: '#444',
-  borderBottom: 'none'
+  borderBottom: 'none',
+  alignItems: 'center'
 };
 
 const rowStyle = {
@@ -115,7 +116,10 @@ const Table = () => {
             textAlign: col.align as 'left' | 'right',
             display: 'flex',
             justifyContent: col.align === 'right' ? 'flex-end' : 'flex-start',
-            fontWeight: 700
+            alignItems: 'center',
+            fontWeight: 700,
+            paddingLeft: col.align === 'left' ? '1.5rem' : '1rem',
+            paddingRight: col.align === 'right' ? '1rem' : '0'
           }}>
             {col.key === 'team' ? <span style={{ textTransform: 'uppercase' }}>{col.label}</span> : col.label}
           </div>
@@ -131,7 +135,7 @@ const Table = () => {
             switch (col.key) {
               case 'place':
                 return (
-                  <div key={i} style={{ width: col.width, display: 'flex', justifyContent: 'flex-end', fontWeight: 600 }}>
+                  <div key={i} style={{ width: col.width, display: 'flex', justifyContent: 'flex-end', fontWeight: 600, paddingLeft: '0.5rem' }}>
                     {team.place} {getPositionIcon(team.positionChange)}
                   </div>
                 );
@@ -151,9 +155,12 @@ const Table = () => {
               case 'wins':
               case 'draws':
               case 'losses':
+                return (
+                  <div key={i} style={{ width: col.width, textAlign: 'right', paddingLeft: '1rem', paddingRight: '1rem' }}>0</div>
+                );
               case 'goals':
                 return (
-                  <div key={i} style={{ width: col.width, textAlign: 'right', paddingLeft: '1rem', paddingRight: '1rem' }}>–</div>
+                  <div key={i} style={{ width: col.width, textAlign: 'right', paddingLeft: '1rem', paddingRight: '1rem' }}>0 - 0</div>
                 );
               case 'form':
                 return (
