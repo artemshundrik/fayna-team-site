@@ -56,7 +56,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
           position: 'relative',
         }}>
           {photoUrl && (
-            <div style={{ overflow: 'hidden', position: 'relative' }}>
+            <div style={{ overflow: 'hidden', position: 'relative', marginBottom: '0' }}>
               <img
                 src={`/images/players/${photoUrl}`}
                 alt={name}
@@ -65,7 +65,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
                   height: '380px',
                   objectFit: 'cover',
                   objectPosition: 'top',
-                  transition: 'transform 0.4s ease'
+                  transition: 'transform 0.4s ease',
+                  marginBottom: '0'  // Ensures no extra space at the bottom of the image
                 }}
                 className="player-image"
               />
@@ -73,9 +74,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
           )}
           <div style={{
             position: 'absolute',
-            bottom: '-1.5rem',
+            bottom: '0',
             left: '0',
-            padding: '1.5rem 0 2.5rem',
+            padding: '1rem 0 1.5rem',
             textAlign: 'left',
             lineHeight: '1',
             background: 'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.0) 100%)',
