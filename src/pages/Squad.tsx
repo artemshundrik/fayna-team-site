@@ -14,6 +14,7 @@ const players = [
   { number: 17, name: "Владислав Хом'яков", lastName: 'Хомяков', position: 'Універсал' },
   { number: 18, name: 'Сергій Осадчий', lastName: 'Осадчий', position: 'Універсал' },
   { number: 19, name: 'Сергій Осаульчук', lastName: 'Осаульчук', position: 'Універсал' },
+  { number: 22, name: 'Мосієнко', lastName: 'Мосієнко', position: 'Універсал' },
   { number: 33, name: 'Руслан Кашкарьов', lastName: 'Кашкарьов', position: 'Воротар' },
   { number: 71, name: 'Артем Головченко', lastName: 'Головченко', position: 'Воротар' },
   { number: 81, name: 'Назар Гнібєда', lastName: 'Гнібєда', position: 'Універсал' },
