@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -14,6 +14,13 @@ const HeaderWrapper = styled.header`
   z-index: 100;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #e0e0e0;
+  transition: top 0.3s ease;
+  &.hidden {
+    top: -100px; /* Hides header when scrolling down */
+  }
+  &.visible {
+    top: 0; /* Resets position when scrolling up */
+  }
 `;
 
 const MobileMenuToggle = styled.button`
@@ -135,52 +142,33 @@ const Nav = styled.nav`
     text-decoration: none;
     font-weight: 700;
     font-family: 'Cuprum', sans-serif;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -75%;
-      width: 50%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.3);
-      transform: skewX(-20deg);
-      transition: left 0.75s ease;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      left: 0;
-      bottom: -6px;
-      height: 2px;
-      width: 100%;
-      background-color: #FF1695;
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s ease-in-out;
-      z-index: 2;
-      border-radius: 2px;
-    }
-
-    &:hover::before {
-      left: 130%;
-    }
-
-    &:hover::after {
-      transform: scaleX(1);
-    }
   }
 `;
 
 const Header = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  const handleScroll = () => {
+    if (typeof window !== 'undefined') {
+      const scrollY = window.scrollY;
+      if (scrollY > lastScrollY) {
+        setIsHeaderVisible(false); // Scroll down
+      } else {
+        setIsHeaderVisible(true); // Scroll up
+      }
+      setLastScrollY(scrollY);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   return (
-    <HeaderWrapper>
+    <HeaderWrapper className={isHeaderVisible ? 'visible' : 'hidden'}>
       <Logo>
         <Link to="/">
           <img src="/images/logo-fayna.svg" alt="FAYNA TEAM logo" />

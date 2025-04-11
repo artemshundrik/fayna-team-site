@@ -7,6 +7,17 @@ const fontStyle = `
     font-weight: normal;
     font-style: normal;
   }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);  /* Card starts below */
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);  /* Card moves to its original position */
+    }
+  }
 `;
 
 type PlayerCardProps = {
@@ -35,6 +46,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
         margin: '0 auto',
         background: 'linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%)',
         transition: 'transform 0.3s ease',
+        animation: 'fadeIn 1s ease-out',  // Apply fade-in animation
+        boxSizing: 'border-box',
       }} 
       onMouseEnter={(e) => {
         const img = e.currentTarget.querySelector('.player-image') as HTMLElement;
