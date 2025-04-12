@@ -93,14 +93,14 @@ const rowStyle = {
 
 const formStyle = {
   display: 'flex',
-  gap: '0.35rem',
+  gap: '0.5rem',
   minWidth: '7rem',
   justifyContent: 'flex-start'
 };
 
 const formBoxStyle = {
   padding: '0.3rem 0.5rem',
-  borderRadius: '6px',
+  borderRadius: '4px',
   color: 'white',
   fontWeight: 600,
   fontSize: '0.75rem'

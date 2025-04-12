@@ -137,7 +137,6 @@ const MatchBox = styled.div`
 
   .team {
     display: flex;
-    flex-direction: row;
     align-items: center;
     gap: 1rem;
     font-size: 2rem;
@@ -145,8 +144,23 @@ const MatchBox = styled.div`
     color: white;
     flex: 1;
     max-width: 300px;
-    justify-content: center;
+
+    &.reverse {
+      flex-direction: row-reverse;
+      text-align: right;
+
+      .team-info {
+        align-items: flex-end;
+      }
+    }
+
+    .team-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
+
 
   .vs {
     position: relative;
@@ -159,6 +173,45 @@ const MatchBox = styled.div`
     font-weight: bold;
     min-width: 80px;
     padding: 0 1rem;
+  }
+`;
+
+const TeamWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  max-width: 300px;
+`;
+
+const Form = styled.div<{ align?: 'left' | 'right' }>`
+  display: flex;
+  justify-content: ${({ align }) => (align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center')};
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  .form-item {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border-radius: 4px;
+  }
+
+  .w {
+    background-color: #4caf50;
+  }
+
+  .l {
+    background-color: #f44336;
+  }
+
+  .d {
+    background-color: #9e9e9e;
   }
 `;
 
@@ -309,30 +362,54 @@ const NextMatch = () => {
         </Countdown>
         <DateText>Неділя, 6 квітня</DateText>
         <MatchBox>
-          <div className="team">
-            <span>FAYNA TEAM</span>
-            <img src="/images/matches/logo-fayna-match.svg" alt="Fayna Team" />
-          </div>
+          <TeamWrapper>
+            <div className="team reverse">
+              <img src="/images/matches/logo-fayna-match.svg" alt="Fayna Team" />
+              <div className="team-info">
+                <span className="name">FAYNA TEAM</span>
+                <Form align="left">
+                  {['l', 'w', 'w', 'w', 'l'].map((item, i) => (
+                    <div key={i} className={`form-item ${item}`}>
+                      {item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н'}
+                    </div>
+                  ))}
+                </Form>
+              </div>
+            </div>
+          </TeamWrapper>
+
           <div className="vs">
-          <div
-            style={{
-              background: 'rgba(0, 0, 0, 0.6)',
-              backdropFilter: 'blur(8px)',
-              padding: '0.5rem 1.25rem',
-              borderRadius: '8px',
-              color: 'white',
-              fontSize: '2.5rem',
-              fontWeight: 'bold',
-              textAlign: 'center',
-            }}
-          >
-            19:00
+            <div
+              style={{
+                background: 'rgba(0, 0, 0, 0.6)',
+                backdropFilter: 'blur(8px)',
+                padding: '0.5rem 1.25rem',
+                borderRadius: '8px',
+                color: 'white',
+                fontSize: '2.5rem',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}
+            >
+              19:00
+            </div>
           </div>
-          </div>
-          <div className="team">
-            <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" />
-            <span>BARCELONA</span>
-          </div>
+
+          <TeamWrapper>
+            <div className="team">
+              <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" />
+              <div className="team-info">
+                <span className="name">UID</span>
+                <Form align="right">
+                  {['w', 'w', 'l', 'l', 'l'].map((item, i) => (
+                    <div key={i} className={`form-item ${item}`}>
+                      {item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н'}
+                    </div>
+                  ))}
+                </Form>
+              </div>
+            </div>
+          </TeamWrapper>
         </MatchBox>
         <Stadium>
           <div className="venue">🏟 МАНЕЖ REJO-ВДНХ №1</div>
