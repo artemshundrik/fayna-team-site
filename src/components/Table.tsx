@@ -1,21 +1,21 @@
 import React from 'react';
 
 const teams = [
-  { place: 1, name: 'Крила Донбасу', logo: '/images/teams/logo-krila-donbasu.png', positionChange: 'up', form: ['W', 'W', 'D', 'W', 'L'] },
-  { place: 2, name: 'ФК Фокус', logo: '/images/teams/logo-focus.png', positionChange: 'down', form: ['D', 'W', 'W', 'W', 'W'] },
-  { place: 3, name: 'UID', logo: '/images/teams/logo-uid.png', positionChange: 'same', form: ['L', 'L', 'W', 'D', 'W'] },
-  { place: 4, name: 'NOOSPHERE KYIV', logo: '/images/teams/logo-noosphere-kyiv.png', positionChange: 'same', form: ['W', 'W', 'W', 'L', 'D'] },
-  { place: 5, name: 'LEFT COAST', logo: '/images/teams/logo-left-coast.png', positionChange: 'up', form: ['D', 'D', 'W', 'W', 'W'] },
-  { place: 6, name: 'FC Inter Kyiv', logo: '/images/teams/logo-inter-kyiv.png', positionChange: 'down', form: ['L', 'L', 'L', 'W', 'D'] },
-  { place: 7, name: 'FC Goldmine', logo: '/images/teams/logo-goldmine.png', positionChange: 'same', form: ['W', 'D', 'D', 'L', 'W'] },
-  { place: 8, name: 'OnlyFans Team', logo: '/images/teams/logo-only-fans.png', positionChange: 'up', form: ['W', 'W', 'L', 'D', 'D'] },
-  { place: 9, name: 'PIN-UP', logo: '/images/teams/logo-pin-up.png', positionChange: 'down', form: ['L', 'L', 'D', 'W', 'W'] },
-  { place: 10, name: 'Благора Інвест', logo: '/images/teams/logo-blagora.png', positionChange: 'same', form: ['D', 'W', 'L', 'L', 'W'] },
-  { place: 11, name: 'FC Agents', logo: '/images/teams/logo-agents.png', positionChange: 'up', form: ['W', 'W', 'D', 'L', 'D'] },
-  { place: 12, name: 'FC MAXIMUS', logo: '/images/teams/logo-maximus.png', positionChange: 'down', form: ['L', 'W', 'W', 'D', 'W'] },
-  { place: 13, name: 'FC KITRUM', logo: '/images/teams/logo-kitrum.png', positionChange: 'same', form: ['D', 'L', 'W', 'W', 'D'] },
-  { place: 14, name: 'ФК "Ерідон"', logo: '/images/teams/logo-eridon.png', positionChange: 'up', form: ['W', 'L', 'D', 'W', 'W'] },
-  { place: 15, name: 'FAYNA TEAM', logo: '/images/matches/logo-fayna-match-black.svg', positionChange: 'same', form: ['W', 'L', 'D', 'L', 'W'] },
+  { place: 1, name: 'Крила Донбасу', logo: '/images/teams/logo-krila-donbasu.png', positionChange: 'up', form: ['В', 'В', 'Н', 'В', 'П'] },
+  { place: 2, name: 'ФК Фокус', logo: '/images/teams/logo-focus.png', positionChange: 'down', form: ['Н', 'В', 'В', 'В', 'В'] },
+  { place: 3, name: 'UID', logo: '/images/teams/logo-uid.png', positionChange: 'same', form: ['П', 'П', 'В', 'Н', 'В'] },
+  { place: 4, name: 'NOOSPHERE KYIV', logo: '/images/teams/logo-noosphere-kyiv.png', positionChange: 'same', form: ['В', 'В', 'В', 'П', 'Н'] },
+  { place: 5, name: 'LEFT COAST', logo: '/images/teams/logo-left-coast.png', positionChange: 'up', form: ['Н', 'Н', 'В', 'В', 'В'] },
+  { place: 6, name: 'FC Inter Kyiv', logo: '/images/teams/logo-inter-kyiv.png', positionChange: 'down', form: ['П', 'П', 'П', 'В', 'Н'] },
+  { place: 7, name: 'FC Goldmine', logo: '/images/teams/logo-goldmine.png', positionChange: 'same', form: ['В', 'Н', 'Н', 'П', 'В'] },
+  { place: 8, name: 'OnlyFans Team', logo: '/images/teams/logo-only-fans.png', positionChange: 'up', form: ['В', 'В', 'П', 'Н', 'Н'] },
+  { place: 9, name: 'PIN-UP', logo: '/images/teams/logo-pin-up.png', positionChange: 'down', form: ['П', 'П', 'Н', 'В', 'В'] },
+  { place: 10, name: 'Благора Інвест', logo: '/images/teams/logo-blagora.png', positionChange: 'same', form: ['Н', 'В', 'П', 'П', 'В'] },
+  { place: 11, name: 'FC Agents', logo: '/images/teams/logo-agents.png', positionChange: 'up', form: ['В', 'В', 'Н', 'П', 'Н'] },
+  { place: 12, name: 'FC MAXIMUS', logo: '/images/teams/logo-maximus.png', positionChange: 'down', form: ['П', 'В', 'В', 'Н', 'В'] },
+  { place: 13, name: 'FC KITRUM', logo: '/images/teams/logo-kitrum.png', positionChange: 'same', form: ['Н', 'П', 'В', 'В', 'Н'] },
+  { place: 14, name: 'ФК "Ерідон"', logo: '/images/teams/logo-eridon.png', positionChange: 'up', form: ['В', 'П', 'Н', 'В', 'В'] },
+  { place: 15, name: 'FAYNA TEAM', logo: '/images/matches/logo-fayna-match-black.svg', positionChange: 'same', form: ['В', 'П', 'Н', 'П', 'В'] },
 ];
 
 const getPositionIcon = (change: string) => {
@@ -43,11 +43,11 @@ const getPositionIcon = (change: string) => {
 
 const getFormColor = (result: string) => {
   switch (result) {
-    case 'W':
+    case 'В':
       return '#4caf50';
-    case 'L':
+    case 'П':
       return '#f44336';
-    case 'D':
+    case 'Н':
       return '#9e9e9e';
     default:
       return '#ccc';
