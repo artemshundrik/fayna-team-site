@@ -1,6 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import styled, { createGlobalStyle } from 'styled-components';
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '../types/supabase';
+import { supabase } from '../supabase';
+import { format } from 'date-fns';
+import { uk } from 'date-fns/locale';
+const fetchScore = async () => {
+  try {
+    const res = await fetch('/.netlify/functions/get-latest-score');
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await res.text();
+      try {
+        const fallback = JSON.parse(text);
+        return fallback;
+      } catch {
+        console.error('Invalid response (not JSON):', text);
+        return null;
+      }
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('Error fetching score:', err);
+    return null;
+  }
+};
 
 const GlobalStyle = createGlobalStyle`
   @keyframes shine {
@@ -132,7 +158,10 @@ const MatchBox = styled.div`
   position: relative;
 
   img {
+    width: 100px;
     height: 100px;
+    border-radius: 50%;
+    object-fit: contain;
   }
 
   .team {
@@ -274,15 +303,28 @@ const TournamentInfo = styled.div`
 `;
 
 const NextMatch = () => {
-  const matchDate = new Date('2025-04-07T19:00:00');
+  const [data, setData] = useState<Database['public']['Tables']['matches']['Row'] & {
+    team1: Database['public']['Tables']['teams']['Row'] | null;
+    team2: Database['public']['Tables']['teams']['Row'] | null;
+  } | null>(null);
+  const [matchDate, setMatchDate] = useState<Date | null>(null);
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [score, setScore] = useState<{
+    home: number;
+    away: number;
+    url?: string;
+    homeTeam?: string;
+    awayTeam?: string;
+  } | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
+      if (!matchDate) return;
+
       const now = new Date();
       const matchDateOnly = new Date(matchDate);
       matchDateOnly.setHours(0, 0, 0, 0);
@@ -315,7 +357,76 @@ const NextMatch = () => {
     }, 1000);
 
     return () => clearInterval(interval);
+  }, [matchDate]);
+
+  useEffect(() => {
+    const fetchMatch = async () => {
+      const { data, error } = await supabase
+        .from('matches')
+        .select('*, team1:team1_id(*), team2:team2_id(*)')
+        .order('date')
+        .limit(1)
+        .single();
+
+      if (error) {
+        console.error('Match fetch error:', error);
+      } else {
+        console.log('Next match data:', data);
+        setData(data);
+        if (data?.date && data?.time) {
+          const dateTimeString = `${data.date}T${data.time}`;
+          setMatchDate(new Date(dateTimeString));
+        }
+      }
+    };
+
+    fetchMatch();
   }, []);
+
+  useEffect(() => {
+    async function checkScore() {
+      const latest = await fetchScore();
+      console.log('📺 latest score:', latest);
+      const match = latest.title?.match(/^(.*?)\s(\d+[-:]\d+)\s(.*?)\s/);
+      const extractedHome = match?.[1]?.trim().toLowerCase() || '';
+      const extractedAway = match?.[3]?.trim().toLowerCase() || '';
+      console.log('🏷 extracted home:', extractedHome, '| away:', extractedAway);
+      if (!latest || !data || (latest.homeScore == null && latest.awayScore == null)) return;
+
+      const team1Name = data.team1?.name?.toLowerCase() || '';
+      const team2Name = data.team2?.name?.toLowerCase() || '';
+      const home = extractedHome;
+      const away = extractedAway;
+      const isFayna = home.includes('fayna') || away.includes('fayna');
+      console.log('🏷 team1:', team1Name, '| team2:', team2Name);
+      console.log('🆚 home:', home, '| away:', away);
+      console.log('✅ isFayna:', isFayna);
+      if (!isFayna) return;
+
+      const isTeam1Home = home.includes(team1Name) || team1Name.includes(home);
+      const isTeam2Home = home.includes(team2Name) || team2Name.includes(home);
+
+      if (isTeam1Home || isTeam2Home) {
+        console.log('🎯 Setting score:', {
+          home: isTeam1Home ? latest.homeScore : latest.awayScore,
+          away: isTeam1Home ? latest.awayScore : latest.homeScore,
+          url: latest.url,
+          homeTeam: latest.homeTeam,
+          awayTeam: latest.awayTeam,
+        });
+        setScore({
+          home: isTeam1Home ? latest.homeScore : latest.awayScore,
+          away: isTeam1Home ? latest.awayScore : latest.homeScore,
+          url: latest.url,
+          homeTeam: latest.homeTeam,
+          awayTeam: latest.awayTeam,
+        });
+      }
+    }
+
+    checkScore();
+  }, [data]);
+  const isFinished = score !== null;
 
   return (
     <>
@@ -327,100 +438,133 @@ const NextMatch = () => {
         transition={{ duration: 0.9, ease: 'easeOut' }}
       >
         <TournamentInfo>
-          <a href="https://r-cup.com.ua/tournament/1025060" target="_blank" rel="noopener noreferrer">
+          <a href="https://r-cup.com.ua/" target="_blank" rel="noopener noreferrer">
             <img src="/images/matches/logo-rejo.png" alt="Турнір" />
           </a>
           <div className="text">
-            <div className="meta">ПЕРША ЛІГА • ТУР 5</div>
+            <div className="meta">
+              {data?.tournament_title}
+              {data?.round_number ? ` • ТУР ${data.round_number}` : ''}
+            </div>
           </div>
         </TournamentInfo>
-        <Countdown>
-          <FlipUnit>
-            <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-              {String(days).padStart(2, '0')}
-            </div>
-            <div className="label">дні</div>
-          </FlipUnit>
-          <FlipUnit>
-            <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-              {String(hours).padStart(2, '0')}
-            </div>
-            <div className="label">год</div>
-          </FlipUnit>
-          <FlipUnit>
-            <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-              {String(minutes).padStart(2, '0')}
-            </div>
-            <div className="label">хв</div>
-          </FlipUnit>
-          <FlipUnit>
-            <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-              {String(seconds).padStart(2, '0')}
-            </div>
-            <div className="label">сек</div>
-          </FlipUnit>
-        </Countdown>
-        <DateText>Неділя, 6 квітня</DateText>
+        {!isFinished ? (
+          <Countdown>
+            <FlipUnit>
+              <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                {String(days).padStart(2, '0')}
+              </div>
+              <div className="label">дні</div>
+            </FlipUnit>
+            <FlipUnit>
+              <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                {String(hours).padStart(2, '0')}
+              </div>
+              <div className="label">год</div>
+            </FlipUnit>
+            <FlipUnit>
+              <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                {String(minutes).padStart(2, '0')}
+              </div>
+              <div className="label">хв</div>
+            </FlipUnit>
+            <FlipUnit>
+              <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                {String(seconds).padStart(2, '0')}
+              </div>
+              <div className="label">сек</div>
+            </FlipUnit>
+          </Countdown>
+        ) : (
+          <div style={{
+            fontSize: '1.8rem',
+            fontWeight: 'bold',
+            color: '#ccc',
+            marginBottom: '1.5rem',
+          }}>
+            Матч завершено
+          </div>
+        )}
+        {matchDate && (
+          <DateText>
+            {format(matchDate, 'EEEE, d MMMM', { locale: uk })}
+          </DateText>
+        )}
         <MatchBox>
           <TeamWrapper>
-            <div className="team reverse">
-              <img src="/images/matches/logo-fayna-match.svg" alt="Fayna Team" />
-              <div className="team-info">
-                <span className="name">FAYNA TEAM</span>
-                <Form align="left">
-                  {['l', 'w', 'w', 'w', 'l'].map((item, i) => (
-                    <div key={i} className={`form-item ${item}`}>
-                      {item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н'}
-                    </div>
-                  ))}
-                </Form>
+            {data?.team1 && (
+              <div className="team reverse">
+                <img src={data.team1.logo || '/images/placeholder.svg'} alt={data.team1.name} />
+                <div className="team-info">
+                  <span className="name">{data.team1.name}</span>
+                  {data.team1?.form && (
+                    <Form align="left">
+                      {data.team1.form.slice(0, 5).toLowerCase().split('').map((item, i) => (
+                        <div key={i} className={`form-item ${item}`}>
+                          {item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н'}
+                        </div>
+                      ))}
+                    </Form>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </TeamWrapper>
 
           <div className="vs">
-            <div
-              style={{
-                background: 'rgba(0, 0, 0, 0.6)',
-                backdropFilter: 'blur(8px)',
-                padding: '0.5rem 1.25rem',
-                borderRadius: '8px',
-                color: 'white',
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}
-            >
-              19:00
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(8px)',
+              padding: '0.5rem 1.25rem',
+              borderRadius: '8px',
+              color: 'white',
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              minWidth: '100px',
+            }}>
+              {score !== null
+                ? `${score.home} - ${score.away}`
+                : matchDate && new Date() < matchDate
+                ? matchDate.toLocaleTimeString('uk-UA', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : '--:--'}
             </div>
           </div>
 
+
           <TeamWrapper>
-            <div className="team">
-              <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" />
-              <div className="team-info">
-                <span className="name">UID</span>
-                <Form align="right">
-                  {['w', 'w', 'l', 'l', 'l'].map((item, i) => (
-                    <div key={i} className={`form-item ${item}`}>
-                      {item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н'}
-                    </div>
-                  ))}
-                </Form>
+            {data?.team2 && (
+              <div className="team">
+                <img src={data.team2.logo || '/images/placeholder.svg'} alt={data.team2.name} />
+                <div className="team-info">
+                  <span className="name">{data.team2.name}</span>
+                  {data.team2?.form && (
+                    <Form align="right">
+                      {data.team2.form.slice(0, 5).toLowerCase().split('').map((item, i) => (
+                        <div key={i} className={`form-item ${item}`}>
+                          {item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н'}
+                        </div>
+                      ))}
+                    </Form>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </TeamWrapper>
         </MatchBox>
         <Stadium>
-          <div className="venue">🏟 МАНЕЖ REJO-ВДНХ №1</div>
+          <div className="venue">🏟 {data?.stadium}</div>
           <div className="address">
             <span className="icon">📍</span>
-            <span>Київ, проспект Академіка Глушкова, 1</span>
+            <span>{data?.address}</span>
           </div>
         </Stadium>
         <div style={{ marginTop: '2rem' }}>
           <a
-            href="https://www.youtube.com/@FCFAYNATEAM"
+            href={score?.url || data?.youtube_link || 'https://www.youtube.com/@FCFAYNATEAM'}
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -447,7 +591,7 @@ const NextMatch = () => {
               setIsHovered(false);
             }}
           >
-            ДИВИТИСЬ ТРАНСЛЯЦІЮ НА YOUTUBE
+            {score?.url ? 'ДИВИТИСЬ ПОВНИЙ МАТЧ' : 'ДИВИТИСЬ ТРАНСЛЯЦІЮ НА YOUTUBE'}
             <img
               src={isHovered ? "/images/icons/youtube_white.svg" : "/images/icons/youtube.svg"}
               alt="YouTube"
