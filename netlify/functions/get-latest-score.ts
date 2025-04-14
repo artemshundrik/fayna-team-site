@@ -2,7 +2,7 @@ import { Handler } from '@netlify/functions';
 import fetch from 'node-fetch';
 import 'dotenv/config';
 
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY!;
+const YOUTUBE_API_KEY = process.env.VITE_YOUTUBE_API_KEY!;
 console.log('✅ API KEY used:', YOUTUBE_API_KEY);
 
 const CHANNEL_ID = 'UC2GEAQobT_BSe2bFZFJVOAg'; // REJO UA
