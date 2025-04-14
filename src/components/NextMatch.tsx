@@ -426,6 +426,7 @@ const NextMatch = () => {
 
     checkScore();
   }, [data]);
+  const isLive = score?.url && !(score !== null);
   const isFinished = score !== null;
 
   return (
@@ -449,40 +450,67 @@ const NextMatch = () => {
           </div>
         </TournamentInfo>
         {!isFinished ? (
-          <Countdown>
-            <FlipUnit>
-              <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-                {String(days).padStart(2, '0')}
-              </div>
-              <div className="label">дні</div>
-            </FlipUnit>
-            <FlipUnit>
-              <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-                {String(hours).padStart(2, '0')}
-              </div>
-              <div className="label">год</div>
-            </FlipUnit>
-            <FlipUnit>
-              <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-                {String(minutes).padStart(2, '0')}
-              </div>
-              <div className="label">хв</div>
-            </FlipUnit>
-            <FlipUnit>
-              <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-                {String(seconds).padStart(2, '0')}
-              </div>
-              <div className="label">сек</div>
-            </FlipUnit>
-          </Countdown>
+          isLive ? (
+            <div style={{
+              display: 'inline-block',
+              backgroundColor: 'rgba(255, 0, 0, 0.15)',
+              border: '1px solid rgba(255, 0, 0, 0.5)',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              fontSize: '1rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: '1.5rem',
+              backdropFilter: 'blur(6px)',
+            }}>
+              🔴 Пряма трансляція
+            </div>
+          ) : (
+            <Countdown>
+              <FlipUnit>
+                <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                  {String(days).padStart(2, '0')}
+                </div>
+                <div className="label">дні</div>
+              </FlipUnit>
+              <FlipUnit>
+                <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                  {String(hours).padStart(2, '0')}
+                </div>
+                <div className="label">год</div>
+              </FlipUnit>
+              <FlipUnit>
+                <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                  {String(minutes).padStart(2, '0')}
+                </div>
+                <div className="label">хв</div>
+              </FlipUnit>
+              <FlipUnit>
+                <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                  {String(seconds).padStart(2, '0')}
+                </div>
+                <div className="label">сек</div>
+              </FlipUnit>
+            </Countdown>
+          )
         ) : (
           <div style={{
-            fontSize: '1.8rem',
+            display: 'inline-block',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: '#fff',
+            padding: '0.5rem 1rem',
+            borderRadius: '8px',
             fontWeight: 'bold',
-            color: '#ccc',
+            fontSize: '1rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
             marginBottom: '1.5rem',
+            backdropFilter: 'blur(6px)',
           }}>
-            Матч завершено
+            🏁 Матч завершено
           </div>
         )}
         {matchDate && (
