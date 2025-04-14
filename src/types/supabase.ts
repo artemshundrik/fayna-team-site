@@ -75,18 +75,45 @@ export type Database = {
           is_our_team: boolean | null
           logo: string | null
           name: string
+          games_played: number | null
+          wins: number | null
+          draws: number | null
+          losses: number | null
+          goals_for: number | null
+          goals_against: number | null
+          form: string | null
+          place: number | null
+          positionChange: number | null
         }
         Insert: {
           id?: string
           is_our_team?: boolean | null
           logo?: string | null
-          name: string
+          name?: string
+          games_played?: number | null
+          wins?: number | null
+          draws?: number | null
+          losses?: number | null
+          goals_for?: number | null
+          goals_against?: number | null
+          form?: string | null
+          place?: number | null
+          positionChange?: number | null
         }
         Update: {
           id?: string
           is_our_team?: boolean | null
           logo?: string | null
           name?: string
+          games_played?: number | null
+          wins?: number | null
+          draws?: number | null
+          losses?: number | null
+          goals_for?: number | null
+          goals_against?: number | null
+          form?: string | null
+          place?: number | null
+          positionChange?: number | null
         }
         Relationships: []
       }

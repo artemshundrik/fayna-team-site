@@ -142,6 +142,28 @@ const Nav = styled.nav`
     text-decoration: none;
     font-weight: 700;
     font-family: 'Cuprum', sans-serif;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      transform: scaleX(0);
+      transform-origin: left;
+      width: 100%;
+      height: 3px;
+      background-color: #FF1695;
+      transition: transform 0.3s ease;
+      opacity: 1;
+    }
+
+    &:hover:after {
+      transform: scaleX(1);
+    }
   }
 `;
 
@@ -180,7 +202,6 @@ const Header = () => {
         <Link to="/squad">Склад</Link>
         <Link to="/fanshop">Фаншоп</Link>
         <Link to="/matches">Матчі</Link>
-        <a href="#">Галерея</a>
         <a href="#">Про нас</a>
       </Nav>
 
@@ -208,7 +229,6 @@ const Header = () => {
         <Link to="/squad" onClick={() => setMenuOpen(false)}>Склад</Link>
         <Link to="/fanshop" onClick={() => setMenuOpen(false)}>Фаншоп</Link>
         <Link to="/matches" onClick={() => setMenuOpen(false)}>Матчі</Link>
-        <a href="#">Галерея</a>
         <a href="#">Про нас</a>
       </MobileMenu>
     </HeaderWrapper>
