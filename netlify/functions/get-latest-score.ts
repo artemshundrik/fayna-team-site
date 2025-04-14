@@ -15,7 +15,11 @@ const cache: {
   data: null,
 };
 
-const CACHE_TTL = 10 * 60 * 1000; // 10 хвилин
+let CACHE_TTL = 10 * 60 * 1000; // Default: 10 хв
+
+if (cache.data?.status === 'finished') {
+  CACHE_TTL = 2 * 60 * 60 * 1000; // 2 години для завершених матчів
+}
 
 const handler: Handler = async () => {
   if (Date.now() - cache.timestamp < CACHE_TTL && cache.data) {
