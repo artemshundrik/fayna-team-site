@@ -31,9 +31,10 @@ type PlayerCardProps = {
   assists?: number;
   yellowCards?: number;
   redCards?: number;
+  saves?: number;
 };
 
-const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUrl, birthDate, matches, goals, assists, yellowCards, redCards }) => {
+const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUrl, birthDate, matches, goals, assists, yellowCards, redCards, saves }) => {
   return (
     <>
       <style>{fontStyle}</style>
@@ -43,6 +44,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
         position: 'relative',
         fontFamily: 'Cuprum, sans-serif',
         width: '360px',
+        height: 'calc(100% + 0px)',
         margin: '0 auto',
         background: 'linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%)',
         transition: 'transform 0.3s ease',
@@ -54,37 +56,50 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
         if (img) img.style.transform = 'scale(1.08)';
         const overlay = e.currentTarget.querySelector('.hover-overlay') as HTMLElement;
         const data = e.currentTarget.querySelector('.hover-data') as HTMLElement;
+        const numberEl = e.currentTarget.querySelector('.player-number') as HTMLElement;
         if (overlay) overlay.style.opacity = '1';
         if (data) data.style.transform = 'translateX(0)';
+        if (numberEl) numberEl.style.opacity = '0.3';
       }}
       onMouseLeave={(e) => {
         const img = e.currentTarget.querySelector('.player-image') as HTMLElement;
         if (img) img.style.transform = 'scale(1)';
         const overlay = e.currentTarget.querySelector('.hover-overlay') as HTMLElement;
         const data = e.currentTarget.querySelector('.hover-data') as HTMLElement;
+        const numberEl = e.currentTarget.querySelector('.player-number') as HTMLElement;
         if (overlay) overlay.style.opacity = '0';
         if (data) data.style.transform = 'translateX(-100%)';
+        if (numberEl) numberEl.style.opacity = '1';
       }}>
         <div style={{
           position: 'relative',
         }}>
-          {photoUrl && (
-            <div style={{ overflow: 'hidden', position: 'relative', marginBottom: '0' }}>
+          <div style={{ overflow: 'hidden', position: 'relative', height: '380px' }}>
+            {photoUrl ? (
               <img
                 src={`/images/players/${photoUrl}`}
                 alt={name}
                 style={{
-                  width: '100%',
+                  position: 'absolute',
+                  bottom: 0,
                   height: '380px',
+                  width: '100%',
                   objectFit: 'cover',
                   objectPosition: 'top',
                   transition: 'transform 0.4s ease',
-                  marginBottom: '0'  // Ensures no extra space at the bottom of the image
                 }}
                 className="player-image"
               />
-            </div>
-          )}
+            ) : (
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                height: '380px',
+                width: '100%',
+                background: '#2c2c2c',
+              }} />
+            )}
+          </div>
           <div style={{
             position: 'absolute',
             bottom: '0',
@@ -113,7 +128,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
             textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
             fontFamily: 'AdiCupQ2022, sans-serif',
             zIndex: 2,
-          }}>
+          }} className="player-number">
             {number}
           </div>
           <div style={{
@@ -138,24 +153,68 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
               transition: 'transform 0.4s ease',
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.6rem',
+              alignItems: 'center',
+              justifyContent: 'center',
               textAlign: 'center',
-              lineHeight: 1.5,
-              letterSpacing: '0.5px',
-              fontSize: '0.95rem'
+              fontSize: '0.95rem',
+              lineHeight: 1.4,
+              width: '100%',
+              padding: '1rem',
+              boxSizing: 'border-box',
             }} className="hover-data">
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                flexWrap: 'wrap',
+                width: '100%',
+                marginBottom: '1rem',
+                color: 'white',
+              }}>
+                <div style={{ textAlign: 'center', minWidth: '45%' }}>
+                  <div style={{ fontSize: '3.4rem', fontWeight: '600', color: 'white' }}>{goals ?? 0}</div>
+                  <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Голи</div>
+                </div>
+                <div style={{ textAlign: 'center', minWidth: '45%' }}>
+                  <div style={{ fontSize: '3.4rem', fontWeight: '600', color: 'white' }}>{assists ?? 0}</div>
+                  <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Асисти</div>
+                </div>
+                <div style={{ textAlign: 'center', minWidth: '45%', marginTop: '0.5rem' }}>
+                  <div style={{ fontSize: '3.4rem', fontWeight: '600', color: 'white' }}>{matches ?? 0}</div>
+                  <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Матчі</div>
+                </div>
+                <div style={{ textAlign: 'center', minWidth: '45%', marginTop: '0.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+                    <div style={{ fontSize: '3.4rem', fontWeight: '600', color: '#ffcc00' }}>
+                      {yellowCards ?? 0}
+                    </div>
+                    <div style={{ fontSize: '3.4rem', fontWeight: '600', color: '#ff4d4d' }}>
+                      {redCards ?? 0}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Картки</div>
+                </div>
+                {position === 'Воротар' && (
+                  <div style={{ textAlign: 'center', minWidth: '45%', marginTop: '0.5rem' }}>
+                    <div style={{ fontSize: '3.4rem', fontWeight: '600', color: 'white' }}>{saves ?? 0}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Сейви</div>
+                  </div>
+                )}
+              </div>
+              <div style={{
+                position: 'absolute',
+                bottom: '1rem',
+                right: '1rem',
+                fontWeight: '600',
+                fontSize: '1.2rem',
+                color: '#ddd',
+              }}>
+                {birthDate ? `${new Date().getFullYear() - new Date(birthDate).getFullYear()} років` : ''}
+              </div>
               {birthDate && (
-                <div style={{ fontWeight: '600', fontSize: '1rem' }}>
+                <div style={{ fontWeight: '600', fontSize: '1rem', color: '#ddd' }}>
                   🎂 {birthDate} ({new Date().getFullYear() - new Date(birthDate).getFullYear()} років)
                 </div>
               )}
-              <div>Матчі: <strong>{matches ?? 0}</strong></div>
-              <div>Голи: <strong>{goals ?? 0}</strong></div>
-              <div>Асисти: <strong>{assists ?? 0}</strong></div>
-              <div>
-                <span style={{ color: '#ffcc00' }}>🟨 {yellowCards ?? 0}</span> &nbsp;&nbsp;
-                <span style={{ color: '#ff4d4d' }}>🟥 {redCards ?? 0}</span>
-              </div>
             </div>
           </div>
         </div>
