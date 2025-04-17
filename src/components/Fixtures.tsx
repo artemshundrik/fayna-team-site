@@ -1,4 +1,6 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../supabase'; // шлях залежить від твого проєкту
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
@@ -35,6 +37,7 @@ const Grid = styled(motion.div)`
 
 const Card = styled.div`
   background: #fff;
+  position: relative;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -42,7 +45,7 @@ const Card = styled.div`
   align-items: center;
   text-align: center;
   transition: box-shadow 0.3s ease;
-
+ 
   &:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   }
@@ -114,6 +117,49 @@ const ScoreBox = styled.div<{ isActive?: boolean }>`
 `;
 
 const Fixtures = () => {
+  const [fixtures, setFixtures] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchFixtures = async () => {
+      const { data, error } = await supabase
+        .from('matches')
+      .select(`
+          *,
+          team1:team1_id ( name, logo ),
+          team2:team2_id ( name, logo ),
+          tournament:tournament_id ( logo_url, stadium, address )
+        `)
+        .order('date', { ascending: true });
+
+      if (!error && data) {
+        const weekdays = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', "п'ятниця", 'субота'];
+        const formatted = data.map((match: any) => {
+          const dateObj = new Date(`${match.date}T${match.time}`);
+          const formatter = new Intl.DateTimeFormat('uk-UA', {
+            day: 'numeric',
+            month: 'long',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          const weekdayName = weekdays[dateObj.getDay()];
+
+          return {
+            ...match,
+            date_text: `${weekdayName}, ${formatter.format(dateObj)}`,
+            score: match.score_team1 != null && match.score_team2 != null
+              ? `${match.score_team1} - ${match.score_team2}`
+              : match.time?.slice(0, 5),
+          };
+        });
+
+        setFixtures(formatted);
+      } else {
+        console.error('Помилка завантаження матчів:', error);
+      }
+    };
+
+    fetchFixtures();
+  }, []);
   return (
     <Section>
       <ContentWrapper
@@ -137,47 +183,86 @@ const Fixtures = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <Card>
-            <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-            <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Понеділок, 1 квітня, 22:00</div>
-            <Teams>
-              <strong>FAYNA TEAM</strong>
-              <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
-              <span>vs</span>
-              <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
-              <strong>BARCELONA</strong>
-            </Teams>
-            <ScoreBox isActive>1 - 0</ScoreBox>
-            <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
-          </Card>
+          {fixtures.map((match, index) => (
+            <Card key={index}>
+              {index === 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '0rem',
+                  left: '0rem',
+                  background: '#E9E9E9',
+                  color: '#6E6E6E',
+                  fontSize: '1rem',
+                  padding: '0.5rem 1rem',
+                  textTransform: 'uppercase',
+                  fontWeight: 600
+                }}>
+                  Минула гра
+                </div>
+              )}
+              {index === fixtures.length - 1 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '0rem',
+                  left: '0rem',
+                  background: '#000',
+                  color: '#fff',
+                  fontSize: '1rem',
+                  padding: '0.5rem 1rem',
+                  textTransform: 'uppercase',
+                  fontWeight: 600
+                }}>
+                  Наступна гра
+                </div>
+              )}
+              <img src={match.tournament.logo_url} alt="Tournament" height="64" style={{ marginBottom: '6px' }} />
+              <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>{match.date_text}</div>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr auto 1fr',
+                  alignItems: 'center',
+                  justifyItems: 'center',
+                  gap: '0.75rem',
+                  marginTop: '0.5rem',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    gap: '0.6rem',
+                    minWidth: '180px',
+                  }}
+                >
+                  <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{match.team1.name}</span>
+                  <img src={match.team1.logo} alt={match.team1.name} style={{ height: 48, width: 48, borderRadius: '50%' }} />
+                </div>
 
-          <Card>
-            <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-            <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Субота, 6 квітня, 18:30</div>
-            <Teams>
-              <strong>FAYNA TEAM</strong>
-              <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
-              <span>vs</span>
-              <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
-              <strong>BARCELONA</strong>
-            </Teams>
-            <ScoreBox isActive>2 - 2</ScoreBox>
-            <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
-          </Card>
+                <ScoreBox isActive={match.score_team1 != null && match.score_team2 != null}>
+                  {match.score || match.time}
+                </ScoreBox>
 
-          <Card>
-            <img src="/images/matches/logo-rejo.png" alt="Rejo" height="48" style={{ marginBottom: '12px' }} />
-            <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>Середа, 10 квітня, 22:00</div>
-            <Teams>
-              <strong>FAYNA TEAM</strong>
-              <img src="/images/matches/logo-fayna-match-black.svg" alt="FAYNA TEAM" height="36" />
-              <span>vs</span>
-              <img src="/images/matches/logo-barcelona.svg" alt="Barcelona" height="36" />
-              <strong>BARCELONA</strong>
-            </Teams>
-            <ScoreBox>22:00</ScoreBox>
-            <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>Манеж REJO-ВДНХ №1</div>
-          </Card>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: '0.6rem',
+                    minWidth: '180px',
+                  }}
+                >
+                  <img src={match.team2.logo} alt={match.team2.name} style={{ height: 48, width: 48, borderRadius: '50%' }} />
+                  <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{match.team2.name}</span>
+                </div>
+              </div>
+              <div style={{ fontSize: '1rem', opacity: 0.9, lineHeight: '1.8', marginTop: '0.5rem' }}>
+                <div>🏟 {match.tournament.stadium || 'Манеж REJO-ВДНХ №1'}</div>
+                <div style={{ color: '#888' }}>📍 {match.tournament.address || 'вул. Академіка Глушкова, 1, Київ'}</div>
+              </div>
+            </Card>
+          ))}
         </Grid>
 
         <ButtonWrapper>

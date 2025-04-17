@@ -69,13 +69,14 @@ const GlobalStyle = createGlobalStyle`
 .team.horizontal {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   justify-content: flex-start;
 }
 
 .team.horizontal.reverse {
   flex-direction: row-reverse;
   justify-content: flex-end;
+  gap: 1.5rem;
 }
 
 /* TEAM1: вирівнювання по правому краю */
