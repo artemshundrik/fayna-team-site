@@ -7,27 +7,6 @@ import type { Database } from '../types/supabase';
 import { supabase } from '../supabase';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
-const fetchScore = async () => {
-  try {
-    const res = await fetch('/.netlify/functions/get-latest-score');
-    const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      const text = await res.text();
-      try {
-        const fallback = JSON.parse(text);
-        return fallback;
-      } catch {
-        console.error('Invalid response (not JSON):', text);
-        return null;
-      }
-    }
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.error('Error fetching score:', err);
-    return null;
-  }
-};
 const YoutubeLink = styled.a`
   display: inline-flex;
   align-items: center;
@@ -474,7 +453,7 @@ const NextMatch = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!matchDate) return;
+      if (!(matchDate instanceof Date) || isNaN(matchDate.getTime())) return;
 
       const now = new Date();
       const matchDateOnly = new Date(matchDate);
@@ -526,7 +505,8 @@ const NextMatch = () => {
       const now = new Date();
 
       // знайти перший матч у майбутньому
-      let upcoming = matches.find(m => new Date(`${m.date}T${m.time}`) > now);
+      const upcomingMatches = matches.filter(m => m.date && m.time);
+      let upcoming = upcomingMatches.find(m => new Date(`${m.date}T${m.time}+03:00`) > now);
 
       // якщо нема — взяти останній зіграний
       if (!upcoming) {
@@ -535,8 +515,11 @@ const NextMatch = () => {
 
       setData(upcoming);
       if (upcoming?.date && upcoming?.time) {
-        const dateTimeString = `${upcoming.date}T${upcoming.time}`;
-        setMatchDate(new Date(dateTimeString));
+        const dateTimeString = `${upcoming.date}T${upcoming.time}+03:00`;
+        const parsedDate = new Date(dateTimeString);
+        if (!isNaN(parsedDate.getTime())) {
+          setMatchDate(parsedDate);
+        }
       }
     };
 
@@ -553,61 +536,6 @@ const NextMatch = () => {
     }
   }, [matchDate]);
 
-  useEffect(() => {
-    async function checkScore() {
-      if (typeof window !== 'undefined' && window.location.hostname.includes('netlify.app')) {
-        console.log('⛔ Skipping get-latest-score on Netlify');
-        return;
-      }
-      const latest = await fetchScore();
-      console.log('📺 latest score:', latest);
-      if (data?.date && data?.time) {
-        const matchStart = new Date(`${data.date}T${data.time}`);
-        const twoHoursLater = new Date(matchStart.getTime() + 2 * 60 * 60 * 1000);
-        const now = new Date();
-        if (now > twoHoursLater) {
-          setMatchIsOver(true);
-        }
-      }
-      const match = latest.title?.match(/^(.*?)\s(\d+[-:]\d+)\s(.*?)\s/);
-      const extractedHome = match?.[1]?.trim().toLowerCase() || '';
-      const extractedAway = match?.[3]?.trim().toLowerCase() || '';
-      console.log('🏷 extracted home:', extractedHome, '| away:', extractedAway);
-      if (!latest || !data || (latest.homeScore == null && latest.awayScore == null)) return;
-
-      const team1Name = data.team1?.name?.toLowerCase() || '';
-      const team2Name = data.team2?.name?.toLowerCase() || '';
-      const home = extractedHome;
-      const away = extractedAway;
-      const isFayna = home.includes('fayna') || away.includes('fayna');
-      console.log('🏷 team1:', team1Name, '| team2:', team2Name);
-      console.log('🆚 home:', home, '| away:', away);
-      console.log('✅ isFayna:', isFayna);
-      if (!isFayna) return;
-
-      const isTeam1Home = home.includes(team1Name) || team1Name.includes(home);
-      const isTeam2Home = home.includes(team2Name) || team2Name.includes(home);
-
-      if (isTeam1Home || isTeam2Home) {
-        console.log('🎯 Setting score:', {
-          home: isTeam1Home ? latest.homeScore : latest.awayScore,
-          away: isTeam1Home ? latest.awayScore : latest.homeScore,
-          url: latest.url,
-          homeTeam: latest.homeTeam,
-          awayTeam: latest.awayTeam,
-        });
-        setScore({
-          home: isTeam1Home ? latest.homeScore : latest.awayScore,
-          away: isTeam1Home ? latest.awayScore : latest.homeScore,
-          url: latest.url,
-          homeTeam: latest.homeTeam,
-          awayTeam: latest.awayTeam,
-        });
-      }
-    }
-
-    checkScore();
-  }, [data]);
 const isLive = !!score?.url && !score?.finishedManually;
 const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(matchDate.getTime() + 2 * 60 * 60 * 1000);
   const isFinished = score !== null;
@@ -715,7 +643,7 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
             </div>
           )
         )}
-        {matchDate && (
+        {matchDate instanceof Date && !isNaN(matchDate.getTime()) && (
           <DateText>
             {format(matchDate, 'EEEE, d MMMM', { locale: uk })}
           </DateText>
