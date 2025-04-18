@@ -1,5 +1,27 @@
 import React from 'react';
 
+function getUkrainianYears(age: number): string {
+  const lastDigit = age % 10;
+  const lastTwoDigits = age % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return 'років';
+  if (lastDigit === 1) return 'рік';
+  if (lastDigit >= 2 && lastDigit <= 4) return 'роки';
+  return 'років';
+}
+
+function calculateAge(birthDateStr: string): number {
+  const today = new Date();
+  const birthDate = new Date(birthDateStr);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  const d = today.getDate() - birthDate.getDate();
+  if (m < 0 || (m === 0 && d < 0)) {
+    age--;
+  }
+  return age;
+}
+
 const fontStyle = `
   @font-face {
     font-family: 'AdiCupQ2022';
@@ -57,9 +79,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
         const overlay = e.currentTarget.querySelector('.hover-overlay') as HTMLElement;
         const data = e.currentTarget.querySelector('.hover-data') as HTMLElement;
         const numberEl = e.currentTarget.querySelector('.player-number') as HTMLElement;
+        const nameBlock = e.currentTarget.querySelector('.player-name') as HTMLElement;
+        const birthBlock = e.currentTarget.querySelector('.player-birthdate') as HTMLElement;
         if (overlay) overlay.style.opacity = '1';
         if (data) data.style.transform = 'translateX(0)';
         if (numberEl) numberEl.style.opacity = '0.3';
+        if (nameBlock) nameBlock.style.opacity = '0';
+        if (birthBlock) birthBlock.style.opacity = '1';
       }}
       onMouseLeave={(e) => {
         const img = e.currentTarget.querySelector('.player-image') as HTMLElement;
@@ -67,9 +93,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
         const overlay = e.currentTarget.querySelector('.hover-overlay') as HTMLElement;
         const data = e.currentTarget.querySelector('.hover-data') as HTMLElement;
         const numberEl = e.currentTarget.querySelector('.player-number') as HTMLElement;
+        const nameBlock = e.currentTarget.querySelector('.player-name') as HTMLElement;
+        const birthBlock = e.currentTarget.querySelector('.player-birthdate') as HTMLElement;
         if (overlay) overlay.style.opacity = '0';
         if (data) data.style.transform = 'translateX(-100%)';
         if (numberEl) numberEl.style.opacity = '1';
+        if (nameBlock) nameBlock.style.opacity = '1';
+        if (birthBlock) birthBlock.style.opacity = '0';
       }}>
         <div style={{
           position: 'relative',
@@ -111,12 +141,35 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
             width: '100%',
             zIndex: 2,
           }}>
-            <div style={{ fontSize: '1.4rem', fontWeight: '500', textTransform: 'uppercase', color: '#fff', marginBottom: '0.25rem', paddingLeft: '30px' }}>
-            {name.split(' ')[0]}
+            <div className="player-name" style={{ transition: 'opacity 0.4s ease;' }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: '500', textTransform: 'uppercase', color: '#fff', marginBottom: '0.25rem', paddingLeft: '30px' }}>
+                {name.split(' ')[0]}
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: '900', textTransform: 'uppercase', color: '#ff1695', paddingLeft: '30px' }}>
+                {name.split(' ')[1]}
+              </div>
             </div>
-            <div style={{ fontSize: '2rem', fontWeight: '900', textTransform: 'uppercase', color: '#ff1695', paddingLeft: '30px' }}>
-              {name.split(' ')[1]}
-            </div>
+          </div>
+          <div
+            className="player-birthdate"
+            style={{
+              position: 'absolute',
+              bottom: '1.5rem',
+              left: '30px',
+              fontSize: '1.4rem',
+              fontWeight: 400,
+              color: '#ddd',
+              opacity: 0,
+              transition: 'opacity 0.4s ease',
+              zIndex: 3,
+            }}
+          >
+            🎂 <span style={{ fontWeight: 300, fontSize: '1.2rem' }}>{birthDate}</span>
+            {birthDate ? (
+              <span style={{ marginLeft: '0.8rem', fontWeight: 600, color: '#fff', fontSize: '1.4rem' }}>
+                {calculateAge(birthDate)} {getUkrainianYears(calculateAge(birthDate))}
+              </span>
+            ) : null}
           </div>
           <div style={{
             position: 'absolute',
@@ -163,26 +216,36 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
               boxSizing: 'border-box',
             }} className="hover-data">
               <div style={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                flexWrap: 'wrap',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '1.2rem 0.5rem',
                 width: '100%',
                 marginBottom: '1rem',
                 color: 'white',
               }}>
-                <div style={{ textAlign: 'center', minWidth: '45%' }}>
-                  <div style={{ fontSize: '3.4rem', fontWeight: '600', color: 'white' }}>{goals ?? 0}</div>
-                  <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Голи</div>
-                </div>
-                <div style={{ textAlign: 'center', minWidth: '45%' }}>
-                  <div style={{ fontSize: '3.4rem', fontWeight: '600', color: 'white' }}>{assists ?? 0}</div>
+                {position !== 'Воротар' ? (
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '3.4rem', fontWeight: '600' }}>{goals ?? 0}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Голи</div>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '3.4rem', fontWeight: '600' }}>{saves ?? 0}</div>
+                    <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Сейви</div>
+                  </div>
+                )}
+
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '3.4rem', fontWeight: '600' }}>{assists ?? 0}</div>
                   <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Асисти</div>
                 </div>
-                <div style={{ textAlign: 'center', minWidth: '45%', marginTop: '0.5rem' }}>
-                  <div style={{ fontSize: '3.4rem', fontWeight: '600', color: 'white' }}>{matches ?? 0}</div>
+
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '3.4rem', fontWeight: '600' }}>{matches ?? 0}</div>
                   <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Матчі</div>
                 </div>
-                <div style={{ textAlign: 'center', minWidth: '45%', marginTop: '0.5rem' }}>
+
+                <div style={{ textAlign: 'center' }}>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
                     <div style={{ fontSize: '3.4rem', fontWeight: '600', color: '#ffcc00' }}>
                       {yellowCards ?? 0}
@@ -193,28 +256,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUr
                   </div>
                   <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Картки</div>
                 </div>
-                {position === 'Воротар' && (
-                  <div style={{ textAlign: 'center', minWidth: '45%', marginTop: '0.5rem' }}>
-                    <div style={{ fontSize: '3.4rem', fontWeight: '600', color: 'white' }}>{saves ?? 0}</div>
-                    <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Сейви</div>
-                  </div>
-                )}
               </div>
-              <div style={{
-                position: 'absolute',
-                bottom: '1rem',
-                right: '1rem',
-                fontWeight: '600',
-                fontSize: '1.2rem',
-                color: '#ddd',
-              }}>
-                {birthDate ? `${new Date().getFullYear() - new Date(birthDate).getFullYear()} років` : ''}
-              </div>
-              {birthDate && (
-                <div style={{ fontWeight: '600', fontSize: '1rem', color: '#ddd' }}>
-                  🎂 {birthDate} ({new Date().getFullYear() - new Date(birthDate).getFullYear()} років)
-                </div>
-              )}
             </div>
           </div>
         </div>

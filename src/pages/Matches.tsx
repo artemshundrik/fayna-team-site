@@ -137,12 +137,12 @@ const Matches: React.FC = () => {
     const fetchMatches = async () => {
       const { data, error } = await supabase
         .from('matches')
-        .select(`
+      .select(`
           *,
           team1:team1_id ( name, logo ),
           team2:team2_id ( name, logo ),
           tournament:tournament_id ( logo_url, stadium, league_name ),
-          round_number
+          round_number, highlight_link
         `)
         .order('date', { ascending: true });
 
@@ -156,16 +156,17 @@ const Matches: React.FC = () => {
 
           return {
             date: match.date,
-            time: match.time.slice(0, 5),
+            time: match.time ? match.time.slice(0, 5) : '',
             dateFormatted: formattedDate,
-            stadium: match.tournament.stadium,
+            stadium: match.tournament?.stadium || '',
             score,
-            tournamentLogo: match.tournament.logo_url,
-            leagueName: match.tournament.league_name,
+          tournamentLogo: match.tournament?.logo_url || '',
+            leagueName: match.tournament?.league_name || '',
             tour: match.round_number,
-            team1Logo: match.team1.logo,
-            team2Logo: match.team2.logo,
-            teams: `${match.team1.name} проти ${match.team2.name}`,
+            team1Logo: match.team1?.logo || '',
+            team2Logo: match.team2?.logo || '',
+            teams: `${match.team1?.name || 'Команда 1'} проти ${match.team2?.name || 'Команда 2'}`,
+            youtube_link: match.highlight_link,
           };
         });
 
@@ -249,7 +250,33 @@ const Matches: React.FC = () => {
                     })()}
                   </CenterContentWrapper>
                   </CenterColumn>
-                </MatchStripe>
+                  <RightColumn>
+                    {match.youtube_link && (
+                      <a
+                        href={match.youtube_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.4rem',
+                          fontWeight: 600,
+                          color: '#e53935',
+                          textDecoration: 'none',
+                          fontSize: '0.95rem',
+                          lineHeight: '1',
+                          transition: 'text-decoration 0.2s ease',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
+                        onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
+                      >
+                        <img src="/icons/youtube.svg" alt="YouTube" style={{ height: '20px' }} />
+                        Дивитись огляд
+                      </a>
+                    )}
+                  </RightColumn>
+              </MatchStripe>
             ))}
           </MatchesList>
         )}
@@ -298,6 +325,33 @@ const Matches: React.FC = () => {
                     })()}
                   </CenterContentWrapper>
                 </CenterColumn>
+                <RightColumn>
+                  {match.youtube_link && (
+                    <a
+                      href={match.youtube_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.4rem',
+                        fontWeight: 600,
+                        color: '#e53935',
+                        textDecoration: 'none',
+                        fontSize: '0.95rem',
+                        lineHeight: '1',
+                        transition: 'text-decoration 0.2s ease',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
+                      onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
+                    >
+                      ДИВИТИСЬ ОГЛЯД
+                      <img src="images/icons/youtube.svg" alt="YouTube" style={{ height: '20px' }} />
+                      
+                    </a>
+                  )}
+                </RightColumn>
               </MatchStripe>
             ))}
           </MatchesList>

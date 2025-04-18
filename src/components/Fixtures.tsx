@@ -152,7 +152,21 @@ const Fixtures = () => {
           };
         });
 
-        setFixtures(formatted);
+        const now = new Date();
+        const pastMatches = formatted
+          .filter(m => new Date(`${m.date}T${m.time}`) < now)
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        const upcomingMatches = formatted
+          .filter(m => new Date(`${m.date}T${m.time}`) >= now)
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        const sliced = [
+          pastMatches[0], // last match
+          upcomingMatches[0], // next match
+        ].filter(Boolean);
+
+        setFixtures(sliced);
       } else {
         console.error('Помилка завантаження матчів:', error);
       }
@@ -215,7 +229,7 @@ const Fixtures = () => {
                   Наступна гра
                 </div>
               )}
-              <img src={match.tournament.logo_url} alt="Tournament" height="64" style={{ marginBottom: '6px' }} />
+              <img src={match.tournament?.logo_url || '/default-tournament.png'} alt="Tournament" height="64" style={{ marginBottom: '6px' }} />
               <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>{match.date_text}</div>
               <div
                 style={{
@@ -236,8 +250,8 @@ const Fixtures = () => {
                     minWidth: '180px',
                   }}
                 >
-                  <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{match.team1.name}</span>
-                  <img src={match.team1.logo} alt={match.team1.name} style={{ height: 48, width: 48, borderRadius: '50%' }} />
+                  <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{match.team1?.name || 'Команда 1'}</span>
+                  <img src={match.team1?.logo || '/default-logo.png'} alt={match.team1?.name || 'Команда 1'} style={{ height: 48, width: 48, borderRadius: '50%' }} />
                 </div>
 
                 <ScoreBox isActive={match.score_team1 != null && match.score_team2 != null}>
@@ -253,20 +267,20 @@ const Fixtures = () => {
                     minWidth: '180px',
                   }}
                 >
-                  <img src={match.team2.logo} alt={match.team2.name} style={{ height: 48, width: 48, borderRadius: '50%' }} />
-                  <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{match.team2.name}</span>
+                  <img src={match.team2?.logo || '/default-logo.png'} alt={match.team2?.name || 'Команда 2'} style={{ height: 48, width: 48, borderRadius: '50%' }} />
+                  <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{match.team2?.name || 'Команда 2'}</span>
                 </div>
               </div>
               <div style={{ fontSize: '1rem', opacity: 0.9, lineHeight: '1.8', marginTop: '0.5rem' }}>
-                <div>🏟 {match.tournament.stadium || 'Манеж REJO-ВДНХ №1'}</div>
-                <div style={{ color: '#888' }}>📍 {match.tournament.address || 'вул. Академіка Глушкова, 1, Київ'}</div>
+                <div>🏟 {match.tournament?.stadium || 'Манеж REJO-ВДНХ №1'}</div>
+                <div style={{ color: '#888' }}>📍 {match.tournament?.address || 'вул. Академіка Глушкова, 1, Київ'}</div>
               </div>
             </Card>
           ))}
         </Grid>
 
         <ButtonWrapper>
-          <Button href="/calendar">Повний календар</Button>
+          <Button href="/matches">Повний календар</Button>
         </ButtonWrapper>
       </ContentWrapper>
     </Section>
