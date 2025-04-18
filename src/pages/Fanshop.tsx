@@ -1,7 +1,9 @@
-import React from 'react';
-import Header from '../components/Header';
+import React, { useState, useEffect } from 'react';
+import Layout from '../layout/Layout';
 import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
+import ProductCard from '../components/ProductCard';
+import { supabase } from '../supabase'; // make sure this path is correct
 
 const fadeIn = keyframes`
   from {
@@ -80,20 +82,61 @@ const ContentWrapper = styled.div`
 `;
 
 function Fanshop() {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [selectedSizeIndex, setSelectedSizeIndex] = useState<number | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchProducts = async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('active', true);
+
+      if (error) {
+        console.error('Error fetching products:', error);
+      } else {
+        console.log('Fetched products from Supabase:', data);
+        if (isMounted) setProducts(data || []);
+      }
+    };
+
+    fetchProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
-    <PageWrapper>
-      <Header />
+    <Layout>
       <ContentWrapper>
-        <div style={{ maxWidth: '600px', width: '100%' }}>
-          <AnimatedWrapper>
-            <div style={{ fontSize: '8rem', marginBottom: '1rem' }}>🛍️</div>
-            <h1>Фаншоп скоро відкриється!</h1>
-            <p style={{ fontSize: '1.5rem', marginTop: '0rem' }}>Ми готуємо для вас класний мерч 💙💛</p>
-            <StyledLink to="/">Повернутись на головну</StyledLink>
-          </AnimatedWrapper>
+        <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '2rem' }}>
+          <h1 style={{ fontSize: '3rem', marginBottom: '2rem', textAlign: 'center' }}>FAYNA Fan Shop</h1>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '2rem'
+          }}>
+          {Array.isArray(products) && products.length > 0 &&
+            Array.from(new Map(products.map(p => [p.id, p])).values()).map((product, i) => (
+              <ProductCard
+                key={product.id || i}
+                index={i}
+                product={product}
+                isHovered={hoveredIndex === i}
+                setHoveredIndex={setHoveredIndex}
+                selectedSizeIndex={selectedSizeIndex}
+                setSelectedSizeIndex={setSelectedSizeIndex}
+              />
+            ))
+          }
+          </div>
         </div>
       </ContentWrapper>
-    </PageWrapper>
+    </Layout>
   );
 }
 
