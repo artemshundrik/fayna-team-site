@@ -555,6 +555,10 @@ const NextMatch = () => {
 
   useEffect(() => {
     async function checkScore() {
+      if (typeof window !== 'undefined' && window.location.hostname.includes('netlify.app')) {
+        console.log('⛔ Skipping get-latest-score on Netlify');
+        return;
+      }
       const latest = await fetchScore();
       console.log('📺 latest score:', latest);
       if (data?.date && data?.time) {
