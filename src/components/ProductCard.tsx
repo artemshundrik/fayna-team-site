@@ -51,22 +51,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       >
       <div style={{ position: 'relative', width: '100%', paddingTop: '100%', overflow: 'hidden' }}>
         {!product.image_2_url ? (
-          <img
-            src={product.image_1_url}
-            alt={product.title}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              transition: 'opacity 0.4s ease',
-              opacity: 1,
-            }}
-          />
-        ) : (
-          <>
+          <div style={{ overflow: 'hidden', transition: 'transform 0.3s ease' }}>
             <img
               src={product.image_1_url}
               alt={product.title}
@@ -77,24 +62,48 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                transition: 'opacity 0.4s ease',
-                opacity: isHovered ? 0 : 1,
+                transition: 'opacity 0.4s ease, transform 0.3s ease',
+                opacity: 1,
+                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
               }}
             />
-            <img
-              src={product.image_2_url}
-              alt={product.title}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                transition: 'opacity 0.4s ease',
-                opacity: isHovered ? 1 : 0,
-              }}
-            />
+          </div>
+        ) : (
+          <>
+            <div style={{ overflow: 'hidden', transition: 'transform 0.3s ease' }}>
+              <img
+                src={product.image_1_url}
+                alt={product.title}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  transition: 'opacity 0.4s ease, transform 0.3s ease',
+                  opacity: isHovered ? 0 : 1,
+                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                }}
+              />
+            </div>
+            <div style={{ overflow: 'hidden', transition: 'transform 0.3s ease' }}>
+              <img
+                src={product.image_2_url}
+                alt={product.title}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  transition: 'opacity 0.4s ease, transform 0.3s ease',
+                  opacity: isHovered ? 1 : 0,
+                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                }}
+              />
+            </div>
           </>
         )}
         {product.type === 'simple' && (
