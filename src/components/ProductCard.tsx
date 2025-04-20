@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
-                transition: 'opacity 0.4s ease, transform 0.3s ease',
+                transition: 'transform 0.3s ease',
                 opacity: 1,
                 transform: isHovered ? 'scale(1.05)' : 'scale(1)',
               }}
@@ -81,9 +81,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain',
-                  transition: 'opacity 0.4s ease, transform 0.3s ease',
+                  transition: 'none',
                   opacity: isHovered ? 0 : 1,
-                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                  transform: 'scale(1)',
                 }}
               />
             </div>
@@ -98,7 +98,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain',
-                  transition: 'opacity 0.4s ease, transform 0.3s ease',
+                  transition: 'transform 0.3s ease',
                   opacity: isHovered ? 1 : 0,
                   transform: isHovered ? 'scale(1.05)' : 'scale(1)',
                 }}
