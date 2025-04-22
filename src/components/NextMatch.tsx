@@ -36,6 +36,7 @@ const ActionText = styled.div`
   text-align: center;
   display: inline-flex;
   align-items: center;
+  font-weight: 500;
   justify-content: center;
   gap: 0.5rem;
 `;
@@ -214,9 +215,15 @@ const Wrapper = styled.section`
   background-size: cover;
   position: relative;
   padding: 4rem 1rem;
+  @media (max-width: 768px) {
+    padding: 2.5rem 1rem;
+  }
+  @media (max-width: 480px) {
+    padding: 2rem 0.5rem;
+  }
   text-align: center;
   color: white;
-  font-family: 'Cuprum', sans-serif;
+  font-family: 'FixelDisplay', sans-serif;
   overflow: hidden;
 
   &::before {
@@ -260,9 +267,10 @@ const FlipUnit = styled.div`
   align-items: center;
 
   .label {
-    margin-top: 0;
+    margin-top: -0.5rem;
     font-size: 0.75rem;
     color: #aaa;
+    font-weight: 1000;
     text-transform: uppercase;
   }
 `;
@@ -278,6 +286,10 @@ const MatchBox = styled.div`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  @media (max-width: 768px) {
+    gap: 0.25rem;
+    flex-direction: column;
+  }
   flex-wrap: wrap;
   margin-bottom: 1rem;
   position: relative;
@@ -298,6 +310,11 @@ const MatchBox = styled.div`
     color: white;
     flex: 1;
     max-width: 300px;
+
+    @media (max-width: 480px) {
+      font-size: 1.4rem;
+      gap: 1rem;
+    }
 
     &.reverse {
       flex-direction: row-reverse;
@@ -392,6 +409,7 @@ const Stadium = styled.div`
     align-items: center;
     gap: 0.4rem;
     color: #aaa;
+    font-weight: 500;
     font-size: 0.95rem;
   }
 
@@ -425,10 +443,11 @@ const TournamentInfo = styled.div`
     .meta {
       font-size: 1rem;
       color: white;
-      font-weight: 400;
+      font-weight: 600;
     }
   }
 `;
+
 
 const NextMatch = () => {
   const [data, setData] = useState<Database['public']['Tables']['matches']['Row'] & {
@@ -539,7 +558,19 @@ const NextMatch = () => {
 const isLive = !!score?.url && !score?.finishedManually;
 const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(matchDate.getTime() + 2 * 60 * 60 * 1000);
   const isFinished = score !== null;
-
+  
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+  
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
   return (
     <>
       <GlobalStyle />

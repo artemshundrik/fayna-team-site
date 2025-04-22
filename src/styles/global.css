@@ -1,0 +1,58 @@
+@font-face {
+  font-family: 'FixelDisplay';
+  src: url('/fonts/FixelDisplay-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FixelDisplay';
+  src: url('/fonts/FixelDisplay-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FixelDisplay';
+  src: url('/fonts/FixelDisplay-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FixelDisplay';
+  src: url('/fonts/FixelDisplay-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Font family */
+  --font-main: 'FixelDisplay', sans-serif;
+
+  /* Colors */
+  --color-accent: #FE294F;
+  --color-black: #111111;
+  --color-white: #ffffff;
+  --color-gray-light: #f5f5f5;
+  --color-gray-medium: #cccccc;
+  --color-gray-dark: #444444;
+  --color-success: #2ecc71;
+  --color-warning: #f39c12;
+  --color-error: #e74c3c;
+
+  /* Font weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Additional colors */
+  --color-info: #3498db;
+  --color-bg: #fefefe;
+  --color-muted: #888888;
+}

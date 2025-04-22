@@ -6,6 +6,10 @@ import Fanshop from './pages/Fanshop';
 import PasswordGate from './PasswordGate';
 import Matches from './pages/Matches';
 import Squad from './pages/Squad';
+import Styleguide from './pages/Styleguide';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './theme';
 
 function ScrollToTop() {
   const location = useLocation();
@@ -19,18 +23,22 @@ function ScrollToTop() {
 
 function App() {
   return (
-    <PasswordGate>
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/fanshop" element={<Fanshop />} />
-          <Route path="/matches" element={<Matches />} />
-          <Route path="/squad" element={<Squad />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </PasswordGate>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <PasswordGate>
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/fanshop" element={<Fanshop />} />
+            <Route path="/matches" element={<Matches />} />
+            <Route path="/squad" element={<Squad />} />
+            <Route path="/styleguide" element={<Styleguide />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </PasswordGate>
+    </ThemeProvider>
   );
 }
 

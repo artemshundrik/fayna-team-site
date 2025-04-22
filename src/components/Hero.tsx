@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+// import Button from '@mui/material/Button';
 
 const Section = styled.section`
   position: relative;
@@ -68,86 +69,15 @@ const Logo = styled.div`
   }
 `;
 
-const Buttons = styled.div`
-  opacity: 0;
-  transform: translateY(40px);
-  animation: fadeInUp 1s ease-out 0.6s forwards;
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  flex-direction: row-reverse;
-
-  a.btn {
-    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 4vw, 2rem);
-    font-size: clamp(1rem, 2vw, 1.4rem);
-    text-transform: uppercase;
-    font-family: 'Cuprum', sans-serif;
-    text-decoration: none;
-  }
-
-  a.btn-primary {
-    position: relative;
-    background: linear-gradient(135deg, #FF1695, #ff6ac1);
-    color: white;
-    border: none;
-    box-shadow: 0 0 12px rgba(255, 22, 149, 0.5), 0 0 24px rgba(255, 22, 149, 0.3);
-    overflow: hidden;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  a.btn-primary::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
-    transition: all 0.75s ease;
-  }
-
-  a.btn-primary:hover::after {
-    left: 100%;
-  }
-
-  a.btn-primary:hover {
-    background: white;
-    color: #FF1695;
-    box-shadow: 0 6px 16px rgba(255, 22, 149, 0.5);
-  }
-
-  a.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(6px);
-    position: relative;
-    overflow: hidden;
-  }
-
-  a.btn-secondary::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
-    transition: all 0.75s ease;
-    pointer-events: none;
-  }
-
-  a.btn-secondary:hover::after {
-    left: 100%;
-  }
-
-  a.btn-secondary:hover {
-    background: white;
-    color: black;
-  }
-`;
+// const Buttons = styled.div`
+//   opacity: 0;
+//   transform: translateY(40px);
+//   animation: fadeInUp 1s ease-out 0.6s forwards;
+//   display: flex;
+//   justify-content: center;
+//   gap: 2rem;
+//   flex-direction: row-reverse;
+// `;
 
 const Social = styled.div`
   margin-top: 3rem;
@@ -211,10 +141,14 @@ const Hero: React.FC = () => {
         <Logo>
           <img src="/images/logo-hero-fayna.svg" alt="FAYNA TEAM" />
         </Logo>
-        <Buttons>
-          <a href="#matches" className="btn btn-primary">Дивитись матчі</a>
-          <a href="#players" className="btn btn-secondary">Склад команди</a>
-        </Buttons>
+        {/* <Buttons>
+          <Button href="#matches" variant="contained" size="large" color="primary">
+            Дивитись матчі
+          </Button>
+          <Button href="#players" variant="outlined" size="large" color="secondary">
+            Склад команди
+          </Button>
+        </Buttons> */}
         <Social>
         <SocialBox href="https://www.youtube.com/@FCFAYNATEAM" target="_blank" rel="noopener noreferrer">
             <img src="/images/icons/youtube-default.svg" className="default" alt="YouTube" />

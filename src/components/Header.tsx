@@ -1,237 +1,207 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import Tooltip from '@mui/material/Tooltip';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Drawer from '@mui/material/Drawer';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
-const HeaderWrapper = styled.header`
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 2rem;
-  background-color: white;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid #e0e0e0;
-  transition: top 0.3s ease;
-  &.hidden {
-    top: -100px; /* Hides header when scrolling down */
-  }
-  &.visible {
-    top: 0; /* Resets position when scrolling up */
-  }
-`;
-
-const MobileMenuToggle = styled.button`
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 100;
-
-  @media (max-width: 768px) {
-    display: block;
-  }
-
-  span {
-    display: block;
-    width: 24px;
-    height: 2px;
-    background: black;
-    margin: 5px 0;
-    transition: all 0.3s ease;
-  }
-`;
-
-const MobileMenu = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: white;
-  z-index: 99;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-
-  &.open {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  a {
-    font-size: 2rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: black;
-  }
-
-  @media (min-width: 769px) {
-    display: none;
-  }
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-`;
-
-const Sponsors = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-
-  img {
-    height: 24px;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    opacity: 0.8;
-    cursor: pointer;
-
-    &:hover {
-      transform: scale(1.05);
-      opacity: 1;
-    }
-  }
-`;
-
-const Logo = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-right: 2rem;
-  z-index: 3;
-
-  img {
-    height: 72px;
-  }
-`;
-
-const Nav = styled.nav`
-  display: flex;
-  justify-content: flex-start;
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-
-  a {
-    position: relative;
-    z-index: 2;
-    color: black;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-    text-decoration: none;
-    font-weight: 700;
-    font-family: 'Cuprum', sans-serif;
-
-    &:hover {
-      opacity: 1;
-    }
-
-    &:after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      left: 0;
-      transform: scaleX(0);
-      transform-origin: left;
-      width: 100%;
-      height: 3px;
-      background-color: #FF1695;
-      transition: transform 0.3s ease;
-      opacity: 1;
-    }
-
-    &:hover:after {
-      transform: scaleX(1);
-    }
-  }
-`;
+const NavLinks = ({ onClick }: { onClick?: () => void }) => (
+  <>
+    <Link to="/" style={{ textDecoration: 'none' }} onClick={onClick}>
+      <Typography variant="navLink">Головна</Typography>
+    </Link>
+    <Link to="/squad" style={{ textDecoration: 'none' }} onClick={onClick}>
+      <Typography variant="navLink">Склад</Typography>
+    </Link>
+    <Link to="/fanshop" style={{ textDecoration: 'none' }} onClick={onClick}>
+      <Typography variant="navLink">Фаншоп</Typography>
+    </Link>
+    <Link to="/matches" style={{ textDecoration: 'none' }} onClick={onClick}>
+      <Typography variant="navLink">Матчі</Typography>
+    </Link>
+    <Link to="#" style={{ textDecoration: 'none' }} onClick={onClick}>
+      <Typography variant="navLink">Про нас</Typography>
+    </Link>
+  </>
+);
 
 const Header = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [showHeader, setShowHeader] = useState(true);
+  const lastScrollY = useRef(0);
 
   const handleScroll = () => {
     if (typeof window !== 'undefined') {
       const scrollY = window.scrollY;
-      if (scrollY > lastScrollY) {
-        setIsHeaderVisible(false); // Scroll down
+      if (scrollY > lastScrollY.current) {
+        setShowHeader(false); // scroll down, hide header
       } else {
-        setIsHeaderVisible(true); // Scroll up
+        setShowHeader(true); // scroll up, show header
       }
-      setLastScrollY(scrollY);
+      lastScrollY.current = scrollY;
     }
   };
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   return (
-    <HeaderWrapper className={isHeaderVisible ? 'visible' : 'hidden'}>
-      <Logo>
-        <Link to="/">
-          <img src="/images/logo-fayna.svg" alt="FAYNA TEAM logo" />
-        </Link>
-      </Logo>
+    <>
+      <AppBar
+        position="fixed"
+        sx={(theme) => ({
+          backgroundColor: theme.palette.background.default,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          px: 2,
+          py: 1,
+          backdropFilter: showHeader ? 'blur(0px)' : 'blur(10px)',
+          boxShadow: 'none', // Прибирає тінь
+          transform: showHeader ? 'translateY(0)' : 'translateY(-100%)',
+          transition: 'transform 0.3s ease, backdrop-filter 0.3s ease',
+        })}
+      >
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ mr: 2 }}>
+              <Link to="/">
+                <img src="/images/logo-fayna.svg" alt="FAYNA TEAM logo" height="64" />
+              </Link>
+            </Box>
+            <Stack direction="row" spacing={3} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
+              <NavLinks />
+            </Stack>
+          </Box>
+ 
+          {/* Спонсори */}
+          <Box sx={{ alignItems: 'center', gap: 3, display: { xs: 'none', md: 'flex' } }}>
+            <Tooltip title="ToSho Agency" arrow>
+              <a href="https://tosho.agency/" target="_blank" rel="noopener noreferrer">
+                <img src="/images/sponsors/logo-sponsor-tosho.svg" alt="ToSho" height="24" className="sponsor-logo" />
+              </a>
+            </Tooltip>
+            <Tooltip title="Wookie Studio" arrow>
+              <a href="https://wookie.com.ua/ua/" target="_blank" rel="noopener noreferrer">
+                <img src="/images/sponsors/logo-sponsor-wookie.svg" alt="Wookie" height="24" className="sponsor-logo" />
+              </a>
+            </Tooltip>
+            <Tooltip title="Minimal Coffee Room" arrow>
+              <a href="https://www.instagram.com/minimal_coffeeroom/" target="_blank" rel="noopener noreferrer">
+                <img src="/images/sponsors/logo-sponsor-minimal.svg" alt="Minimal" height="24" className="sponsor-logo" />
+              </a>
+            </Tooltip>
+          </Box>
+ 
+          {/* Mobile Menu Icon */}
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={() => setMenuOpen(true)}
+            sx={{
+              color: (theme) => theme.palette.text.primary,
+              display: { xs: 'block', md: 'none' }, // Показати тільки на мобільних
+              boxShadow: 'none', // Прибираємо тінь
+              '&:hover': {
+                backgroundColor: 'transparent', // Окремий ефект для ховера
+              },
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
 
-      <Nav>
-        <Link to="/" className="active">Головна</Link>
-        <Link to="/squad">Склад</Link>
-        <Link to="/fanshop">Фаншоп</Link>
-        <Link to="/matches">Матчі</Link>
-        <a href="#">Про нас</a>
-      </Nav>
+      <Drawer
+        anchor="right"
+        open={isMenuOpen}
+        onClose={() => setMenuOpen(false)}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          width: '100%',
+          maxWidth: '100vw',
+          zIndex: 1300,
+        }}
+      >
+        <Box
+          sx={{
+            width: 250,
+            p: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            transform: isMenuOpen ? 'translateX(0)' : 'translateX(100%)',
+            opacity: isMenuOpen ? 1 : 0,
+            transition: 'transform 0.3s ease, opacity 0.3s ease',
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <IconButton
+              onClick={() => setMenuOpen(false)}
+              sx={{
+                color: (theme) => theme.palette.text.primary,
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Stack direction="column" spacing={2} mt={2}>
+            <NavLinks onClick={() => setMenuOpen(false)} />
+          </Stack>
 
-      <Sponsors>
-        <a href="https://tosho.agency/" target="_blank" rel="noopener noreferrer">
-          <img src="/images/sponsors/logo-sponsor-tosho.svg" alt="ToSho logo" />
-        </a>
-        <a href="https://wookie.com.ua/ua/" target="_blank" rel="noopener noreferrer">
-          <img src="/images/sponsors/logo-sponsor-wookie.svg" alt="Wookie logo" />
-        </a>
-        <a href="https://www.instagram.com/minimal_coffeeroom/" target="_blank" rel="noopener noreferrer">
-          <img src="/images/sponsors/logo-sponsor-minimal.svg" alt="Minimal logo" />
-        </a>
-      </Sponsors>
+          {/* Spacer */}
+          <Box sx={{ flexGrow: 1 }} /> {/* Spacer */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, paddingBottom: 3 }}>
+            {/* Спонсори в мобільному меню */}
+            <Tooltip title="ToSho Agency" arrow>
+              <a href="https://tosho.agency/" target="_blank" rel="noopener noreferrer">
+                <img src="/images/sponsors/logo-sponsor-tosho.svg" alt="ToSho" height="24" className="sponsor-logo" />
+              </a>
+            </Tooltip>
+            <Tooltip title="Wookie Studio" arrow>
+              <a href="https://wookie.com.ua/ua/" target="_blank" rel="noopener noreferrer">
+                <img src="/images/sponsors/logo-sponsor-wookie.svg" alt="Wookie" height="24" className="sponsor-logo" />
+              </a>
+            </Tooltip>
+            <Tooltip title="Minimal Coffee Room" arrow>
+              <a href="https://www.instagram.com/minimal_coffeeroom/" target="_blank" rel="noopener noreferrer">
+                <img src="/images/sponsors/logo-sponsor-minimal.svg" alt="Minimal" height="24" className="sponsor-logo" />
+              </a>
+            </Tooltip>
+          </Box>
+        </Box>
+      </Drawer>
 
-      <MobileMenuToggle onClick={() => setMenuOpen(!isMenuOpen)}>
-        <span />
-        <span />
-        <span />
-      </MobileMenuToggle>
+      {/* Основний контент */}
+      <Box sx={{ paddingTop: '64px' }}>
+        {/* Ваш контент */}
+      </Box>
+      <style>{`
+        .sponsor-logo {
+          transition: transform 0.3s ease-in-out;
+          cursor: pointer;
+          display: inline-block;
+        }
 
-      <MobileMenu className={isMenuOpen ? 'open' : ''}>
-        <CloseButton onClick={() => setMenuOpen(false)}>×</CloseButton>
-        <Link to="/" onClick={() => setMenuOpen(false)}>Головна</Link>
-        <Link to="/squad" onClick={() => setMenuOpen(false)}>Склад</Link>
-        <Link to="/fanshop" onClick={() => setMenuOpen(false)}>Фаншоп</Link>
-        <Link to="/matches" onClick={() => setMenuOpen(false)}>Матчі</Link>
-        <a href="#">Про нас</a>
-      </MobileMenu>
-    </HeaderWrapper>
+        .sponsor-logo:hover {
+          transform: scale(1.1);
+        }
+
+        .sponsor-container {
+          display: flex;
+          gap: 20px;
+          justify-content: center;
+        }
+      `}</style>
+    </>
   );
 };
 
