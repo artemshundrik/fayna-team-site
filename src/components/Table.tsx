@@ -80,7 +80,7 @@ const columns: Column[] = [
   { key: 'wins', label: 'В', align: 'center', hideOnMobile: true },
   { key: 'draws', label: 'Н', align: 'center', hideOnMobile: true },
   { key: 'losses', label: 'П', align: 'center', hideOnMobile: true },
-  { key: 'goals', label: '+/−', align: 'center' },
+  { key: 'goals', label: '+/−', align: 'center', hideOnMobile: true },
   { key: 'points', label: 'О', align: 'center' },
   { key: 'form', label: 'ФОРМА', width: '150px', align: 'left', hideOnMobile: true },
 ];
@@ -157,6 +157,17 @@ const columns: Column[] = [
   return (
     <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 } }}>
       <Paper elevation={0} square sx={{ border: 'none' }}>
+        <Box
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            textAlign: 'center',
+            fontSize: '0.85rem',
+            color: theme.palette.grey[600],
+            padding: theme.spacing(1),
+          }}
+        >
+          Щоб побачити повну таблицю — переверніть телефон у горизонтальне положення 📱↩️
+        </Box>
         <Box sx={{ overflowX: 'auto' }}>
           <TableContainer sx={{ width: '100%' }}>
             <Table sx={{ minWidth: '100%', width: '100%', tableLayout: 'auto' }}>
@@ -175,6 +186,16 @@ const columns: Column[] = [
                         whiteSpace: 'nowrap',
                         display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                         ...(col.key === 'goals' ? { whiteSpace: 'nowrap' } : {}),
+                        // Responsive padding for header cells
+                        ...(col.key === 'team'
+                          ? { padding: { xs: '6px 8px', sm: '6px 16px' } }
+                          : col.key === 'place'
+                          ? { paddingLeft: { xs: '8px', sm: '24px' }, paddingRight: { xs: '4px', sm: '12px' } }
+                          : col.key === 'form'
+                          ? { paddingLeft: { xs: '4px', sm: '8px' }, paddingRight: { xs: '4px', sm: '8px' } }
+                          : col.key === 'games_played' || col.key === 'goals' || col.key === 'points'
+                          ? { padding: { xs: '6px 16px', sm: '12px 16px' } }
+                          : { padding: { xs: '6px 4px', sm: '12px 16px' } }),
                       }}
                     >
                       {(col.key === 'games_played') ? (
@@ -231,8 +252,8 @@ const columns: Column[] = [
                               sx={{
                                 fontSize: theme.typography.body1.fontSize,
                                 fontFamily: theme.typography.fontFamily,
-                                paddingLeft: '24px',
-                                paddingRight: '12px',
+                                paddingLeft: { xs: '8px', sm: '24px' },
+                                paddingRight: { xs: '4px', sm: '12px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                               }}
                             >
@@ -259,7 +280,7 @@ const columns: Column[] = [
                                   sm: theme.typography.body1.fontSize
                                 },
                                 fontFamily: theme.typography.fontFamily,
-                                padding: '6px 16px',
+                                padding: { xs: '6px 8px', sm: '6px 16px' },
                                 width: '100%',
                                 maxWidth: '100%',
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
@@ -294,6 +315,7 @@ const columns: Column[] = [
                               sx={{
                                 fontSize: theme.typography.body1.fontSize,
                                 fontFamily: theme.typography.fontFamily,
+                                padding: { xs: '6px 8px', sm: '12px 16px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                               }}
                             >
@@ -308,6 +330,7 @@ const columns: Column[] = [
                               sx={{
                                 fontSize: theme.typography.body1.fontSize,
                                 fontFamily: theme.typography.fontFamily,
+                                padding: { xs: '6px 4px', sm: '12px 16px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                               }}
                             >
@@ -322,6 +345,7 @@ const columns: Column[] = [
                               sx={{
                                 fontSize: theme.typography.body1.fontSize,
                                 fontFamily: theme.typography.fontFamily,
+                                padding: { xs: '6px 4px', sm: '12px 16px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                               }}
                             >
@@ -352,6 +376,7 @@ const columns: Column[] = [
                                 fontFamily: theme.typography.fontFamily,
                                 whiteSpace: 'nowrap',
                                 textAlign: 'center',
+                                padding: { xs: '6px 8px', sm: '12px 16px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                                 justifyContent: 'center',
                                 alignItems: 'center',
@@ -368,6 +393,7 @@ const columns: Column[] = [
                               sx={{
                                 fontSize: theme.typography.body1.fontSize,
                                 fontFamily: theme.typography.fontFamily,
+                                padding: { xs: '6px 16px', sm: '12px 16px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                               }}
                             >
@@ -386,8 +412,8 @@ const columns: Column[] = [
                                 minWidth: col.width,
                                 maxWidth: col.width,
                                 whiteSpace: 'nowrap',
-                                paddingLeft: '8px',
-                                paddingRight: '8px',
+                                paddingLeft: { xs: '4px', sm: '8px' },
+                                paddingRight: { xs: '4px', sm: '8px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                               }}
                             >

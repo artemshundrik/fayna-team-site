@@ -176,7 +176,14 @@ const Matches: React.FC = () => {
         </Container>
         
         {activeTab === 'table' && (
-          <Box sx={{ width: '100%', px: 0 }}>
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: '1200px',
+              mx: 'auto',
+              px: { xs: 1, sm: 2 },
+            }}
+          >
             <Stack spacing={2} sx={{ width: '100%' }}>
               <Table />
             </Stack>
@@ -184,7 +191,14 @@ const Matches: React.FC = () => {
         )}
 
         {activeTab === 'upcoming' && (
-          <Box sx={{ width: '100%', px: 0 }}>
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: '1200px',
+              mx: 'auto',
+              px: { xs: 1, sm: 2 },
+            }}
+          >
             <Stack spacing={2}>
               {futureMatches.map((match, index) => {
                 const [team1, team2] = match.teams.split(' проти ');
@@ -330,7 +344,14 @@ const Matches: React.FC = () => {
         )}
 
         {activeTab === 'past' && (
-          <Box sx={{ width: '100%', px: 0 }}>
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: '1200px',
+              mx: 'auto',
+              px: { xs: 1, sm: 2 },
+            }}
+          >
             <Stack spacing={2}>
               {pastMatches.map((match, index) => {
                 const [team1, team2] = match.teams.split(' проти ');

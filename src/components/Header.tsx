@@ -55,7 +55,8 @@ const Header = () => {
             backgroundColor: theme.palette.background.default,
             borderBottom: `1px solid ${theme.palette.divider}`,
             px: 2,
-            py: 1,
+            py: { xs: 0.5, sm: 1 }, // менше падінг на мобілці
+            minHeight: { xs: 48, sm: 64 }, // нижча висота хедера на мобілці
             boxShadow: 'none',
           })}
         >
@@ -63,7 +64,14 @@ const Header = () => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ mr: 2 }}>
               <Link to="/">
-                <img src="/images/logo-fayna.svg" alt="FAYNA TEAM logo" height="64" />
+                <Box
+                  component="img"
+                  src="/images/logo-fayna.svg"
+                  alt="FAYNA TEAM logo"
+                  sx={{ height: { xs: 40, sm: 64 } }}
+                  srcSet="/images/logo-fayna.svg 1x, /images/logo-fayna.svg 2x"
+                  sizes="(max-width: 600px) 40px, 64px"
+                />
               </Link>
             </Box>
             <Stack direction="row" spacing={3} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
