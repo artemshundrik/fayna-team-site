@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import styled from 'styled-components';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Container, Stack, Tabs, Tab } from '@mui/material';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import Layout from '../layout/Layout';
 import Table from '../components/Table';
@@ -48,9 +48,7 @@ const MatchesList = styled.div`
   flex-direction: column;
   gap: 1rem;
   width: 100%;
-  max-width: 100%;
   margin: 0 auto;
-  padding: 0;
 
   @media (min-width: 900px) {
     max-width: 1200px;
@@ -153,377 +151,323 @@ const Matches: React.FC = () => {
   return (
     <Layout>
       <Wrapper>
-        <MatchesList>
-          <div style={{ display: 'flex', gap: '2rem', marginBottom: '1rem' }}>
-            <Button
-              onClick={() => setActiveTab('upcoming')}
-              sx={(theme) => ({
-                fontFamily: 'FixelDisplay, sans-serif',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                color: activeTab === 'upcoming'
-                  ? theme.palette.primary.main
-                  : theme.palette.text.secondary,
-                borderBottom: activeTab === 'upcoming'
-                  ? `2px solid ${theme.palette.primary.main}`
-                  : '2px solid transparent',
-                borderRadius: 0,
-                px: 1.5,
-                pb: 0.5,
-                transition: 'border-color 0.2s ease, color 0.2s ease',
-                '&:hover': {
-                  color: theme.palette.primary.main,
-                },
-              })}
-            >
-              МАЙБУТНІ
-            </Button>
-            <Button
-              onClick={() => setActiveTab('past')}
-              sx={(theme) => ({
-                fontFamily: 'FixelDisplay, sans-serif',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                color: activeTab === 'past'
-                  ? theme.palette.primary.main
-                  : theme.palette.text.secondary,
-                borderBottom: activeTab === 'past'
-                  ? `2px solid ${theme.palette.primary.main}`
-                  : '2px solid transparent',
-                borderRadius: 0,
-                px: 1.5,
-                pb: 0.5,
-                transition: 'border-color 0.2s ease, color 0.2s ease',
-                '&:hover': {
-                  color: theme.palette.primary.main,
-                },
-              })}
-            >
-              ЗІГРАНІ
-            </Button>
-            <Button
-              onClick={() => setActiveTab('table')}
-              sx={(theme) => ({
-                fontFamily: 'FixelDisplay, sans-serif',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                color: activeTab === 'table'
-                  ? theme.palette.primary.main
-                  : theme.palette.text.secondary,
-                borderBottom: activeTab === 'table'
-                  ? `2px solid ${theme.palette.primary.main}`
-                  : '2px solid transparent',
-                borderRadius: 0,
-                px: 1.5,
-                pb: 0.5,
-                transition: 'border-color 0.2s ease, color 0.2s ease',
-                '&:hover': {
-                  color: theme.palette.primary.main,
-                },
-              })}
-            >
-              ТАБЛИЦЯ
-            </Button>
-          </div>
-        </MatchesList>
+        <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, mb: 2 }}>
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => setActiveTab(newValue)}
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{
+              borderBottom: 1,
+              borderColor: 'divider',
+            }}
+          >
+            <Tab label="МАЙБУТНІ" value="upcoming" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
+            <Tab label="ЗІГРАНІ" value="past" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
+            <Tab label="ТАБЛИЦЯ" value="table" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
+          </Tabs>
+        </Container>
         
         {activeTab === 'table' && (
-          <MatchesList>
-            <Table />
-          </MatchesList>
+          <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, width: '100%' }}>
+            <Stack spacing={2}>
+              <Table />
+            </Stack>
+          </Container>
         )}
 
         {activeTab === 'upcoming' && (
-          <MatchesList>
-            {futureMatches.map((match, index) => {
-              const [team1, team2] = match.teams.split(' проти ');
-              return (
-                <Box
-                  key={index}
-                  sx={(theme) => ({
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    backgroundColor: theme.palette.background.paper,
-                    padding: {
-                      xs: '0.75rem 0.5rem',
-                      sm: '0.75rem 1.25rem',
-                    },
-                    minHeight: '110px',
-                    borderRadius: 0,
-                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
-                    transition: 'box-shadow 0.3s ease-in-out',
-                    flexDirection: {
-                      xs: 'column',
-                      sm: 'row',
-                    },
-                    flexWrap: 'wrap',
-                    '&:hover': {
-                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
-                    },
-                  })}
-                >
-                  {/* LEFT */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-                    <img
-                      src={match.tournamentLogo}
-                      alt="Турнір"
-                      style={{ height: '56px' }}
-                    />
-                    <Box
-                      sx={{
-                        fontSize: '0.95rem',
-                        fontWeight: 600,
-                        letterSpacing: '0.5px',
-                        textTransform: 'uppercase',
-                        color: '#111',
-                      }}
-                    >
-                      {match.leagueName}
-                      {match.tour ? ` • ТУР ${match.tour}` : ''}
-                    </Box>
-                  </Box>
-
-                  {/* CENTER */}
+          <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, width: '100%' }}>
+            <Stack spacing={2}>
+              {futureMatches.map((match, index) => {
+                const [team1, team2] = match.teams.split(' проти ');
+                return (
                   <Box
-                    sx={{
-                      flex: 2,
+                    key={index}
+                    sx={(theme) => ({
+                      width: '100%',
                       display: 'flex',
-                      flexDirection: 'column',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.25rem',
-                    }}
+                      justifyContent: 'space-between',
+                      backgroundColor: theme.palette.background.paper,
+                      padding: {
+                        xs: '0.75rem 0.5rem',
+                        sm: '0.75rem 1.25rem',
+                      },
+                      minHeight: '110px',
+                      borderRadius: 0,
+                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                      transition: 'box-shadow 0.3s ease-in-out',
+                      flexDirection: {
+                        xs: 'column',
+                        sm: 'row',
+                      },
+                      flexWrap: 'wrap',
+                      '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
+                      },
+                    })}
                   >
-                    <Box
-                      sx={(theme) => ({
-                        fontSize: '0.875rem',
-                        fontWeight: 600,
-                        color: theme.palette.text.secondary,
-                      })}
-                    >
-                      {formatDateWithTime(match.date, match.time)}
+                    {/* LEFT */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+                      <img
+                        src={match.tournamentLogo}
+                        alt="Турнір"
+                        style={{ height: '56px' }}
+                      />
+                      <Box
+                        sx={{
+                          fontSize: '0.95rem',
+                          fontWeight: 600,
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase',
+                          color: '#111',
+                        }}
+                      >
+                        {match.leagueName}
+                        {match.tour ? ` • ТУР ${match.tour}` : ''}
+                      </Box>
                     </Box>
 
+                    {/* CENTER */}
                     <Box
                       sx={{
+                        flex: 2,
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '1rem',
                         justifyContent: 'center',
-                        flexWrap: 'nowrap',
+                        gap: '0.25rem',
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team1}</Box>
-                        <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                      <Box
+                        sx={(theme) => ({
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          color: theme.palette.text.secondary,
+                        })}
+                      >
+                        {formatDateWithTime(match.date, match.time)}
                       </Box>
 
                       <Box
-                        sx={(theme) => ({
-                          backgroundColor: theme.palette.grey[200],
-                          color: theme.palette.text.secondary,
-                          padding: '0.4rem 0.8rem',
-                          borderRadius: '0.4rem',
-                          fontSize: '1.1rem',
-                          fontWeight: 600,
-                          minWidth: '2.2rem',
-                          textAlign: 'center',
+                        sx={{
                           display: 'flex',
                           alignItems: 'center',
+                          gap: '1rem',
                           justifyContent: 'center',
-                        })}
+                          flexWrap: 'nowrap',
+                        }}
                       >
-                        {match.time}
-                      </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team1}</Box>
+                          <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                        </Box>
 
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
-                        <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team2}</Box>
+                        <Box
+                          sx={(theme) => ({
+                            backgroundColor: theme.palette.grey[200],
+                            color: theme.palette.text.secondary,
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '0.4rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            minWidth: '2.2rem',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          })}
+                        >
+                          {match.time}
+                        </Box>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
+                          <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team2}</Box>
+                        </Box>
                       </Box>
                     </Box>
-                  </Box>
 
-                  {/* RIGHT */}
-                  <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                    {match.youtube_link && (
-                      <a
-                        href={match.youtube_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'flex-end',
-                          gap: '0.4rem',
-                          fontWeight: 600,
-                          color: '#e53935',
-                          textDecoration: 'none',
-                          fontSize: '0.95rem',
-                          transition: 'text-decoration 0.2s ease',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                        onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-                      >
-                        <span>Дивитись огляд</span>
-                        <YouTubeIcon sx={{ fontSize: 20 }} />
-                      </a>
-                    )}
+                    {/* RIGHT */}
+                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                      {match.youtube_link && (
+                        <a
+                          href={match.youtube_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            gap: '0.4rem',
+                            fontWeight: 600,
+                            color: '#e53935',
+                            textDecoration: 'none',
+                            fontSize: '0.95rem',
+                            transition: 'text-decoration 0.2s ease',
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                          onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                        >
+                          <span>Дивитись огляд</span>
+                          <YouTubeIcon sx={{ fontSize: 20 }} />
+                        </a>
+                      )}
+                    </Box>
                   </Box>
-                </Box>
-              );
-            })}
-          </MatchesList>
+                );
+              })}
+            </Stack>
+          </Container>
         )}
 
         {activeTab === 'past' && (
-          <MatchesList>
-            {pastMatches.map((match, index) => {
-              const [team1, team2] = match.teams.split(' проти ');
-              return (
-                <Box
-                  key={index}
-                  sx={(theme) => ({
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    backgroundColor: theme.palette.background.paper,
-                    padding: {
-                      xs: '0.75rem 0.5rem',
-                      sm: '0.75rem 1.25rem',
-                    },
-                    minHeight: '110px',
-                    gap: '2rem',
-                    borderRadius: 0,
-                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
-                    flexWrap: 'wrap',
-                    cursor: 'default',
-                    transition: 'box-shadow 0.3s ease-in-out',
-                    '&:hover': {
-                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
-                    },
-                    flexDirection: {
-                      xs: 'column',
-                      sm: 'row',
-                    },
-                  })}
-                >
-                  {/* LEFT */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-                    <img
-                      src={match.tournamentLogo}
-                      alt="Турнір"
-                      style={{ height: '56px' }}
-                    />
-                    <Box
-                      sx={{
-                        fontSize: '0.95rem',
-                        fontWeight: 600,
-                        letterSpacing: '0.5px',
-                        textTransform: 'uppercase',
-                        color: '#111',
-                      }}
-                    >
-                      {match.leagueName}
-                      {match.tour ? ` • ТУР ${match.tour}` : ''}
-                    </Box>
-                  </Box>
-
-                  {/* CENTER */}
+          <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, width: '100%' }}>
+            <Stack spacing={2}>
+              {pastMatches.map((match, index) => {
+                const [team1, team2] = match.teams.split(' проти ');
+                return (
                   <Box
-                    sx={{
-                      flex: 2,
+                    key={index}
+                    sx={(theme) => ({
+                      width: '100%',
                       display: 'flex',
-                      flexDirection: 'column',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.25rem',
-                    }}
+                      backgroundColor: theme.palette.background.paper,
+                      padding: {
+                        xs: '0.75rem 0.5rem',
+                        sm: '0.75rem 1.25rem',
+                      },
+                      minHeight: '110px',
+                      gap: '2rem',
+                      borderRadius: 0,
+                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                      flexWrap: 'wrap',
+                      cursor: 'default',
+                      transition: 'box-shadow 0.3s ease-in-out',
+                      '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
+                      },
+                      flexDirection: {
+                        xs: 'column',
+                        sm: 'row',
+                      },
+                    })}
                   >
-                    <Box
-                      sx={(theme) => ({
-                        fontSize: '0.875rem',
-                        fontWeight: 600,
-                        color: theme.palette.text.secondary,
-                      })}
-                    >
-                      {formatDateWithTime(match.date, match.time)}
+                    {/* LEFT */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+                      <img
+                        src={match.tournamentLogo}
+                        alt="Турнір"
+                        style={{ height: '56px' }}
+                      />
+                      <Box
+                        sx={{
+                          fontSize: '0.95rem',
+                          fontWeight: 600,
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase',
+                          color: '#111',
+                        }}
+                      >
+                        {match.leagueName}
+                        {match.tour ? ` • ТУР ${match.tour}` : ''}
+                      </Box>
                     </Box>
 
+                    {/* CENTER */}
                     <Box
                       sx={{
+                        flex: 2,
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '1rem',
                         justifyContent: 'center',
-                        flexWrap: 'nowrap',
+                        gap: '0.25rem',
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team1}</Box>
-                        <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                      <Box
+                        sx={(theme) => ({
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          color: theme.palette.text.secondary,
+                        })}
+                      >
+                        {formatDateWithTime(match.date, match.time)}
                       </Box>
 
                       <Box
-                        sx={(theme) => ({
-                          backgroundColor: theme.palette.secondary.dark,
-                          color: theme.palette.common.white,
-                          padding: '0.4rem 0.8rem',
-                          borderRadius: '0.4rem',
-                          fontSize: '1.1rem',
-                          fontWeight: 600,
-                          minWidth: '2.2rem',
-                          textAlign: 'center',
+                        sx={{
                           display: 'flex',
                           alignItems: 'center',
+                          gap: '1rem',
                           justifyContent: 'center',
-                        })}
+                          flexWrap: 'nowrap',
+                        }}
                       >
-                        {match.score}
-                      </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team1}</Box>
+                          <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                        </Box>
 
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
-                        <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team2}</Box>
+                        <Box
+                          sx={(theme) => ({
+                            backgroundColor: theme.palette.secondary.dark,
+                            color: theme.palette.common.white,
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '0.4rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            minWidth: '2.2rem',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          })}
+                        >
+                          {match.score}
+                        </Box>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
+                          <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team2}</Box>
+                        </Box>
                       </Box>
                     </Box>
-                  </Box>
 
-                  {/* RIGHT */}
-                  <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                    {match.youtube_link && (
-                      <a
-                        href={match.youtube_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'flex-end',
-                          gap: '0.4rem',
-                          fontWeight: 600,
-                          color: '#e53935',
-                          textDecoration: 'none',
-                          fontSize: '0.95rem',
-                          transition: 'text-decoration 0.2s ease',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                        onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
-                      >
-                        <span>Дивитись огляд</span>
-                        <YouTubeIcon sx={{ fontSize: 20 }} />
-                      </a>
-                    )}
+                    {/* RIGHT */}
+                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                      {match.youtube_link && (
+                        <a
+                          href={match.youtube_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            gap: '0.4rem',
+                            fontWeight: 600,
+                            color: '#e53935',
+                            textDecoration: 'none',
+                            fontSize: '0.95rem',
+                            transition: 'text-decoration 0.2s ease',
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                          onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                        >
+                          <span>Дивитись огляд</span>
+                          <YouTubeIcon sx={{ fontSize: 20 }} />
+                        </a>
+                      )}
+                    </Box>
                   </Box>
-                </Box>
-              );
-            })}
-          </MatchesList>
+                );
+              })}
+            </Stack>
+          </Container>
         )}
       </Wrapper>
     </Layout>

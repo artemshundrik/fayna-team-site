@@ -2,7 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import type { Database } from '../types/supabase';
 import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Stack,
+  Paper,
+  Container,
+  Tooltip,
+  Box
+} from '@mui/material';
+
+type ExtendedTeam = Database['public']['Tables']['teams']['Row'] & {
+  points: number;
+  goals_string: string;
+  place: number;
+  positionChange: 'up' | 'down' | 'same';
+};
 
 const calculateTeamStats = (teams: Database['public']['Tables']['teams']['Row'][]) => {
   return teams.map((team) => {
@@ -16,7 +35,7 @@ const calculateTeamStats = (teams: Database['public']['Tables']['teams']['Row'][
   });
 };
 
-const Table = () => {
+const TableComponent = () => {
   const theme = useTheme();
 
   const formBoxStyle = {
@@ -46,52 +65,32 @@ const Table = () => {
     }
   };
 
-  const tableStyle = {
-    display: 'table',
-    width: '100%',
-    borderCollapse: 'collapse'
-  };
+type Column = {
+  key: string;
+  label: string;
+  align: 'left' | 'center' | 'right' | 'inherit' | 'justify';
+  width?: string;
+  hideOnMobile?: boolean;
+};
 
-  const tableRowStyle = {
-    display: 'table-row',
-    height: '4rem',
-  };
-
-  const tableCellStyle = {
-    display: 'table-cell',
-    padding: '0.75rem 0.5rem',
-    textAlign: 'right' as const,
-    verticalAlign: 'middle' as const,
-    fontSize: theme.typography.body1.fontSize,
-    fontFamily: theme.typography.fontFamily,
-  };
-
-  const tableHeaderCellStyle = {
-    ...tableCellStyle,
-    fontWeight: theme.typography.fontWeightSemiBold,
-    color: theme.palette.grey[500],
-    fontSize: theme.typography.body1.fontSize,
-    borderBottom: `1px solid ${theme.palette.grey[300]}`,
-    backgroundColor: theme.palette.common.white,
-  };
-
-  const columns = [
-    { key: 'place', label: '#', width: '1rem', align: 'center' },
-    { key: 'team', label: 'КОМАНДА', width: '15rem', align: 'left' },
-    { key: 'games_played', label: 'І', width: '1.5rem', align: 'center' },
-    { key: 'wins', label: 'В', width: '1.5rem', align: 'center' },
-    { key: 'draws', label: 'Н', width: '1.5rem', align: 'center' },
-    { key: 'losses', label: 'П', width: '1.5rem', align: 'center' },
-    { key: 'goals', label: 'МЗ/МП', width: '2rem', align: 'center' },
-    { key: 'points', label: 'О', width: '1.5rem', align: 'center' },
-    { key: 'form', label: 'ФОРМА', width: '6rem', align: 'left' },
-  ];
+const columns: Column[] = [
+  { key: 'place', label: '#', width: '3rem', align: 'center' },
+  { key: 'team', label: 'КОМАНДА', align: 'left', width: '100%' },
+  { key: 'games_played', label: 'І', align: 'center' },
+  { key: 'wins', label: 'В', align: 'center', hideOnMobile: true },
+  { key: 'draws', label: 'Н', align: 'center', hideOnMobile: true },
+  { key: 'losses', label: 'П', align: 'center', hideOnMobile: true },
+  { key: 'goals', label: '+/−', align: 'center' },
+  { key: 'points', label: 'О', align: 'center' },
+  { key: 'form', label: 'ФОРМА', width: '150px', align: 'left', hideOnMobile: true },
+];
 
   useEffect(() => {
     const fetchTeams = async () => {
       const { data, error } = await supabase
         .from('teams')
-        .select('id, name, logo, is_our_team, games_played, wins, draws, losses, goals_for, goals_against, form');
+        .select('id, name, logo, is_our_team, games_played, wins, draws, losses, goals_for, goals_against, form')
+        .returns<Database['public']['Tables']['teams']['Row'][]>();
       if (error) {
         console.error('Error fetching teams:', error);
         return;
@@ -99,21 +98,38 @@ const Table = () => {
       if (data) {
         const teamsWithPoints = calculateTeamStats(data);
 
+        // Save previous positions by id
+        const previousPositions = new Map(teamsWithPoints.map((team, i) => [team.id, i]));
+
         const sortedTeams = teamsWithPoints
-          .sort((a, b) => b.points - a.points || (b.goals_for - b.goals_against) - (a.goals_for - a.goals_against));
+          .slice() // ensure not in-place
+          .sort(
+            (a, b) =>
+              b.points - a.points ||
+              ((b.goals_for ?? 0) - (b.goals_against ?? 0)) - ((a.goals_for ?? 0) - (a.goals_against ?? 0))
+          );
 
-        const teamsWithPlace = sortedTeams.map((team, index) => ({
-          ...team,
-          place: index + 1,
-        }));
+        const teamsWithPlace: ExtendedTeam[] = sortedTeams.map((team, index) => {
+          const prevIndex = previousPositions.get(team.id);
+          let positionChange: 'up' | 'down' | 'same' = 'same';
+          if (typeof prevIndex === 'number') {
+            if (index < prevIndex) positionChange = 'up';
+            else if (index > prevIndex) positionChange = 'down';
+          }
+          return {
+            ...team,
+            place: index + 1,
+            positionChange,
+          };
+        });
 
-        setTeams(teamsWithPlace as Database['public']['Tables']['teams']['Row'][]);
+        setTeams(teamsWithPlace);
       }
     };
     fetchTeams();
   }, []);
 
-  const [teams, setTeams] = useState<Database['public']['Tables']['teams']['Row'][]>([]);
+  const [teams, setTeams] = useState<ExtendedTeam[]>([]);
 
   const getPositionIcon = (change: string) => {
     switch (change) {
@@ -139,110 +155,273 @@ const Table = () => {
   };
 
   return (
-    <Box sx={{ overflowX: 'auto' }}>
-      <Box sx={tableStyle}>
-        <Box sx={tableRowStyle}>
-          {columns.map((col, idx) => (
-            <Box key={idx} sx={{ ...tableHeaderCellStyle, textAlign: col.align as 'left' | 'right' }}>
-              {col.label}
-            </Box>
-          ))}
-        </Box>
-        {teams.map((team, idx) => (
-          <Box
-            key={idx}
-            sx={{
-              ...tableRowStyle,
-              backgroundColor: idx % 2 === 0
-                ? theme.palette.grey[100]
-                : theme.palette.common.white,
-              borderLeft: team.is_our_team ? `4px solid ${theme.palette.primary.main}` : 'none',
-            }}
-          >
-            {columns.map((col, i) => {
-              switch (col.key) {
-                case 'place':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>
-                      {team.place}
-                    </Box>
-                  );
-                case 'team':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>
-                      <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                      }}>
-                        <img src={team.logo || ''} alt={team.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                        <Box
-                          component="span"
-                          sx={{
-                            fontSize: theme.typography.body1.fontSize,
-                            fontWeight: team.is_our_team ? theme.typography.fontWeightMedium : theme.typography.fontWeightMedium,
-                            marginLeft: 0,
-                            color: team.is_our_team ? theme.palette.primary.main : 'inherit',
-                            textShadow: team.is_our_team ? `0 0 1px ${theme.palette.primary.main}` : 'none',
-                            fontFamily: theme.typography.fontFamily,
-                          }}
-                        >
-                          {team.name}
-                        </Box>
-                      </Box>
-                    </Box>
-                  );
-                case 'games_played':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>{team.games_played}</Box>
-                  );
-                case 'wins':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>{team.wins}</Box>
-                  );
-                case 'draws':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>{team.draws}</Box>
-                  );
-                case 'losses':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>{team.losses}</Box>
-                  );
-                case 'goals':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>{team.goals_string}</Box>
-                  );
-                case 'points':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>
-                      {team.points}
-                    </Box>
-                  );
-                case 'form':
-                  return (
-                    <Box key={i} sx={{ ...tableCellStyle, textAlign: col.align as 'left' | 'right', width: col.width }}>
-                      {typeof team.form === 'string' &&
-                        team.form !== '0' &&
-                        team.form.split('').map((res, idx) => {
-                          const resUA = res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : '';
+    <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 } }}>
+      <Paper elevation={0} square sx={{ border: 'none' }}>
+        <Box sx={{ overflowX: 'auto' }}>
+          <TableContainer sx={{ width: '100%' }}>
+            <Table sx={{ minWidth: '100%', width: '100%', tableLayout: 'auto' }}>
+              <TableHead>
+                <TableRow>
+                  {columns.map((col, idx) => (
+                    <TableCell
+                      key={idx}
+                      align={col.align as 'left' | 'center' | 'right' | 'justify' | 'inherit'}
+                      sx={{
+                        fontWeight: theme.typography.fontWeightSemiBold,
+                        color: theme.palette.grey[500],
+                        borderBottom: `1px solid ${theme.palette.grey[300]}`,
+                        backgroundColor: theme.palette.common.white,
+                        fontFamily: theme.typography.fontFamily,
+                        whiteSpace: 'nowrap',
+                        display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                        ...(col.key === 'goals' ? { whiteSpace: 'nowrap' } : {}),
+                      }}
+                    >
+                      {(col.key === 'games_played') ? (
+                        <Tooltip title="Ігри зіграні" arrow>
+                          <span>{col.label}</span>
+                        </Tooltip>
+                      ) : (col.key === 'wins') ? (
+                        <Tooltip title="Перемоги" arrow>
+                          <span>{col.label}</span>
+                        </Tooltip>
+                      ) : (col.key === 'draws') ? (
+                        <Tooltip title="Нічиї" arrow>
+                          <span>{col.label}</span>
+                        </Tooltip>
+                      ) : (col.key === 'losses') ? (
+                        <Tooltip title="Поразки" arrow>
+                          <span>{col.label}</span>
+                        </Tooltip>
+                      ) : (col.key === 'goals') ? (
+                        <Tooltip title="М'ячі забиті / пропущені" arrow>
+                          <span>{col.label}</span>
+                        </Tooltip>
+                      ) : (col.key === 'points') ? (
+                        <Tooltip title="Очки" arrow>
+                          <span>{col.label}</span>
+                        </Tooltip>
+                      ) : (col.key === 'form') ? (
+                        <Tooltip title="Результати останніх матчів (В – перемога, Н – нічия, П – поразка)" arrow>
+                          <span>{col.label}</span>
+                        </Tooltip>
+                      ) : (
+                        col.label
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {teams.map((team, idx) => (
+                  <TableRow
+                    key={idx}
+                    sx={{
+                      backgroundColor: idx % 2 === 0 ? theme.palette.grey[100] : theme.palette.common.white,
+                      borderLeft: team.is_our_team ? `4px solid ${theme.palette.primary.main}` : 'none',
+                    }}
+                  >
+                    {columns.map((col, i) => {
+                      switch (col.key) {
+                        case 'place':
                           return (
-                            <Box key={idx} component="span" sx={{
-                              ...formBoxStyle,
-                              backgroundColor: getFormColor(resUA)
-                            }}>{resUA}</Box>
+                            <TableCell
+                              key={i}
+                              align={col.align}
+                              sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontFamily: theme.typography.fontFamily,
+                                paddingLeft: '24px',
+                                paddingRight: '12px',
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                              }}
+                            >
+                              <Stack
+                                direction="row"
+                                spacing={0.15}
+                                alignItems="center"
+                                justifyContent="center"
+                                sx={{ pl: 0, pr: 0 }}
+                              >
+                                <span>{team.place}</span>
+                                {getPositionIcon(team.positionChange)}
+                              </Stack>
+                            </TableCell>
                           );
-                        })}
-                    </Box>
-                  );
-                default:
-                  return null;
-              }
-            })}
-          </Box>
-        ))}
-      </Box>
-    </Box>
+                        case 'team':
+                          return (
+                            <TableCell
+                              key={i}
+                              align={col.align}
+                              sx={{
+                                fontSize: {
+                                  xs: '0.85rem',
+                                  sm: theme.typography.body1.fontSize
+                                },
+                                fontFamily: theme.typography.fontFamily,
+                                padding: '6px 16px',
+                                width: '100%',
+                                maxWidth: '100%',
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <img src={team.logo || ''} alt={team.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    fontSize: {
+                                      xs: '0.85rem',
+                                      sm: theme.typography.body1.fontSize
+                                    },
+                                    fontWeight: team.is_our_team ? theme.typography.fontWeightMedium : theme.typography.fontWeightMedium,
+                                    ml: 0,
+                                    color: team.is_our_team ? theme.palette.primary.main : 'inherit',
+                                    textShadow: team.is_our_team ? `0 0 1px ${theme.palette.primary.main}` : 'none',
+                                    fontFamily: theme.typography.fontFamily,
+                                  }}
+                                >
+                                  {team.name}
+                                </Box>
+                              </div>
+                            </TableCell>
+                          );
+                        case 'games_played':
+                          return (
+                            <TableCell
+                              key={i}
+                              align={col.align}
+                              sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontFamily: theme.typography.fontFamily,
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                              }}
+                            >
+                              {team.games_played}
+                            </TableCell>
+                          );
+                        case 'wins':
+                          return (
+                            <TableCell
+                              key={i}
+                              align={col.align}
+                              sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontFamily: theme.typography.fontFamily,
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                              }}
+                            >
+                              {team.wins}
+                            </TableCell>
+                          );
+                        case 'draws':
+                          return (
+                            <TableCell
+                              key={i}
+                              align={col.align}
+                              sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontFamily: theme.typography.fontFamily,
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                              }}
+                            >
+                              {team.draws}
+                            </TableCell>
+                          );
+                        case 'losses':
+                          return (
+                            <TableCell
+                              key={i}
+                              align={col.align}
+                              sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontFamily: theme.typography.fontFamily,
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                              }}
+                            >
+                              {team.losses}
+                            </TableCell>
+                          );
+                        case 'goals':
+                          return (
+                            <TableCell
+                              key={i}
+                              align="center"
+                              sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontFamily: theme.typography.fontFamily,
+                                whiteSpace: 'nowrap',
+                                textAlign: 'center',
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              }}
+                            >
+                              {team.goals_string}
+                            </TableCell>
+                          );
+                        case 'points':
+                          return (
+                            <TableCell
+                              key={i}
+                              align={col.align}
+                              sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontFamily: theme.typography.fontFamily,
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                              }}
+                            >
+                              {team.points}
+                            </TableCell>
+                          );
+                        case 'form':
+                          return (
+                            <TableCell
+                              key={i}
+                              align={col.align as 'left' | 'center' | 'right' | 'justify' | 'inherit'}
+                              sx={{
+                                fontSize: theme.typography.body1.fontSize,
+                                fontFamily: theme.typography.fontFamily,
+                                width: col.width,
+                                minWidth: col.width,
+                                maxWidth: col.width,
+                                whiteSpace: 'nowrap',
+                                paddingLeft: '8px',
+                                paddingRight: '8px',
+                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                              }}
+                            >
+                              {typeof team.form === 'string' &&
+                                team.form !== '0' &&
+                                team.form.split('').map((res, idx) => {
+                                  const resUA = res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : '';
+                                  const title = resUA === 'В' ? 'Перемога' : resUA === 'Н' ? 'Нічия' : resUA === 'П' ? 'Поразка' : '';
+                                  return (
+                                    <Tooltip key={idx} title={title} arrow>
+                                      <span style={{
+                                        ...formBoxStyle,
+                                        backgroundColor: getFormColor(resUA),
+                                        display: 'inline-block',
+                                        textAlign: 'center' as const,
+                                      }}>{resUA}</span>
+                                    </Tooltip>
+                                  );
+                                })}
+                            </TableCell>
+                          );
+                        default:
+                          return null;
+                      }
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 
-export default Table;
+export default TableComponent;
