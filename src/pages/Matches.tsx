@@ -220,6 +220,14 @@ const Matches: React.FC = () => {
                         xs: 'column',
                         sm: 'row',
                       },
+                      gap: {
+                        xs: 2,
+                        sm: '2rem',
+                      },
+                      textAlign: {
+                        xs: 'center',
+                        sm: 'left',
+                      },
                       flexWrap: 'wrap',
                       '&:hover': {
                         boxShadow: theme.shadows[4],
@@ -256,6 +264,7 @@ const Matches: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '0.25rem',
+                        width: '100%',
                       }}
                     >
                       <Box
@@ -270,18 +279,38 @@ const Matches: React.FC = () => {
 
                       <Box
                         sx={{
-                          display: 'flex',
+                          display: { xs: 'grid', sm: 'flex' },
+                          gridTemplateColumns: { xs: '1fr auto 1fr', sm: 'none' },
+                          flexDirection: { sm: 'row' },
                           alignItems: 'center',
-                          gap: '1rem',
                           justifyContent: 'center',
-                          flexWrap: 'nowrap',
+                          gap: { xs: 1, sm: 2 },
+                          textAlign: 'center',
+                          width: '100%',
                         }}
                       >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team1}</Box>
-                          <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                        {/* Team 1 */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: { xs: 'center', sm: 'center' },
+                              gap: { xs: '0.25rem', sm: '0.5rem' },
+                              flexDirection: { xs: 'column', sm: 'row-reverse' },
+                            }}
+                          >
+                            <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                            <Box sx={{ fontSize: '1rem', fontWeight: 500 }}>{team1}</Box>
+                          </Box>
                         </Box>
-
+                        {/* Time */}
                         <Box
                           sx={(theme) => ({
                             backgroundColor: theme.palette.grey[200],
@@ -290,8 +319,7 @@ const Matches: React.FC = () => {
                             borderRadius: '0.4rem',
                             fontSize: '1.1rem',
                             fontWeight: 600,
-                            minWidth: '2.2rem',
-                            textAlign: 'center',
+                            minWidth: '2.5rem',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -299,10 +327,26 @@ const Matches: React.FC = () => {
                         >
                           {match.time}
                         </Box>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
-                          <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team2}</Box>
+                        {/* Team 2 */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: { xs: 'center', sm: 'center' },
+                              gap: { xs: '0.25rem', sm: '0.5rem' },
+                              flexDirection: { xs: 'column', sm: 'row' },
+                            }}
+                          >
+                            <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
+                            <Box sx={{ fontSize: '1rem', fontWeight: 500 }}>{team2}</Box>
+                          </Box>
                         </Box>
                       </Box>
                     </Box>
@@ -374,7 +418,6 @@ const Matches: React.FC = () => {
                         sm: '0.75rem 1.25rem',
                       },
                       minHeight: '110px',
-                      gap: '2rem',
                       borderRadius: 0,
                       boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
                       flexWrap: 'wrap',
@@ -386,6 +429,14 @@ const Matches: React.FC = () => {
                       flexDirection: {
                         xs: 'column',
                         sm: 'row',
+                      },
+                      gap: {
+                        xs: 2,
+                        sm: '2rem',
+                      },
+                      textAlign: {
+                        xs: 'center',
+                        sm: 'left',
                       },
                     })}
                   >
@@ -419,6 +470,7 @@ const Matches: React.FC = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '0.25rem',
+                        width: '100%',
                       }}
                     >
                       <Box
@@ -433,18 +485,38 @@ const Matches: React.FC = () => {
 
                       <Box
                         sx={{
-                          display: 'flex',
+                          display: { xs: 'grid', sm: 'flex' },
+                          gridTemplateColumns: { xs: '1fr auto 1fr', sm: 'none' },
+                          flexDirection: { sm: 'row' },
                           alignItems: 'center',
-                          gap: '1rem',
                           justifyContent: 'center',
-                          flexWrap: 'nowrap',
+                          gap: { xs: 1, sm: 2 },
+                          textAlign: 'center',
+                          width: '100%',
                         }}
                       >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team1}</Box>
-                          <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                        {/* Team 1 */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: { xs: 'center', sm: 'center' },
+                              gap: { xs: '0.25rem', sm: '0.5rem' },
+                              flexDirection: { xs: 'column', sm: 'row-reverse' },
+                            }}
+                          >
+                            <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                            <Box sx={{ fontSize: '1rem', fontWeight: 500 }}>{team1}</Box>
+                          </Box>
                         </Box>
-
+                        {/* Score */}
                         <Box
                           sx={(theme) => ({
                             backgroundColor: theme.palette.secondary.dark,
@@ -453,8 +525,7 @@ const Matches: React.FC = () => {
                             borderRadius: '0.4rem',
                             fontSize: '1.1rem',
                             fontWeight: 600,
-                            minWidth: '2.2rem',
-                            textAlign: 'center',
+                            minWidth: '2.5rem',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -462,10 +533,26 @@ const Matches: React.FC = () => {
                         >
                           {match.score}
                         </Box>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
-                          <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>{team2}</Box>
+                        {/* Team 2 */}
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: { xs: 'center', sm: 'center' },
+                              gap: { xs: '0.25rem', sm: '0.5rem' },
+                              flexDirection: { xs: 'column', sm: 'row' },
+                            }}
+                          >
+                            <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
+                            <Box sx={{ fontSize: '1rem', fontWeight: 500 }}>{team2}</Box>
+                          </Box>
                         </Box>
                       </Box>
                     </Box>
