@@ -219,7 +219,7 @@ const Fixtures = () => {
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr auto 1fr',
+                  gridTemplateColumns: { xs: '1fr auto 1fr', sm: '1fr auto 1fr' },
                   alignItems: 'center',
                   justifyItems: 'center',
                   gap: '0.75rem',
@@ -229,13 +229,14 @@ const Fixtures = () => {
                 <Box
                   sx={{
                     display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    gap: '0.6rem',
-                    minWidth: 'min(180px, 40vw)',
+                    gap: { xs: '0.25rem', sm: '0.6rem' },
+                    minWidth: 'auto',
+                    maxWidth: '100%',
                   }}
                 >
-                  <Box sx={{ fontSize: '1.2rem', fontWeight: 600 }}>{match.team1?.name || 'Команда 1'}</Box>
                   <Box
                     component="img"
                     src={match.team1?.logo || '/default-logo.png'}
@@ -246,6 +247,17 @@ const Fixtures = () => {
                       borderRadius: '50%',
                     }}
                   />
+                  <Box
+                    sx={{
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {match.team1?.name || 'Команда 1'}
+                  </Box>
                 </Box>
 
                 <Box
@@ -272,10 +284,12 @@ const Fixtures = () => {
                 <Box
                   sx={{
                     display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    gap: '0.6rem',
-                    minWidth: 'min(180px, 40vw)',
+                    gap: { xs: '0.25rem', sm: '0.6rem' },
+                    minWidth: 'auto',
+                    maxWidth: '100%',
                   }}
                 >
                   <Box
@@ -288,7 +302,17 @@ const Fixtures = () => {
                       borderRadius: '50%',
                     }}
                   />
-                  <Box sx={{ fontSize: '1.2rem', fontWeight: 600 }}>{match.team2?.name || 'Команда 2'}</Box>
+                  <Box
+                    sx={{
+                      fontSize: '1.2rem',
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {match.team2?.name || 'Команда 2'}
+                  </Box>
                 </Box>
               </Box>
               <Box sx={{ fontSize: '1rem', opacity: 0.9, lineHeight: 1.8, mt: '0.5rem' }}>
