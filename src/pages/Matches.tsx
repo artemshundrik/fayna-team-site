@@ -229,9 +229,6 @@ const Matches: React.FC = () => {
                         sm: 'left',
                       },
                       flexWrap: 'wrap',
-                      '&:hover': {
-                        boxShadow: theme.shadows[4],
-                      },
                     })}
                   >
                     {/* LEFT */}
@@ -423,9 +420,6 @@ const Matches: React.FC = () => {
                       flexWrap: 'wrap',
                       cursor: 'default',
                       transition: 'box-shadow 0.3s ease-in-out',
-                      '&:hover': {
-                        boxShadow: theme.shadows[4],
-                      },
                       flexDirection: {
                         xs: 'column',
                         sm: 'row',

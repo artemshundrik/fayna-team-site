@@ -15,6 +15,7 @@ import {
   Tooltip,
   Box
 } from '@mui/material';
+import ScreenRotationIcon from '@mui/icons-material/ScreenRotation';
 
 type ExtendedTeam = Database['public']['Tables']['teams']['Row'] & {
   points: number;
@@ -160,14 +161,18 @@ const columns: Column[] = [
       <Paper elevation={0} square sx={{ border: 'none' }}>
         <Box
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            textAlign: 'center',
+            display: { xs: 'flex', sm: 'none' },
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
             fontSize: '0.85rem',
             color: theme.palette.grey[600],
             padding: theme.spacing(1),
+            textAlign: 'center',
           }}
         >
-          Щоб побачити повну таблицю — переверніть телефон у горизонтальне положення 📱↩️
+          <ScreenRotationIcon sx={{ fontSize: '1.2rem' }} />
+          Щоб побачити повну таблицю — переверніть телефон у горизонтальне положення
         </Box>
         <Box sx={{ overflowX: 'auto' }}>
           <TableContainer sx={{ width: '100%' }}>
