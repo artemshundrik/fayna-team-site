@@ -47,11 +47,14 @@ const MatchesList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 1200px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 1rem 1rem;
-  @media (min-width: 600px) {
-    padding: 1rem 2rem;
+  padding: 0;
+
+  @media (min-width: 900px) {
+    max-width: 1200px;
+    padding: 0 1.5rem;
   }
 `;
 
