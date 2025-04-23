@@ -10,6 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 
 const NavLinks = ({ onClick }: { onClick?: () => void }) => (
   <>
@@ -42,8 +43,11 @@ const Header = () => {
     const scrollY = window.scrollY;
     const delta = scrollY - lastScrollY.current;
 
-    // Ігноруємо малі скрол-рухи
-    if (Math.abs(delta) < 5) return;
+    // Завжди показувати хедер на самому верху або якщо скрол маленький
+    if (scrollY <= 10 || Math.abs(delta) < 5) {
+      setShowHeader(true);
+      return;
+    }
 
     if (delta > 0) {
       setShowHeader(false); // scroll down
@@ -64,14 +68,15 @@ const Header = () => {
       <AppBar
         position="fixed"
         sx={(theme) => ({
-          backgroundColor: theme.palette.background.default,
+          backgroundColor: showHeader
+            ? theme.palette.background.default
+            : alpha(theme.palette.background.default, 0.7),
           borderBottom: `1px solid ${theme.palette.divider}`,
           px: 2,
           py: 1,
-          backdropFilter: showHeader ? 'blur(0px)' : 'blur(10px)',
           boxShadow: 'none', // Прибирає тінь
           transform: showHeader ? 'translateY(0)' : 'translateY(-100%)',
-          transition: 'transform 0.3s ease, backdrop-filter 0.3s ease',
+          transition: 'transform 0.3s ease, background-color 0.3s ease',
         })}
       >
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
