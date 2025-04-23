@@ -25,10 +25,17 @@ const formatDateWithTime = (dateStr: string, time: string) => {
 const Wrapper = styled.div`
   font-family: 'FixelDisplay', sans-serif;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1rem;
   background: #F3F4F6;
   color: #111;
   text-align: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  @media (min-width: 600px) {
+    padding: 2rem;
+  }
 `;
 
 const Heading = styled.h1`
@@ -150,7 +157,7 @@ const Matches: React.FC = () => {
 
   return (
     <Layout>
-      <Wrapper>
+      <Wrapper sx={{ width: '100%' }}>
         <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, mb: 2 }}>
           <Tabs
             value={activeTab}
@@ -169,15 +176,15 @@ const Matches: React.FC = () => {
         </Container>
         
         {activeTab === 'table' && (
-          <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, width: '100%' }}>
-            <Stack spacing={2}>
+          <Box sx={{ width: '100%', px: 0 }}>
+            <Stack spacing={2} sx={{ width: '100%' }}>
               <Table />
             </Stack>
-          </Container>
+          </Box>
         )}
 
         {activeTab === 'upcoming' && (
-          <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, width: '100%' }}>
+          <Box sx={{ width: '100%', px: 0 }}>
             <Stack spacing={2}>
               {futureMatches.map((match, index) => {
                 const [team1, team2] = match.teams.split(' проти ');
@@ -319,11 +326,11 @@ const Matches: React.FC = () => {
                 );
               })}
             </Stack>
-          </Container>
+          </Box>
         )}
 
         {activeTab === 'past' && (
-          <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, width: '100%' }}>
+          <Box sx={{ width: '100%', px: 0 }}>
             <Stack spacing={2}>
               {pastMatches.map((match, index) => {
                 const [team1, team2] = match.teams.split(' проти ');
@@ -467,7 +474,7 @@ const Matches: React.FC = () => {
                 );
               })}
             </Stack>
-          </Container>
+          </Box>
         )}
       </Wrapper>
     </Layout>
