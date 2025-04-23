@@ -36,26 +36,31 @@ const Header = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
+  const ticking = useRef(false);
 
   const handleScroll = () => {
     if (typeof window === 'undefined') return;
 
-    const scrollY = window.scrollY;
-    const delta = scrollY - lastScrollY.current;
+    const update = () => {
+      const scrollY = window.scrollY;
+      const delta = scrollY - lastScrollY.current;
 
-    // Завжди показувати хедер на самому верху або якщо скрол маленький
-    if (scrollY <= 10 || Math.abs(delta) < 5) {
-      setShowHeader(true);
-      return;
+      if (scrollY <= 10 || Math.abs(delta) < 5) {
+        setShowHeader(true);
+      } else if (delta > 0) {
+        setShowHeader(false);
+      } else {
+        setShowHeader(true);
+      }
+
+      lastScrollY.current = scrollY;
+      ticking.current = false;
+    };
+
+    if (!ticking.current) {
+      requestAnimationFrame(update);
+      ticking.current = true;
     }
-
-    if (delta > 0) {
-      setShowHeader(false); // scroll down
-    } else {
-      setShowHeader(true); // scroll up
-    }
-
-    lastScrollY.current = scrollY;
   };
 
   useEffect(() => {
