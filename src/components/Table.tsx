@@ -47,9 +47,10 @@ const TableComponent = () => {
     fontWeight: theme.typography.fontWeightMedium,
     fontFamily: theme.typography.fontFamily,
     fontSize: theme.typography.body2.fontSize,
-    marginRight: '0.3rem',
+    marginRight: theme.spacing(0.5),
     textAlign: 'center',
     lineHeight: '1.5rem',
+    verticalAlign: 'middle',
   };
 
   const getFormColor = (result: string) => {
@@ -82,7 +83,7 @@ const columns: Column[] = [
   { key: 'losses', label: 'П', align: 'center', hideOnMobile: true },
   { key: 'goals', label: '+/−', align: 'center', hideOnMobile: true },
   { key: 'points', label: 'О', align: 'center' },
-  { key: 'form', label: 'ФОРМА', width: '150px', align: 'left', hideOnMobile: true },
+  { key: 'form', label: 'ФОРМА', width: '180px', align: 'left', hideOnMobile: true },
 ];
 
   useEffect(() => {
@@ -408,31 +409,44 @@ const columns: Column[] = [
                               sx={{
                                 fontSize: theme.typography.body1.fontSize,
                                 fontFamily: theme.typography.fontFamily,
-                                width: col.width,
-                                minWidth: col.width,
-                                maxWidth: col.width,
+                                width: '180px',
+                                minWidth: '180px',
+                                maxWidth: '180px',
                                 whiteSpace: 'nowrap',
                                 paddingLeft: { xs: '4px', sm: '8px' },
                                 paddingRight: { xs: '4px', sm: '8px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                               }}
                             >
-                              {typeof team.form === 'string' &&
-                                team.form !== '0' &&
-                                team.form.split('').map((res, idx) => {
-                                  const resUA = res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : '';
-                                  const title = resUA === 'В' ? 'Перемога' : resUA === 'Н' ? 'Нічия' : resUA === 'П' ? 'Поразка' : '';
-                                  return (
-                                    <Tooltip key={idx} title={title} arrow>
-                                      <span style={{
-                                        ...formBoxStyle,
-                                        backgroundColor: getFormColor(resUA),
-                                        display: 'inline-block',
-                                        textAlign: 'center' as const,
-                                      }}>{resUA}</span>
-                                    </Tooltip>
-                                  );
-                                })}
+                              {typeof team.form === 'string' && (
+                                <Stack direction="row" justifyContent="flex-start" spacing={0.3}>
+                                  {Array(5).fill('').map((_, idx) => {
+                                    const res = team.form?.[idx];
+                                    const resUA = res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : '';
+                                    const title = resUA === 'В' ? 'Перемога' : resUA === 'Н' ? 'Нічия' : resUA === 'П' ? 'Поразка' : '';
+                                    return resUA ? (
+                                      <Tooltip key={idx} title={title} arrow>
+                                        <span
+                                          style={{
+                                            ...formBoxStyle,
+                                            backgroundColor: getFormColor(resUA),
+                                          }}
+                                        >
+                                          {resUA}
+                                        </span>
+                                      </Tooltip>
+                                    ) : (
+                                      <span
+                                        key={idx}
+                                        style={{
+                                          ...formBoxStyle,
+                                          backgroundColor: theme.palette.grey[300],
+                                        }}
+                                      />
+                                    );
+                                  })}
+                                </Stack>
+                              )}
                             </TableCell>
                           );
                         default:
