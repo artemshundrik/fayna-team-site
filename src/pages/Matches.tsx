@@ -181,7 +181,7 @@ const Matches: React.FC = () => {
               width: '100%',
               maxWidth: '1200px',
               mx: 'auto',
-              px: { xs: 1, sm: 2 },
+              px: { xs: 0, sm: 2 },
             }}
           >
             <Stack spacing={2} sx={{ width: '100%' }}>
@@ -196,7 +196,7 @@ const Matches: React.FC = () => {
               width: '100%',
               maxWidth: '1200px',
               mx: 'auto',
-              px: { xs: 1, sm: 2 },
+              px: { xs: 0, sm: 2 },
             }}
           >
             <Stack spacing={2}>
@@ -349,7 +349,7 @@ const Matches: React.FC = () => {
               width: '100%',
               maxWidth: '1200px',
               mx: 'auto',
-              px: { xs: 1, sm: 2 },
+              px: { xs: 0, sm: 2 },
             }}
           >
             <Stack spacing={2}>
