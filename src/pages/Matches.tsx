@@ -22,21 +22,6 @@ const formatDateWithTime = (dateStr: string, time: string) => {
   return `${dayOfWeek}, ${day} ${month}, ${time}`;
 };
 
-const Wrapper = styled.div`
-  font-family: 'FixelDisplay', sans-serif;
-  min-height: 100vh;
-  padding: 1rem;
-  background: #F3F4F6;
-  color: #111;
-  text-align: center;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-
-  @media (min-width: 600px) {
-    padding: 2rem;
-  }
-`;
 
 const Heading = styled.h1`
   font-family: 'FixelDisplay', sans-serif;
@@ -47,7 +32,7 @@ const Heading = styled.h1`
 const Paragraph = styled.p`
   font-family: 'FixelDisplay', sans-serif;
   font-size: 1.1rem;
-  color: #555;
+  color: ${({ theme }) => theme.palette.text.secondary};
 `;
 
 const MatchesList = styled.div`
@@ -157,7 +142,19 @@ const Matches: React.FC = () => {
 
   return (
     <Layout>
-      <Wrapper sx={{ width: '100%' }}>
+      <Box
+        sx={(theme) => ({
+          fontFamily: `'FixelDisplay', sans-serif`,
+          minHeight: '100vh',
+          padding: { xs: '1rem', sm: '2rem' },
+          backgroundColor: theme.palette.grey[100],
+          color: theme.palette.text.primary,
+          textAlign: 'center',
+          width: '100%',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+        })}
+      >
         <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, mb: 2 }}>
           <Tabs
             value={activeTab}
@@ -225,7 +222,7 @@ const Matches: React.FC = () => {
                       },
                       flexWrap: 'wrap',
                       '&:hover': {
-                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
+                        boxShadow: theme.shadows[4],
                       },
                     })}
                   >
@@ -237,13 +234,13 @@ const Matches: React.FC = () => {
                         style={{ height: '56px' }}
                       />
                       <Box
-                        sx={{
+                        sx={(theme) => ({
                           fontSize: '0.95rem',
                           fontWeight: 600,
                           letterSpacing: '0.5px',
                           textTransform: 'uppercase',
-                          color: '#111',
-                        }}
+                          color: theme.palette.text.primary,
+                        })}
                       >
                         {match.leagueName}
                         {match.tour ? ` • ТУР ${match.tour}` : ''}
@@ -323,7 +320,7 @@ const Matches: React.FC = () => {
                             justifyContent: 'flex-end',
                             gap: '0.4rem',
                             fontWeight: 600,
-                            color: '#e53935',
+                            color: undefined, // will be set in sx below
                             textDecoration: 'none',
                             fontSize: '0.95rem',
                             transition: 'text-decoration 0.2s ease',
@@ -331,8 +328,16 @@ const Matches: React.FC = () => {
                           onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
                           onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
                         >
-                          <span>Дивитись огляд</span>
-                          <YouTubeIcon sx={{ fontSize: 20 }} />
+                          <span
+                            style={{
+                              color: undefined,
+                            }}
+                          >
+                            <Box component="span" sx={(theme) => ({ color: theme.palette.error.main, fontWeight: 600, fontSize: '0.95rem' })}>
+                              Дивитись огляд
+                            </Box>
+                          </span>
+                          <YouTubeIcon sx={{ fontSize: 20, color: (theme) => theme.palette.error.main }} />
                         </a>
                       )}
                     </Box>
@@ -376,7 +381,7 @@ const Matches: React.FC = () => {
                       cursor: 'default',
                       transition: 'box-shadow 0.3s ease-in-out',
                       '&:hover': {
-                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
+                        boxShadow: theme.shadows[4],
                       },
                       flexDirection: {
                         xs: 'column',
@@ -392,13 +397,13 @@ const Matches: React.FC = () => {
                         style={{ height: '56px' }}
                       />
                       <Box
-                        sx={{
+                        sx={(theme) => ({
                           fontSize: '0.95rem',
                           fontWeight: 600,
                           letterSpacing: '0.5px',
                           textTransform: 'uppercase',
-                          color: '#111',
-                        }}
+                          color: theme.palette.text.primary,
+                        })}
                       >
                         {match.leagueName}
                         {match.tour ? ` • ТУР ${match.tour}` : ''}
@@ -478,7 +483,7 @@ const Matches: React.FC = () => {
                             justifyContent: 'flex-end',
                             gap: '0.4rem',
                             fontWeight: 600,
-                            color: '#e53935',
+                            color: undefined, // will be set in sx below
                             textDecoration: 'none',
                             fontSize: '0.95rem',
                             transition: 'text-decoration 0.2s ease',
@@ -486,8 +491,16 @@ const Matches: React.FC = () => {
                           onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
                           onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
                         >
-                          <span>Дивитись огляд</span>
-                          <YouTubeIcon sx={{ fontSize: 20 }} />
+                          <span
+                            style={{
+                              color: undefined,
+                            }}
+                          >
+                            <Box component="span" sx={(theme) => ({ color: theme.palette.error.main, fontWeight: 600, fontSize: '0.95rem' })}>
+                              Дивитись огляд
+                            </Box>
+                          </span>
+                          <YouTubeIcon sx={{ fontSize: 20, color: (theme) => theme.palette.error.main }} />
                         </a>
                       )}
                     </Box>
@@ -497,7 +510,7 @@ const Matches: React.FC = () => {
             </Stack>
           </Box>
         )}
-      </Wrapper>
+      </Box>
     </Layout>
   );
 };

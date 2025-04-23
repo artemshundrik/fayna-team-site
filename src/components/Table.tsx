@@ -43,7 +43,7 @@ const TableComponent = () => {
     width: '1.5rem',
     height: '1.5rem',
     borderRadius: '0.4rem',
-    color: theme.palette.common.white,
+    color: theme.palette.success.contrastText,
     fontWeight: theme.typography.fontWeightMedium,
     fontFamily: theme.typography.fontFamily,
     fontSize: theme.typography.body2.fontSize,
@@ -135,13 +135,13 @@ const columns: Column[] = [
     switch (change) {
       case 'up':
         return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="green" xmlns="http://www.w3.org/2000/svg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill={theme.palette.success.main} xmlns="http://www.w3.org/2000/svg">
             <path d="M12 4L6 10H10V20H14V10H18L12 4Z" />
           </svg>
         );
       case 'down':
         return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="red" xmlns="http://www.w3.org/2000/svg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill={theme.palette.error.main} xmlns="http://www.w3.org/2000/svg">
             <path d="M12 20L6 14H10V4H14V14H18L12 20Z" />
           </svg>
         );
@@ -155,7 +155,7 @@ const columns: Column[] = [
   };
 
   return (
-    <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 } }}>
+    <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 0 } }}>
       <Paper elevation={0} square sx={{ border: 'none' }}>
         <Box
           sx={{
