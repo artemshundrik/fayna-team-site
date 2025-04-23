@@ -37,15 +37,21 @@ const Header = () => {
   const lastScrollY = useRef(0);
 
   const handleScroll = () => {
-    if (typeof window !== 'undefined') {
-      const scrollY = window.scrollY;
-      if (scrollY > lastScrollY.current) {
-        setShowHeader(false); // scroll down, hide header
-      } else {
-        setShowHeader(true); // scroll up, show header
-      }
-      lastScrollY.current = scrollY;
+    if (typeof window === 'undefined') return;
+
+    const scrollY = window.scrollY;
+    const delta = scrollY - lastScrollY.current;
+
+    // Ігноруємо малі скрол-рухи
+    if (Math.abs(delta) < 5) return;
+
+    if (delta > 0) {
+      setShowHeader(false); // scroll down
+    } else {
+      setShowHeader(true); // scroll up
     }
+
+    lastScrollY.current = scrollY;
   };
 
   useEffect(() => {
