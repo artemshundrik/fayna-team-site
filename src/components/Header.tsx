@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
@@ -11,6 +11,17 @@ import CloseIcon from '@mui/icons-material/Close';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
+
+import useScrollTrigger from '@mui/material/useScrollTrigger';
+import Slide from '@mui/material/Slide';
+function HideOnScroll({ children }: { children: React.ReactElement }) {
+  const trigger = useScrollTrigger();
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
 
 const NavLinks = ({ onClick }: { onClick?: () => void }) => (
   <>
@@ -34,56 +45,20 @@ const NavLinks = ({ onClick }: { onClick?: () => void }) => (
 
 const Header = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [showHeader, setShowHeader] = useState(true);
-  const lastScrollY = useRef(0);
-  const ticking = useRef(false);
-
-  const handleScroll = () => {
-    if (typeof window === 'undefined') return;
-
-    const update = () => {
-      const scrollY = window.scrollY;
-      const delta = scrollY - lastScrollY.current;
-
-      if (scrollY <= 10 || Math.abs(delta) < 5) {
-        setShowHeader(true);
-      } else if (delta > 0) {
-        setShowHeader(false);
-      } else {
-        setShowHeader(true);
-      }
-
-      lastScrollY.current = scrollY;
-      ticking.current = false;
-    };
-
-    if (!ticking.current) {
-      requestAnimationFrame(update);
-      ticking.current = true;
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <>
-      <AppBar
-        position="fixed"
-        sx={(theme) => ({
-          backgroundColor: showHeader
-            ? theme.palette.background.default
-            : alpha(theme.palette.background.default, 0.7),
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          px: 2,
-          py: 1,
-          boxShadow: 'none', // Прибирає тінь
-          transform: showHeader ? 'translateY(0)' : 'translateY(-100%)',
-          transition: 'transform 0.3s ease, background-color 0.3s ease',
-        })}
-      >
+      <HideOnScroll>
+        <AppBar
+          position="fixed"
+          sx={(theme) => ({
+            backgroundColor: theme.palette.background.default,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            px: 2,
+            py: 1,
+            boxShadow: 'none',
+          })}
+        >
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box sx={{ mr: 2 }}>
@@ -132,7 +107,8 @@ const Header = () => {
             <MenuIcon />
           </IconButton>
         </Toolbar>
-      </AppBar>
+        </AppBar>
+      </HideOnScroll>
 
       <Drawer
         anchor="right"
