@@ -175,7 +175,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             sx={{
               transition: 'opacity 0.4s ease',
               opacity: !isMobile && hover ? 0 : 1,
-              color: theme.palette.primary.main,
+              color: theme.palette.common.white,
               fontWeight: 900,
               textTransform: 'uppercase',
               textAlign: 'center',
