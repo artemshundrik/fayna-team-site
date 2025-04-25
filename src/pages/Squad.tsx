@@ -1,37 +1,44 @@
 import React from 'react';
 import Layout from '../layout/Layout';
 import PlayersList from '../components/PlayersList';
+import { Box, Container, Typography, Stack } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 const Squad: React.FC = () => {
+  const theme = useTheme();
   return (
-    <div style={{ backgroundColor: '#f4f4f4' }}>
+    <Box sx={{ backgroundColor: theme.palette.grey[100] }}>
       <Layout>
-        <main
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '2rem',
-            backgroundColor: '#f4f4f4',
-            color: '#000',
-            fontFamily: 'Cuprum, sans-serif',
+        <Container
+          component="main"
+          maxWidth="lg"
+          disableGutters
+          sx={{
+            py: theme.spacing(4),
+            backgroundColor: theme.palette.grey[100],
+            color: theme.palette.text.primary,
+            fontFamily: theme.typography.fontFamily,
           }}
         >
-          <h1 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '2rem' }}>Склад</h1>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <section>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', margin: '2rem 0 1rem' }}>Воротарі</h2>
+          <Stack spacing={4}>
+            <Box component="section">
+              <Typography variant="h6" sx={{ mb: theme.spacing(1), textTransform: 'uppercase' }}>
+                Воротарі
+              </Typography>
               <PlayersList position="Воротар" />
-            </section>
+            </Box>
 
-            <section>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', margin: '2rem 0 1rem' }}>Універсали</h2>
+            <Box component="section">
+              <Typography variant="h6" sx={{ mb: theme.spacing(1), textTransform: 'uppercase' }}>
+                Універсали
+              </Typography>
               <PlayersList position="Універсал" />
-            </section>
-          </div>
-        </main>
+            </Box>
+          </Stack>
+        </Container>
       </Layout>
-    </div>
+    </Box>
   );
 };
 

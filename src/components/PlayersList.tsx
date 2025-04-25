@@ -50,13 +50,14 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         columnGap: '2rem',
         rowGap: '2.5rem',
-        justifyItems: 'center',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '0 1rem',
+        justifyItems: { xs: 'center', md: 'start' },
+        width: '100%',
+        maxWidth: '100%',
+        margin: 0,
+        padding: 0,
       }}
     >
       {players.map((player: Player) => (

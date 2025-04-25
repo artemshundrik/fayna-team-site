@@ -144,6 +144,12 @@ const theme = createTheme({
           font-weight: 700;
           font-style: normal;
         }
+        @font-face {
+          font-family: 'AdiCupQ2022';
+          src: url('/fonts/AdiCupQ2022.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+        }
       `,
     },
     MuiTypography: {

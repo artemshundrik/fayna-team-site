@@ -1,452 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import styled, { createGlobalStyle } from 'styled-components';
 import { createClient } from '@supabase/supabase-js';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 import type { Database } from '../types/supabase';
 import { supabase } from '../supabase';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
-const YoutubeLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.6rem;
-  background: linear-gradient(90deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.1));
-  border: 1px solid rgba(255, 0, 0, 0.6);
-  border-radius: 0px;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-
-  &:hover {
-    background: linear-gradient(90deg, rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.2));
-    border-color: rgba(255, 0, 0, 0.8);
-    transform: translateY(-1px);
-  }
-`;
-
-const ActionText = styled.div`
-  color: #aaa;
-  font-size: 0.95rem;
-  font-style: italic;
-  text-align: center;
-  display: inline-flex;
-  align-items: center;
-  font-weight: 500;
-  justify-content: center;
-  gap: 0.5rem;
-`;
-const GlobalStyle = createGlobalStyle`
-  @keyframes shine {
-    0% { background-position: 100% }
-    100% { background-position: -100% }
-  }
-
-.team.horizontal {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  justify-content: flex-start;
-}
-
-.team.horizontal.reverse {
-  flex-direction: row-reverse;
-  justify-content: flex-end;
-  gap: 1.5rem;
-}
-
-/* TEAM1: вирівнювання по правому краю */
-.team.horizontal .team-layout {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-}
-
-.team.horizontal .team-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-}
-
-/* TEAM2: вирівнювання по лівому краю */
-.team.horizontal.reverse .team-layout {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.team.horizontal.reverse .team-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.team-header .name {
-  font-size: 2rem;
-  font-weight: bold;
-  color: white;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.team-extra {
-  margin-top: 0.3rem;
-  font-size: 1.1rem;
-  font-weight: 300;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.team.horizontal .team-extra {
-  align-items: flex-end;
-  text-align: right;
-}
-
-.team.horizontal.reverse .team-extra {
-  align-items: flex-start;
-  text-align: left;
-}
-.team-header {
-  text-align: inherit;
-}
-
-  
-
-  .team-header,
-  .team-extra {
-    align-items: inherit;
-    text-align: inherit;
-  }
-
-  .team-header .name {
-    font-size: 2rem;
-    font-weight: bold;
-    color: white;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-
-  .team img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: contain;
-  }
-  
-
-  .watch-link-wrapper {
-    display: inline-block;
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-
-  .watch-link {
-    display: inline-block;
-    position: relative;
-    color: inherit;
-    text-decoration: none;
-    background: linear-gradient(90deg, #ff1695 0%, #fff 50%, #ff1695 100%);
-    background-size: 200%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shine 2s infinite linear;
-  }
-
-  .watch-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 100%;
-    height: 2px;
-    background-color: #ff1695;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease-out;
-  }
-
-  .watch-link:hover::after {
-    transform: scaleX(1);
-  }
-
-
- 
-
-  .team-logo {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    border-radius: 50%;
-  }
-
-
-
-  .watch-text {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .arrow {
-    display: inline-block;
-  }
-  
-  .team-layout {
-    min-width: 160px;
-  }
-`;
-
-const Wrapper = styled.section`
-  background: url('/images/matches/next-match-bg.png') no-repeat center center;
-  background-size: cover;
-  position: relative;
-  padding: 4rem 1rem;
-  @media (max-width: 768px) {
-    padding: 2.5rem 1rem;
-  }
-  @media (max-width: 480px) {
-    padding: 2rem 0.5rem;
-  }
-  text-align: center;
-  color: white;
-  font-family: 'FixelDisplay', sans-serif;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    backdrop-filter: blur(12px);
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: 0;
-  }
-
-  > * {
-    position: relative;
-    z-index: 1;
-  }
-`;
-
-const Title = styled.h2`
-  font-size: 1.6rem;
-  color: #aaa;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
-`;
-
-const DateText = styled.div`
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
-`;
-
-const Countdown = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-bottom: 2rem;
-`;
-
-const FlipUnit = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .label {
-    margin-top: -0.5rem;
-    font-size: 0.75rem;
-    color: #aaa;
-    font-weight: 1000;
-    text-transform: uppercase;
-  }
-`;
-
-const Time = styled.div`
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: #ccc;
-`;
-
-const MatchBox = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  @media (max-width: 768px) {
-    gap: 0.25rem;
-    flex-direction: column;
-  }
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-  position: relative;
-
-  img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: contain;
-  }
-
-  .team {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    font-size: 2rem;
-    font-weight: bold;
-    color: white;
-    flex: 1;
-    max-width: 300px;
-
-    @media (max-width: 480px) {
-      font-size: 1.4rem;
-      gap: 1rem;
-    }
-
-    &.reverse {
-      flex-direction: row-reverse;
-      text-align: right;
-
-      .team-info {
-        align-items: flex-end;
-      }
-    }
-
-    .team-info {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  }
-
-
-  .vs {
-    position: relative;
-    margin: 0 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    font-weight: bold;
-    min-width: 80px;
-    padding: 0 1rem;
-  }
-`;
-
-
-const TeamWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-  max-width: 300px;
-`;
-
-const Form = styled.div<{ align?: 'left' | 'right' }>`
-  display: flex;
-  justify-content: ${({ align }) =>
-    align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center'};
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  width: 100%; /* додай це! */
-
-  .form-item {
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    border-radius: 4px;
-  }
-
-  .w {
-    background-color: #4caf50;
-  }
-
-  .l {
-    background-color: #f44336;
-  }
-
-  .d {
-    background-color: #9e9e9e;
-  }
-`;
-
-const Stadium = styled.div`
-  font-size: 1rem;
-  color: #ddd;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: -1.5rem;
-
-  .venue {
-    font-weight: bold;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    margin-bottom: 0.25rem;
-  }
-
-  .address {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    color: #aaa;
-    font-weight: 500;
-    font-size: 0.95rem;
-  }
-
-  .icon {
-    color: red;
-  }
-`;
-
-const TournamentInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1.5rem;
-
-  img {
-    height: 80px;
-    margin-bottom: 0.3rem;
-  }
-
-  .text {
-    text-align: center;
-    font-size: 0.95rem;
-    color: #ccc;
-
-    .name {
-      font-weight: bold;
-      font-size: 1.4rem;
-      color: white;
-    }
-
-    .meta {
-      font-size: 1rem;
-      color: white;
-      font-weight: 600;
-    }
-  }
-`;
 
 
 const NextMatch = () => {
@@ -573,270 +135,644 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
   
   return (
     <>
-      <GlobalStyle />
-      <Wrapper as={motion.section}
+      <Box
+        component={motion.section}
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.9, ease: 'easeOut' }}
+        sx={{
+          backgroundImage: "url('/images/matches/next-match-bg.png')",
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          position: 'relative',
+          px: { xs: '0.5rem', sm: '1rem' },
+          py: { xs: '2rem', sm: '2.5rem', md: '4rem' },
+          textAlign: 'center',
+          color: 'white',
+          fontFamily: 'FixelDisplay, sans-serif',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            backdropFilter: 'blur(12px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            zIndex: 0,
+          },
+          '& > *': {
+            position: 'relative',
+            zIndex: 1,
+          },
+        }}
       >
-        <TournamentInfo>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mb: '1.5rem',
+          }}
+        >
           <a href="https://r-cup.com.ua/" target="_blank" rel="noopener noreferrer">
-            <img src={data?.tournament?.logo_url || '/images/matches/logo-rejo.png'} alt={data?.tournament?.title || 'Турнір'} />
+            <Box
+              component="img"
+              src={data?.tournament?.logo_url || '/images/matches/logo-rejo.png'}
+              alt={data?.tournament?.title || 'Турнір'}
+              sx={{ height: 80, mb: 0.3 }}
+            />
           </a>
-          <div className="text">
-            <div className="meta">
+          <Box
+            sx={{
+              textAlign: 'center',
+              fontSize: '0.95rem',
+              color: '#ccc',
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: '1rem',
+                color: 'white',
+                fontWeight: 600,
+              }}
+              className="meta"
+            >
               {data?.tournament?.league_name}
               {data?.round_number ? ` • ТУР ${data.round_number}` : ''}
-            </div>
-          </div>
-        </TournamentInfo>
+            </Typography>
+          </Box>
+        </Box>
         {!score && !matchIsOver ? (
           isLive || isNowLive ? (
-            <div style={{
-              display: 'inline-block',
-              backgroundColor: 'rgba(255, 0, 0, 0.15)',
-              border: '1px solid rgba(255, 0, 0, 0.5)',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '1.5rem',
-              backdropFilter: 'blur(6px)',
-            }}>
+            <Box
+              sx={{
+                display: 'inline-block',
+                backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                border: '1px solid rgba(255, 0, 0, 0.5)',
+                color: 'white',
+                px: '1rem',
+                py: '0.5rem',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                mb: '1.5rem',
+                backdropFilter: 'blur(6px)',
+              }}
+            >
               🔴 Пряма трансляція
-            </div>
+            </Box>
           ) : (
-            <Countdown>
-              <FlipUnit>
-                <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-                  {String(days).padStart(2, '0')}
-                </div>
-                <div className="label">дні</div>
-              </FlipUnit>
-              <FlipUnit>
-                <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-                  {String(hours).padStart(2, '0')}
-                </div>
-                <div className="label">год</div>
-              </FlipUnit>
-              <FlipUnit>
-                <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-                  {String(minutes).padStart(2, '0')}
-                </div>
-                <div className="label">хв</div>
-              </FlipUnit>
-              <FlipUnit>
-                <div style={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
-                  {String(seconds).padStart(2, '0')}
-                </div>
-                <div className="label">сек</div>
-              </FlipUnit>
-            </Countdown>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: '1rem',
+                justifyContent: 'center',
+                mb: '2rem',
+              }}
+            >
+              {[{ value: days, label: 'дні' }, { value: hours, label: 'год' }, { value: minutes, label: 'хв' }, { value: seconds, label: 'сек' }].map((item, idx) => (
+                <Box
+                  key={item.label}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Typography sx={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                    {String(item.value).padStart(2, '0')}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      mt: '-0.5rem',
+                      fontSize: '0.75rem',
+                      color: '#aaa',
+                      fontWeight: 1000,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
           )
         ) : (
           matchIsOver ? (
-            <div style={{
-              display: 'inline-block',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              color: '#fff',
-              padding: '0.5rem 1rem',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '1.5rem',
-              backdropFilter: 'blur(6px)',
-            }}>
+            <Box
+              sx={{
+                display: 'inline-block',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: '#fff',
+                px: '1rem',
+                py: '0.5rem',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                mb: '1.5rem',
+                backdropFilter: 'blur(6px)',
+              }}
+            >
               🏁 Матч завершено
-            </div>
+            </Box>
           ) : (
-            <div style={{
-              display: 'inline-block',
-              backgroundColor: 'rgba(255, 0, 0, 0.15)',
-              border: '1px solid rgba(255, 0, 0, 0.5)',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '1.5rem',
-              backdropFilter: 'blur(6px)',
-            }}>
+            <Box
+              sx={{
+                display: 'inline-block',
+                backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                border: '1px solid rgba(255, 0, 0, 0.5)',
+                color: 'white',
+                px: '1rem',
+                py: '0.5rem',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                mb: '1.5rem',
+                backdropFilter: 'blur(6px)',
+              }}
+            >
               🔴 Пряма трансляція
-            </div>
+            </Box>
           )
         )}
         {matchDate instanceof Date && !isNaN(matchDate.getTime()) && (
-          <DateText>
+          <Typography
+            sx={{
+              fontSize: '1.4rem',
+              fontWeight: 'bold',
+              mb: '0.25rem',
+            }}
+          >
             {format(matchDate, 'EEEE, d MMMM', { locale: uk })}
-          </DateText>
+          </Typography>
         )}
-        <MatchBox>
-        <TeamWrapper>
-  {data?.team1 && (
-    <div className="team horizontal">
-      <div className="team-layout">
-        <div className="team-header">
-          <span className="name">{data.team1.name}</span>
-        </div>
-        <div className="team-info">
-          {data.team1?.form && (
-            <Form align="right">
-              {data.team1.form.slice(0, 5).toLowerCase().split('').map((item, i) => {
-                const label = item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н';
-                const className = item === 'w' ? 'w' : item === 'l' ? 'l' : 'd';
-                return <div key={i} className={`form-item ${className}`}>{label}</div>;
-              })}
-            </Form>
-          )}
-          {data.team1.name?.toLowerCase().includes('fayna') && matchIsOver && (
-            <div className="team-extra">
-              {data?.mvp && <div>⭐ MVP {data.mvp.last_name}</div>}
-              {data?.scorers_fayna && data.scorers_fayna.split(',').map((name, i) => (
-                <div key={i}>⚽ {name.trim()}</div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      <img src={data.team1.logo || '/images/placeholder.svg'} alt={data.team1.name} />
-    </div>
-  )}
-</TeamWrapper>
-
-
-  <div className="vs">
-    <div style={{
-      background: 'rgba(0, 0, 0, 0.6)',
-      backdropFilter: 'blur(8px)',
-      padding: '0.5rem 1.25rem',
-      borderRadius: '8px',
-      color: 'white',
-      fontSize: '2.5rem',
-      fontWeight: 'bold',
-      textAlign: 'center',
-      minWidth: '100px',
-    }}>
-      {matchIsOver && data?.score_team1 != null && data?.score_team2 != null
-        ? `${data.score_team1} - ${data.score_team2}`
-        : matchDate && new Date() < matchDate
-        ? matchDate.toLocaleTimeString('uk-UA', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })
-        : isNowLive ? 'vs' : '--:--'}
-    </div>
-  </div>
-
-  <TeamWrapper>
-  {data?.team2 && (
-    <div className="team horizontal reverse">
-      <div className="team-layout">
-        <div className="team-header">
-          <span className="name">{data.team2.name}</span>
-        </div>
-        <div className="team-info">
-          {data.team2?.form && (
-            <Form align="left">
-              {data.team2.form.slice(0, 5).toLowerCase().split('').map((item, i) => {
-                const label = item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н';
-                const className = item === 'w' ? 'w' : item === 'l' ? 'l' : 'd';
-                return <div key={i} className={`form-item ${className}`}>{label}</div>;
-              })}
-            </Form>
-          )}
-          {data.team2.name?.toLowerCase().includes('fayna') && matchIsOver && (
-            <div className="team-extra">
-              {data?.mvp && <div>⭐ MVP {data.mvp.last_name}</div>}
-              {data?.scorers_fayna && data.scorers_fayna.split(',').map((name, i) => (
-                <div key={i}>⚽ {name.trim()}</div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      <img src={data.team2.logo || '/images/placeholder.svg'} alt={data.team2.name} />
-    </div>
-  )}
-</TeamWrapper>
-</MatchBox>
-        <div style={{ position: 'relative', marginTop: '2.5rem' }}>
-          <Stadium>
-            <div className="venue">🏟 {data?.tournament?.stadium}</div>
-            <div className="address">
-              <span className="icon">📍</span>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: { xs: 1, sm: 2 },
+            mb: 2,
+            flexDirection: { xs: 'column', md: 'row' },
+            position: 'relative',
+          }}
+        >
+          <Box
+            sx={{
+              flex: 1,
+              maxWidth: 300,
+              display: 'flex',
+              justifyContent: { xs: 'center', sm: 'space-between' },
+              alignItems: 'center',
+            }}
+          >
+            <Box
+              className="team"
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column-reverse', sm: 'row' },
+                alignItems: 'center',
+                gap: { xs: '1rem', sm: '2rem' },
+                fontSize: { xs: '1.4rem', sm: '2rem' },
+                fontWeight: 'bold',
+                color: 'white',
+                flex: 1,
+                maxWidth: 300,
+              }}
+            >
+              {data?.team1 && (
+                <>
+                  <Box
+                    sx={{
+                      minWidth: 160,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: { xs: 'center', sm: 'flex-end' },
+                      textAlign: { xs: 'center', sm: 'right' },
+                      flex: 1,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: '2rem',
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        whiteSpace: 'nowrap',
+                        textAlign: { xs: 'center', sm: 'inherit' },
+                      }}
+                      className="name"
+                    >
+                      {data.team1.name}
+                    </Typography>
+                    <Box
+                      className="team-info"
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: { xs: 'center', sm: 'flex-end' },
+                        textAlign: { xs: 'center', sm: 'right' },
+                      }}
+                    >
+                      {data.team1?.form && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: { xs: 'center', sm: 'flex-end' },
+                            gap: '0.5rem',
+                            mt: '0.5rem',
+                            width: '100%',
+                          }}
+                        >
+                          {data.team1.form.slice(0, 5).toLowerCase().split('').map((item, i) => {
+                            const label = item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н';
+                            const bg = item === 'w' ? '#4caf50' : item === 'l' ? '#f44336' : '#9e9e9e';
+                            return (
+                              <Box
+                                key={i}
+                                sx={{
+                                  width: 20,
+                                  height: 20,
+                                  fontSize: '0.7rem',
+                                  color: 'white',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontWeight: 'bold',
+                                  borderRadius: '4px',
+                                  backgroundColor: bg,
+                                }}
+                              >
+                                {label}
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      )}
+                      {data.team1.name?.toLowerCase().includes('fayna') && matchIsOver && (
+                        <Box
+                          className="team-extra"
+                          sx={{
+                            mt: '0.3rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 300,
+                            color: 'white',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.25rem',
+                            alignItems: { xs: 'center', sm: 'flex-end' },
+                            textAlign: { xs: 'center', sm: 'right' },
+                          }}
+                        >
+                          {data?.mvp && <div>⭐ MVP {data.mvp.last_name}</div>}
+                          {data?.scorers_fayna && data.scorers_fayna.split(',').map((name, i) => (
+                            <div key={i}>⚽ {name.trim()}</div>
+                          ))}
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                  <img
+                    src={data.team1.logo || '/images/placeholder.svg'}
+                    alt={data.team1.name}
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      objectFit: 'contain',
+                      marginBottom: 8,
+                    }}
+                  />
+                </>
+              )}
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              position: 'relative',
+              m: { xs: '0.5rem 0', md: '0 1rem' },
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '2rem',
+              fontWeight: 'bold',
+              minWidth: 80,
+              px: 2,
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: 2,
+              color: 'white',
+              textAlign: 'center',
+            }}
+          >
+            {matchIsOver && data?.score_team1 != null && data?.score_team2 != null
+              ? `${data.score_team1} - ${data.score_team2}`
+              : matchDate && new Date() < matchDate
+              ? matchDate.toLocaleTimeString('uk-UA', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : isNowLive ? 'vs' : '--:--'}
+          </Box>
+          <Box
+            sx={{
+              flex: 1,
+              maxWidth: 300,
+              display: 'flex',
+              justifyContent: { xs: 'center', sm: 'space-between' },
+              alignItems: 'center',
+            }}
+          >
+            <Box
+              className="team reverse"
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column-reverse', sm: 'row-reverse' },
+                alignItems: 'center',
+                gap: { xs: '1rem', sm: '2rem' },
+                fontSize: { xs: '1.4rem', sm: '2rem' },
+                fontWeight: 'bold',
+                color: 'white',
+                flex: 1,
+                maxWidth: 300,
+                textAlign: 'right',
+                '& .team-info': {
+                  alignItems: { xs: 'center', sm: 'flex-end' },
+                },
+              }}
+            >
+              {data?.team2 && (
+                <>
+                  <Box
+                    sx={{
+                      minWidth: 160,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: { xs: 'center', sm: 'flex-start' },
+                      textAlign: { xs: 'center', sm: 'left' },
+                      flex: 1,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: '2rem',
+                        fontWeight: 'bold',
+                        color: 'white',
+                        textTransform: 'uppercase',
+                        whiteSpace: 'nowrap',
+                        textAlign: { xs: 'center', sm: 'inherit' },
+                      }}
+                      className="name"
+                    >
+                      {data.team2.name}
+                    </Typography>
+                    <Box
+                      className="team-info"
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: { xs: 'center', sm: 'flex-start' },
+                        textAlign: { xs: 'center', sm: 'left' },
+                      }}
+                    >
+                      {data.team2?.form && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: { xs: 'center', sm: 'flex-start' },
+                            gap: '0.5rem',
+                            mt: '0.5rem',
+                            width: '100%',
+                          }}
+                        >
+                          {data.team2.form.slice(0, 5).toLowerCase().split('').map((item, i) => {
+                            const label = item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н';
+                            const bg = item === 'w' ? '#4caf50' : item === 'l' ? '#f44336' : '#9e9e9e';
+                            return (
+                              <Box
+                                key={i}
+                                sx={{
+                                  width: 20,
+                                  height: 20,
+                                  fontSize: '0.7rem',
+                                  color: 'white',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontWeight: 'bold',
+                                  borderRadius: '4px',
+                                  backgroundColor: bg,
+                                }}
+                              >
+                                {label}
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      )}
+                      {data.team2.name?.toLowerCase().includes('fayna') && matchIsOver && (
+                        <Box
+                          className="team-extra"
+                          sx={{
+                            mt: '0.3rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 300,
+                            color: 'white',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.25rem',
+                            alignItems: { xs: 'center', sm: 'flex-start' },
+                            textAlign: { xs: 'center', sm: 'left' },
+                          }}
+                        >
+                          {data?.mvp && <div>⭐ MVP {data.mvp.last_name}</div>}
+                          {data?.scorers_fayna && data.scorers_fayna.split(',').map((name, i) => (
+                            <div key={i}>⚽ {name.trim()}</div>
+                          ))}
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                  <img
+                    src={data.team2.logo || '/images/placeholder.svg'}
+                    alt={data.team2.name}
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: '50%',
+                      objectFit: 'contain',
+                      marginBottom: 8,
+                    }}
+                  />
+                </>
+              )}
+            </Box>
+          </Box>
+        </Box>
+        <Box sx={{ position: 'relative', mt: '2.5rem' }}>
+          <Box
+            sx={{
+              fontSize: '1rem',
+              color: '#ddd',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              mt: '-1.5rem',
+            }}
+          >
+            <Typography
+              className="venue"
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '1.1rem',
+                textTransform: 'uppercase',
+                mb: '0.25rem',
+                color: 'inherit',
+              }}
+            >
+              🏟 {data?.tournament?.stadium}
+            </Typography>
+            <Box
+              className="address"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                color: '#aaa',
+                fontWeight: 500,
+                fontSize: '0.95rem',
+              }}
+            >
+              <span style={{ color: 'red' }}>📍</span>
               <span>{data?.tournament?.address}</span>
-            </div>
-          </Stadium>
-        </div>
-        <div style={{ marginTop: '2rem' }}>
-        {matchIsOver && data?.highlight_link ? (
-  // 1. Матч завершено і є огляд
-  <div style={{ marginTop: '2rem' }}>
-    <YoutubeLink
-      href={data.highlight_link}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      ДИВИТИСЬ ОГЛЯД МАТЧУ
-      <img src="/images/icons/youtube.svg" style={{ width: 20, height: 20 }} />
-    </YoutubeLink>
-  </div>
-) : matchIsOver && !data?.highlight_link ? (
-  // 2. Матч завершено, але огляду ще нема
-            <div style={{
-    marginTop: '2rem',
-    color: '#aaa',
-    fontSize: '0.95rem',
-    fontStyle: 'italic',
-    textAlign: 'center',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }}>
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-      Огляд буде доступний пізніше
-      <img
-        src="/images/icons/youtube.svg"
-        alt="Очікуємо на огляд"
-        style={{ width: 20, height: 20, opacity: 0.5 }}
-      />
-    </span>
-  </div>
-) : !matchIsOver && data?.youtube_link ? (
-  // 3. Матч ще не завершено, але є трансляція
-  <div style={{ marginTop: '2rem' }}>
-    <YoutubeLink
-      href={data.youtube_link}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      ДИВИТИСЬ ТРАНСЛЯЦІЮ НА YOUTUBE
-      <img src="/images/icons/youtube.svg" style={{ width: 20, height: 20 }} />
-    </YoutubeLink>
-  </div>
-) : (
-            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-              <ActionText>
+            </Box>
+          </Box>
+        </Box>
+        <Box sx={{ mt: '2rem' }}>
+          {matchIsOver && data?.highlight_link ? (
+            // 1. Матч завершено і є огляд
+            <Box sx={{ mt: '2rem' }}>
+              <Link
+                href={data.highlight_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  px: '1.6rem',
+                  py: '0.75rem',
+                  background: 'linear-gradient(90deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.1))',
+                  border: '1px solid rgba(255, 0, 0, 0.6)',
+                  borderRadius: 0,
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.2))',
+                    borderColor: 'rgba(255, 0, 0, 0.8)',
+                    transform: 'translateY(-1px)',
+                  },
+                }}
+              >
+                ДИВИТИСЬ ОГЛЯД МАТЧУ
+                <img src="/images/icons/youtube.svg" style={{ width: 20, height: 20 }} />
+              </Link>
+            </Box>
+          ) : matchIsOver && !data?.highlight_link ? (
+            // 2. Матч завершено, але огляду ще нема
+            <Typography
+              sx={{
+                mt: '2rem',
+                color: '#aaa',
+                fontSize: '0.95rem',
+                fontStyle: 'italic',
+                textAlign: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              Огляд буде доступний пізніше
+              <img
+                src="/images/icons/youtube.svg"
+                alt="Очікуємо на огляд"
+                style={{ width: 20, height: 20, opacity: 0.5 }}
+              />
+            </Typography>
+          ) : !matchIsOver && data?.youtube_link ? (
+            // 3. Матч ще не завершено, але є трансляція
+            <Box sx={{ mt: '2rem' }}>
+              <Link
+                href={data.youtube_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  px: '1.6rem',
+                  py: '0.75rem',
+                  background: 'linear-gradient(90deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.1))',
+                  border: '1px solid rgba(255, 0, 0, 0.6)',
+                  borderRadius: 0,
+                  color: 'white',
+                  textDecoration: 'none',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.2))',
+                    borderColor: 'rgba(255, 0, 0, 0.8)',
+                    transform: 'translateY(-1px)',
+                  },
+                }}
+              >
+                ДИВИТИСЬ ТРАНСЛЯЦІЮ НА YOUTUBE
+                <img src="/images/icons/youtube.svg" style={{ width: 20, height: 20 }} />
+              </Link>
+            </Box>
+          ) : (
+            <Box sx={{ mt: '2rem', textAlign: 'center' }}>
+              <Typography
+                sx={{
+                  color: '#aaa',
+                  fontSize: '0.95rem',
+                  fontStyle: 'italic',
+                  textAlign: 'center',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  fontWeight: 500,
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                }}
+              >
                 Очікуємо на трансляцію
                 <img
                   src="/images/icons/youtube.svg"
                   alt="Очікуємо на трансляцію"
                   style={{ width: 20, height: 20, opacity: 0.5 }}
                 />
-              </ActionText>
-            </div>
-)}
-        </div>
-      </Wrapper>
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Box>
     </>
   );
 };

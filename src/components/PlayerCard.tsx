@@ -1,9 +1,11 @@
 import React from 'react';
+import { Box, Card, CardMedia, Typography, useTheme, styled } from '@mui/material';
+import { alpha } from '@mui/material';
+import { keyframes } from '@emotion/react';
 
 function getUkrainianYears(age: number): string {
   const lastDigit = age % 10;
   const lastTwoDigits = age % 100;
-
   if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return 'років';
   if (lastDigit === 1) return 'рік';
   if (lastDigit >= 2 && lastDigit <= 4) return 'роки';
@@ -16,31 +18,9 @@ function calculateAge(birthDateStr: string): number {
   let age = today.getFullYear() - birthDate.getFullYear();
   const m = today.getMonth() - birthDate.getMonth();
   const d = today.getDate() - birthDate.getDate();
-  if (m < 0 || (m === 0 && d < 0)) {
-    age--;
-  }
+  if (m < 0 || (m === 0 && d < 0)) age--;
   return age;
 }
-
-const fontStyle = `
-  @font-face {
-    font-family: 'AdiCupQ2022';
-    src: url('/fonts/AdiCupQ2022.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);  /* Card starts below */
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);  /* Card moves to its original position */
-    }
-  }
-`;
 
 type PlayerCardProps = {
   name: string;
@@ -56,212 +36,247 @@ type PlayerCardProps = {
   saves?: number;
 };
 
-const PlayerCard: React.FC<PlayerCardProps> = ({ name, position, number, photoUrl, birthDate, matches, goals, assists, yellowCards, redCards, saves }) => {
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  overflow: 'hidden',
+  borderRadius: 0,
+  position: 'relative',
+  color: theme.palette.common.white,
+  width: '100%',
+  maxWidth: 360,
+  margin: '0 auto',
+  background: `linear-gradient(180deg,rgb(37, 37, 37) 0%,rgb(16, 16, 17) 100%)`,
+  transition: 'transform 0.3s ease',
+  animation: `${fadeIn} 1s ease-out`,
+  fontFamily: theme.typography.fontFamily,
+  [theme.breakpoints.up('md')]: {
+    maxWidth: 480,
+  },
+}));
+
+const HoverOverlay = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  left: 0,
+  bottom: 0,
+  width: '100%',
+  height: '50%',
+  backgroundImage: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.85)} 0%, ${alpha(theme.palette.common.black, 0)} 100%)`,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(4),
+  paddingBottom: theme.spacing(4),
+}));
+
+const PlayerCard: React.FC<PlayerCardProps> = ({
+  name,
+  position,
+  number,
+  photoUrl,
+  birthDate,
+  matches,
+  goals,
+  assists,
+  yellowCards,
+  redCards,
+  saves,
+}) => {
+  const theme = useTheme();
+  const [hover, setHover] = React.useState(false);
+  // Use window.innerWidth < 600 to detect mobile
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 600 : false;
+  const age = birthDate ? calculateAge(birthDate) : 0;
+  const years = getUkrainianYears(age);
+  const formattedBirthDate = birthDate
+    ? new Date(birthDate).toLocaleDateString('uk-UA', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : '';
+
   return (
-    <>
-      <style>{fontStyle}</style>
-      <div style={{
-        overflow: 'hidden',
-        color: 'white',
+    <StyledCard
+      onMouseEnter={() => !isMobile && setHover(true)}
+      onMouseLeave={() => !isMobile && setHover(false)}
+    >
+      <Box sx={{
         position: 'relative',
-        fontFamily: 'Cuprum, sans-serif',
-        width: '360px',
-        height: 'calc(100% + 0px)',
-        margin: '0 auto',
-        background: 'linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%)',
-        transition: 'transform 0.3s ease',
-        animation: 'fadeIn 1s ease-out',  // Apply fade-in animation
-        boxSizing: 'border-box',
-      }} 
-      onMouseEnter={(e) => {
-        const img = e.currentTarget.querySelector('.player-image') as HTMLElement;
-        if (img) img.style.transform = 'scale(1.08)';
-        const overlay = e.currentTarget.querySelector('.hover-overlay') as HTMLElement;
-        const data = e.currentTarget.querySelector('.hover-data') as HTMLElement;
-        const numberEl = e.currentTarget.querySelector('.player-number') as HTMLElement;
-        const nameBlock = e.currentTarget.querySelector('.player-name') as HTMLElement;
-        const birthBlock = e.currentTarget.querySelector('.player-birthdate') as HTMLElement;
-        if (overlay) overlay.style.opacity = '1';
-        if (data) data.style.transform = 'translateX(0)';
-        if (numberEl) numberEl.style.opacity = '0.3';
-        if (nameBlock) nameBlock.style.opacity = '0';
-        if (birthBlock) birthBlock.style.opacity = '1';
-      }}
-      onMouseLeave={(e) => {
-        const img = e.currentTarget.querySelector('.player-image') as HTMLElement;
-        if (img) img.style.transform = 'scale(1)';
-        const overlay = e.currentTarget.querySelector('.hover-overlay') as HTMLElement;
-        const data = e.currentTarget.querySelector('.hover-data') as HTMLElement;
-        const numberEl = e.currentTarget.querySelector('.player-number') as HTMLElement;
-        const nameBlock = e.currentTarget.querySelector('.player-name') as HTMLElement;
-        const birthBlock = e.currentTarget.querySelector('.player-birthdate') as HTMLElement;
-        if (overlay) overlay.style.opacity = '0';
-        if (data) data.style.transform = 'translateX(-100%)';
-        if (numberEl) numberEl.style.opacity = '1';
-        if (nameBlock) nameBlock.style.opacity = '1';
-        if (birthBlock) birthBlock.style.opacity = '0';
+        height: 380,
+        overflow: 'hidden',
+        [theme.breakpoints.up('md')]: {
+          height: 460,
+          aspectRatio: '480 / 580',
+        },
       }}>
-        <div style={{
-          position: 'relative',
-        }}>
-          <div style={{ overflow: 'hidden', position: 'relative', height: '380px' }}>
-            {photoUrl ? (
-              <img
-                src={`/images/players/${photoUrl}`}
-                alt={name}
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  height: '380px',
-                  width: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'top',
-                  transition: 'transform 0.4s ease',
-                }}
-                className="player-image"
-              />
-            ) : (
-              <div style={{
-                position: 'absolute',
-                bottom: 0,
-                height: '380px',
-                width: '100%',
-                background: '#2c2c2c',
-              }} />
-            )}
-          </div>
-          <div style={{
-            position: 'absolute',
-            bottom: '0',
-            left: '0',
-            padding: '1rem 0 1.5rem',
-            textAlign: 'left',
-            lineHeight: '1',
-            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.0) 100%)',
-            width: '100%',
-            zIndex: 2,
-          }}>
-            <div className="player-name" style={{ transition: 'opacity 0.4s ease;' }}>
-              <div style={{ fontSize: '1.4rem', fontWeight: '500', textTransform: 'uppercase', color: '#fff', marginBottom: '0.25rem', paddingLeft: '30px' }}>
-                {name.split(' ')[0]}
-              </div>
-              <div style={{ fontSize: '2rem', fontWeight: '900', textTransform: 'uppercase', color: '#ff1695', paddingLeft: '30px' }}>
-                {name.split(' ')[1]}
-              </div>
-            </div>
-          </div>
-          <div
-            className="player-birthdate"
-            style={{
+        {photoUrl ? (
+          <CardMedia
+            component="img"
+            image={`/images/players/${photoUrl}`}
+            alt={name}
+            sx={{
               position: 'absolute',
-              bottom: '1.5rem',
-              left: '30px',
-              fontSize: '1.4rem',
-              fontWeight: 400,
-              color: '#ddd',
-              opacity: 0,
+              bottom: 0,
+              height: 380,
+              width: '100%',
+              objectFit: 'cover',
+              objectPosition: 'top',
+              transition: 'transform 0.4s ease',
+              transform: hover ? 'scale(1.08)' : 'scale(1)',
+              [theme.breakpoints.up('md')]: {
+                height: 'auto',
+                aspectRatio: '480 / 580',
+              },
+            }}
+          />
+        ) : (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              height: 380,
+              width: '100%',
+              bgcolor: theme.palette.grey[900],
+            }}
+          />
+        )}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            width: '100%',
+            p: theme.spacing(10, 0, 3),
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            backgroundImage: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.9)} 0%, ${alpha(theme.palette.common.black, 0)} 100%)`,
+            zIndex: 2,
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            sx={{
               transition: 'opacity 0.4s ease',
-              zIndex: 3,
+              opacity: hover ? 0 : 1,
+              textTransform: 'uppercase',
+              textAlign: 'center',
             }}
           >
-            🎂 <span style={{ fontWeight: 300, fontSize: '1.2rem' }}>{birthDate}</span>
-            {birthDate ? (
-              <span style={{ marginLeft: '0.8rem', fontWeight: 600, color: '#fff', fontSize: '1.4rem' }}>
-                {calculateAge(birthDate)} {getUkrainianYears(calculateAge(birthDate))}
-              </span>
-            ) : null}
-          </div>
-          <div style={{
+            {name.split(' ')[0]}
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              transition: 'opacity 0.4s ease',
+              opacity: hover ? 0 : 1,
+              color: theme.palette.primary.main,
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              textAlign: 'center',
+            }}
+          >
+            {name.split(' ')[1]}
+          </Typography>
+        </Box>
+        <Typography
+          variant="h1"
+          sx={{
             position: 'absolute',
-            top: '20px',
-            left: '30px',
-            fontSize: '3.2rem',
-            fontWeight: '900',
-            color: '#fff',
-            textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+            top: theme.spacing(4),
+            left: theme.spacing(4),
             fontFamily: 'AdiCupQ2022, sans-serif',
+            fontSize: '3.2rem',
+            fontWeight: 900,
+            transition: 'opacity 0.4s ease, color 0.4s ease',
+            color: hover ? theme.palette.common.white : theme.palette.primary.main,
+            opacity: hover ? 0.3 : 1,
+          }}
+        >
+          {number}
+        </Typography>
+        <HoverOverlay
+          sx={{
+            transform: !isMobile && hover ? 'translateY(0%)' : 'translateY(100%)',
+            transition: 'transform 0.4s ease',
             zIndex: 2,
-          }} className="player-number">
-            {number}
-          </div>
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'rgba(0, 0, 0, 0.6)',
-            color: '#fff',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            opacity: 0,
-            transition: 'opacity 0.4s ease',
-            pointerEvents: 'none',
-            backdropFilter: 'blur(4px)',
-            zIndex: 1,
-          }} className="hover-overlay">
-            <div style={{
-              transform: 'translateX(-100%)',
-              transition: 'transform 0.4s ease',
+          }}
+        >
+          <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+            {position !== 'Воротар' ? (
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
+                  {goals ?? 0}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+                  Голи
+                </Typography>
+              </Box>
+            ) : (
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
+                  {saves ?? 0}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+                  Сейви
+                </Typography>
+              </Box>
+            )}
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
+                {assists ?? 0}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+                Асисти
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
+                {matches ?? 0}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+                Матчі
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1) }}>
+                <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.warning.main, fontWeight: 500 }}>
+                  {yellowCards ?? 0}
+                </Typography>
+                <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.error.main, fontWeight: 500 }}>
+                  {redCards ?? 0}
+                </Typography>
+              </Box>
+              <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+                Картки
+              </Typography>
+            </Box>
+          </Box>
+          {birthDate && (
+            <Box sx={{
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              textAlign: 'center',
-              fontSize: '0.95rem',
-              lineHeight: 1.4,
-              width: '100%',
-              padding: '1rem',
-              boxSizing: 'border-box',
-            }} className="hover-data">
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '1.2rem 0.5rem',
-                width: '100%',
-                marginBottom: '1rem',
-                color: 'white',
-              }}>
-                {position !== 'Воротар' ? (
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '3.4rem', fontWeight: '600' }}>{goals ?? 0}</div>
-                    <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Голи</div>
-                  </div>
-                ) : (
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '3.4rem', fontWeight: '600' }}>{saves ?? 0}</div>
-                    <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Сейви</div>
-                  </div>
-                )}
-
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '3.4rem', fontWeight: '600' }}>{assists ?? 0}</div>
-                  <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Асисти</div>
-                </div>
-
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '3.4rem', fontWeight: '600' }}>{matches ?? 0}</div>
-                  <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Матчі</div>
-                </div>
-
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-                    <div style={{ fontSize: '3.4rem', fontWeight: '600', color: '#ffcc00' }}>
-                      {yellowCards ?? 0}
-                    </div>
-                    <div style={{ fontSize: '3.4rem', fontWeight: '600', color: '#ff4d4d' }}>
-                      {redCards ?? 0}
-                    </div>
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '-0.5rem' }}>Картки</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+              gap: theme.spacing(1),
+              mt: theme.spacing(2),
+            }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 300, color: theme.palette.common.white }}>
+                🎂 {formattedBirthDate}
+              </Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: theme.palette.common.white }}>
+                {age} {years}
+              </Typography>
+            </Box>
+          )}
+        </HoverOverlay>
+      </Box>
+    </StyledCard>
   );
 };
 
