@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Box, Card, CardMedia, Typography, useTheme, styled } from '@mui/material';
 import { alpha } from '@mui/material';
 import { keyframes } from '@emotion/react';
@@ -41,7 +42,9 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-const StyledCard = styled(Card)(({ theme }) => ({
+const StyledCard = styled(Card, {
+  shouldForwardProp: (prop) => prop !== 'isMobile',
+})<{ isMobile?: boolean }>(({ theme, isMobile }) => ({
   overflow: 'hidden',
   borderRadius: 0,
   position: 'relative',
@@ -53,6 +56,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   transition: 'transform 0.3s ease',
   animation: `${fadeIn} 1s ease-out`,
   fontFamily: theme.typography.fontFamily,
+  minHeight: isMobile ? 380 : 460,
   [theme.breakpoints.up('md')]: {
     maxWidth: 480,
   },
@@ -89,7 +93,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
 }) => {
   const theme = useTheme();
   const [hover, setHover] = React.useState(false);
-  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 600 : false;
+  // useMediaQuery for mobile detection
+  const isMobile = typeof window !== 'undefined'
+    ? window.matchMedia('(max-width:599.95px)').matches
+    : false;
   const age = birthDate ? calculateAge(birthDate) : 0;
   const years = getUkrainianYears(age);
   const formattedBirthDate = birthDate
@@ -101,18 +108,17 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     : '';
 
   return (
-    <StyledCard
-      onMouseEnter={() => !isMobile && setHover(true)}
-      onMouseLeave={() => !isMobile && setHover(false)}
-    >
+    <Link to={`/player/${number}`} style={{ textDecoration: 'none' }}>
+      <StyledCard
+        isMobile={isMobile}
+        onMouseEnter={() => !isMobile && setHover(true)}
+        onMouseLeave={() => !isMobile && setHover(false)}
+      >
       <Box sx={{
         position: 'relative',
-        height: 380,
         overflow: 'hidden',
-        [theme.breakpoints.up('md')]: {
-          height: 460,
-          aspectRatio: '480 / 580',
-        },
+        height: isMobile ? 380 : 460,
+        aspectRatio: isMobile ? undefined : '480 / 580',
       }}>
         {photoUrl ? (
           <CardMedia
@@ -120,18 +126,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             image={`/images/players/${photoUrl}`}
             alt={name}
             sx={{
-              position: 'absolute',
-              bottom: 0,
-              height: 380,
+              position: 'relative',
               width: '100%',
+              height: isMobile ? 380 : 'auto',
               objectFit: 'cover',
               objectPosition: 'top',
               transition: 'transform 0.4s ease',
               transform: hover ? 'scale(1.08)' : 'scale(1)',
-              [theme.breakpoints.up('md')]: {
-                height: 'auto',
-                aspectRatio: '480 / 580',
-              },
             }}
           />
         ) : (
@@ -162,7 +163,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             variant="subtitle1"
             sx={{
               transition: 'opacity 0.4s ease',
-              opacity: hover ? 0 : 1,
+              opacity: !isMobile && hover ? 0 : 1,
               textTransform: 'uppercase',
               textAlign: 'center',
             }}
@@ -173,7 +174,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             variant="h4"
             sx={{
               transition: 'opacity 0.4s ease',
-              opacity: hover ? 0 : 1,
+              opacity: !isMobile && hover ? 0 : 1,
               color: theme.palette.primary.main,
               fontWeight: 900,
               textTransform: 'uppercase',
@@ -275,7 +276,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           )}
         </HoverOverlay>
       </Box>
-    </StyledCard>
+      </StyledCard>
+    </Link>
   );
 };
 

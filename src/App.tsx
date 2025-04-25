@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import NotFound from "./components/NotFound";
+import PlayerProfile from './pages/PlayerProfile';
 import Home from './pages/Home';
 import Fanshop from './pages/Fanshop';
 import PasswordGate from './PasswordGate';
@@ -34,6 +35,7 @@ function App() {
             <Route path="/matches" element={<Matches />} />
             <Route path="/squad" element={<Squad />} />
             <Route path="/styleguide" element={<Styleguide />} />
+            <Route path="/player/:number" element={<PlayerProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
