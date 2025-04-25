@@ -49,7 +49,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   width: '100%',
   maxWidth: 360,
   margin: '0 auto',
-  background: `linear-gradient(180deg,rgb(37, 37, 37) 0%,rgb(16, 16, 17) 100%)`,
+  background: `linear-gradient(180deg, rgb(37, 37, 37) 0%, rgb(16, 16, 17) 100%)`,
   transition: 'transform 0.3s ease',
   animation: `${fadeIn} 1s ease-out`,
   fontFamily: theme.typography.fontFamily,
@@ -69,7 +69,7 @@ const HoverOverlay = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'flex-end',
-  paddingLeft: theme.spacing(2),
+  paddingLeft: theme.spacing(4),
   paddingRight: theme.spacing(4),
   paddingBottom: theme.spacing(4),
 }));
@@ -89,7 +89,6 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
 }) => {
   const theme = useTheme();
   const [hover, setHover] = React.useState(false);
-  // Use window.innerWidth < 600 to detect mobile
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 600 : false;
   const age = birthDate ? calculateAge(birthDate) : 0;
   const years = getUkrainianYears(age);
@@ -209,41 +208,41 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
         >
           <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
             {position !== 'Воротар' ? (
-              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
                   {goals ?? 0}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+                <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
                   Голи
                 </Typography>
               </Box>
             ) : (
-              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
                   {saves ?? 0}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+                <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
                   Сейви
                 </Typography>
               </Box>
             )}
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
                 {assists ?? 0}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+              <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
                 Асисти
               </Typography>
             </Box>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
                 {matches ?? 0}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
+              <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
                 Матчі
               </Typography>
             </Box>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1) }}>
                 <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.warning.main, fontWeight: 500 }}>
                   {yellowCards ?? 0}
@@ -262,7 +261,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
               gap: theme.spacing(1),
               mt: theme.spacing(2),
             }}>

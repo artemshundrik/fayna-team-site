@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import PlayerCard from './PlayerCard';
+import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 type Player = {
   first_name: string;
@@ -23,6 +25,7 @@ type PlayersListProps = {
 
 const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
   const [players, setPlayers] = useState<Player[]>([]);
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -47,17 +50,17 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
   }
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        columnGap: '2rem',
-        rowGap: '2.5rem',
-        justifyItems: { xs: 'center', md: 'start' },
+        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+        columnGap: theme.spacing(2),
+        rowGap: theme.spacing(2.5),
+        justifyItems: 'center',
         width: '100%',
         maxWidth: '100%',
-        margin: 0,
-        padding: 0,
+        m: 0,
+        p: 0,
       }}
     >
       {players.map((player: Player) => (
@@ -76,7 +79,7 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
           saves={player.saves}
         />
       ))}
-    </div>
+    </Box>
   );
 };
 
