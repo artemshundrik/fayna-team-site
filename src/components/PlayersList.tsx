@@ -20,7 +20,7 @@ type Player = {
 };
 
 type PlayersListProps = {
-  position: string;
+  position?: string;
 };
 
 const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
@@ -35,9 +35,12 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
       } else {
         console.log('📦 Отримані гравці:', data);
         setPlayers(
-          data
-            .filter((player: Player) => player.position === position)
-            .sort((a: Player, b: Player) => a.number - b.number)
+          (position ? data.filter((player: Player) => player.position === position) : data)
+            .sort((a: Player, b: Player) => {
+              if (a.position === 'Воротар' && b.position !== 'Воротар') return -1;
+              if (a.position !== 'Воротар' && b.position === 'Воротар') return 1;
+              return a.number - b.number;
+            })
         );
       }
     };

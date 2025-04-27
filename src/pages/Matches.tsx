@@ -214,7 +214,7 @@ const Matches: React.FC = () => {
                       },
                       minHeight: '110px',
                       borderRadius: 0,
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                      // boxShadow removed
                       transition: 'box-shadow 0.3s ease-in-out',
                       flexDirection: {
                         xs: 'column',
@@ -416,7 +416,7 @@ const Matches: React.FC = () => {
                       },
                       minHeight: '110px',
                       borderRadius: 0,
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                      // boxShadow removed
                       flexWrap: 'wrap',
                       cursor: 'default',
                       transition: 'box-shadow 0.3s ease-in-out',

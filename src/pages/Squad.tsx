@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../layout/Layout';
 import PlayersList from '../components/PlayersList';
-import { Box, Container, Typography, Stack } from '@mui/material';
+import PlayerStatistics from '../components/PlayerStatistics';
+import { Box, Container, Typography, Stack, Tabs, Tab } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 const Squad: React.FC = () => {
   const theme = useTheme();
+  const [tab, setTab] = useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue);
+  };
+
   return (
     <Box sx={{ backgroundColor: theme.palette.grey[100] }}>
       <Layout>
@@ -20,22 +27,18 @@ const Squad: React.FC = () => {
             fontFamily: theme.typography.fontFamily,
           }}
         >
+          <Tabs value={tab} onChange={handleChange} sx={{ mb: theme.spacing(3) }}>
+            <Tab label="Гравці" />
+            <Tab label="Статистика" />
+          </Tabs>
 
-          <Stack spacing={4}>
-            <Box component="section">
-              <Typography variant="h6" sx={{ mb: theme.spacing(1), textTransform: 'uppercase' }}>
-                Воротарі
-              </Typography>
-              <PlayersList position="Воротар" />
-            </Box>
+          {tab === 0 && (
+            <PlayersList />
+          )}
 
-            <Box component="section">
-              <Typography variant="h6" sx={{ mb: theme.spacing(1), textTransform: 'uppercase' }}>
-                Універсали
-              </Typography>
-              <PlayersList position="Універсал" />
-            </Box>
-          </Stack>
+          {tab === 1 && (
+            <PlayerStatistics />
+          )}
         </Container>
       </Layout>
     </Box>
