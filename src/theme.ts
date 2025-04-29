@@ -27,6 +27,14 @@ declare module '@mui/material/styles' {
   }
 }
 
+declare module '@mui/material/styles' {
+  interface Shape {
+    small: number;
+    medium: number;
+    large: number;
+  }
+}
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -111,7 +119,10 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 8, // default
+    small: 4,
+    medium: 8,
+    large: 16,
   },
   spacing: 8,
   components: {

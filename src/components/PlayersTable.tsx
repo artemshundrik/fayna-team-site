@@ -144,9 +144,11 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               onClick={() => navigate(`/player/${player.number}`)}
               sx={{
                 cursor: 'pointer',
-                '&:hover td': {
-                  backgroundColor: theme.palette.action.selected,
-                },
+                ...( !isMobile && {
+                  '&:hover td': {
+                    backgroundColor: theme.palette.action.hover,
+                  },
+                }),
                 height: 64,
               }}
             >
