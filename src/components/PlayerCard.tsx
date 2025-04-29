@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Box, Card, CardMedia, Typography, useTheme, styled, Skeleton } from '@mui/material';
 import { alpha } from '@mui/material';
 import { keyframes } from '@emotion/react';
+import { supabase } from '../supabase';
 
 function getUkrainianYears(age: number): string {
   const lastDigit = age % 10;
@@ -60,9 +61,6 @@ const StyledCard = styled(Card, {
   [theme.breakpoints.up('md')]: {
     maxWidth: 480,
   },
-  '&:hover': {
-    transform: 'translateY(-4px) scale(1.02)',
-  },
   // Можлива підтримка stagger-ефекту через проп animationDelay у майбутньому
 }));
 
@@ -88,12 +86,6 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   number,
   photoUrl,
   birthDate,
-  matches,
-  goals,
-  assists,
-  yellowCards,
-  redCards,
-  saves,
 }) => {
   const theme = useTheme();
   const [hover, setHover] = React.useState(false);
@@ -110,6 +102,61 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
         year: 'numeric',
       })
     : '';
+
+  const [overallStats, setOverallStats] = React.useState<{
+    matches: number;
+    goals: number;
+    assists: number;
+    yellowCards: number;
+    redCards: number;
+    saves: number;
+  }>({
+    matches: 0,
+    goals: 0,
+    assists: 0,
+    yellowCards: 0,
+    redCards: 0,
+    saves: 0,
+  });
+
+  React.useEffect(() => {
+    async function fetchStats() {
+      const { data, error } = await supabase
+        .from('players')
+        .select('statistics')
+        .eq('number', number)
+        .single();
+      if (error || !data?.statistics) {
+        console.error('Error fetching statistics JSON:', error);
+        return;
+      }
+      // data.statistics is an object: { year: { tournament: {goals,..} } }
+      const statsObj = data.statistics as Record<string, Record<string, {
+        goals: number;
+        saves: number;
+        assists: number;
+        matches: number;
+        red_cards: number;
+        yellow_cards: number;
+      }>>;
+      // Flatten and accumulate all nested values
+      const aggregated = Object.values(statsObj)
+        .flatMap(Object.values)
+        .reduce(
+          (acc, curr) => ({
+            matches: acc.matches + (curr.matches || 0),
+            goals: acc.goals + (curr.goals || 0),
+            assists: acc.assists + (curr.assists || 0),
+            yellowCards: acc.yellowCards + (curr.yellow_cards || 0),
+            redCards: acc.redCards + (curr.red_cards || 0),
+            saves: acc.saves + (curr.saves || 0),
+          }),
+          { matches: 0, goals: 0, assists: 0, yellowCards: 0, redCards: 0, saves: 0 }
+        );
+      setOverallStats(aggregated);
+    }
+    fetchStats();
+  }, [number]);
 
   return (
     <Link to={`/player/${number}`} style={{ textDecoration: 'none' }}>
@@ -215,7 +262,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             {position !== 'Воротар' ? (
               <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
-                  {goals ?? 0}
+                  {overallStats.goals}
                 </Typography>
                 <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
                   Голи
@@ -224,7 +271,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             ) : (
               <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
-                  {saves ?? 0}
+                  {overallStats.saves}
                 </Typography>
                 <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
                   Сейви
@@ -233,7 +280,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             )}
             <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
-                {assists ?? 0}
+                {overallStats.assists}
               </Typography>
               <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
                 Асисти
@@ -241,7 +288,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             </Box>
             <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.common.white, fontWeight: 500 }}>
-                {matches ?? 0}
+                {overallStats.matches}
               </Typography>
               <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>
                 Матчі
@@ -250,10 +297,10 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             <Box sx={{ minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1) }}>
                 <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.warning.main, fontWeight: 500 }}>
-                  {yellowCards ?? 0}
+                  {overallStats.yellowCards}
                 </Typography>
                 <Typography variant="h3" sx={{ fontSize: '2.5rem', color: theme.palette.error.main, fontWeight: 500 }}>
-                  {redCards ?? 0}
+                  {overallStats.redCards}
                 </Typography>
               </Box>
               <Typography variant="caption" sx={{ color: theme.palette.common.white, fontWeight: 600 }}>

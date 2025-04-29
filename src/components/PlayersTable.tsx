@@ -47,9 +47,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
       // Toggle sort order when clicking the same column
       setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
     } else {
-      // When switching columns, start with ascending order
+      // When switching columns, start with descending order
       setSortBy(field);
-      setSortOrder('asc');
+      setSortOrder('desc');
     }
   };
 
