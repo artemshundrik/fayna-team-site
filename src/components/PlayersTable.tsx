@@ -190,8 +190,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
                       mt: '2px',
                       '& img': {
                         objectFit: 'cover',
-                        objectPosition: 'center -60%',
-                        transform: 'scale(1.2)',
+                        objectPosition: 'center -80%',
+                        transform: 'scale(1.8)',
                       },
                     }}
                   />
