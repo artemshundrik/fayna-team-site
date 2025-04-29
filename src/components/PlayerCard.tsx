@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Card, CardMedia, Typography, useTheme, styled } from '@mui/material';
+import { Box, Card, CardMedia, Typography, useTheme, styled, Skeleton } from '@mui/material';
 import { alpha } from '@mui/material';
 import { keyframes } from '@emotion/react';
 
@@ -38,7 +38,7 @@ type PlayerCardProps = {
 };
 
 const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
@@ -53,13 +53,17 @@ const StyledCard = styled(Card, {
   maxWidth: 360,
   margin: '0 auto',
   background: `linear-gradient(180deg, rgb(37, 37, 37) 0%, rgb(16, 16, 17) 100%)`,
-  transition: 'transform 0.3s ease',
-  animation: `${fadeIn} 1s ease-out`,
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  animation: `${fadeIn} 0.6s ease-out`,
   fontFamily: theme.typography.fontFamily,
   minHeight: isMobile ? 380 : 460,
   [theme.breakpoints.up('md')]: {
     maxWidth: 480,
   },
+  '&:hover': {
+    transform: 'translateY(-4px) scale(1.02)',
+  },
+  // Можлива підтримка stagger-ефекту через проп animationDelay у майбутньому
 }));
 
 const HoverOverlay = styled(Box)(({ theme }) => ({
@@ -136,13 +140,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             }}
           />
         ) : (
-          <Box
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={isMobile ? 380 : 460}
+            animation="wave"
             sx={{
-              position: 'absolute',
-              bottom: 0,
-              height: 380,
-              width: '100%',
-              bgcolor: theme.palette.grey[900],
+              bgcolor: 'grey.800',
             }}
           />
         )}

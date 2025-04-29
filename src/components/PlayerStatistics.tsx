@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Stack } from '@mui/material';
-import PlayersTable from './PlayersTable';
+import { Stack, CircularProgress } from '@mui/material';
+import PlayersTableWithFilters from './PlayersTableWithFilters';
 import { supabase } from '../supabase';
 
 type Player = {
@@ -15,40 +15,48 @@ type Player = {
   red_cards?: number;
   saves?: number;
   photo_url?: string;
+  statistics?: any;
+};
+
+type Tournament = {
+  id: string;
+  title: string;
 };
 
 const PlayerStatistics: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPlayers = async () => {
-      const { data, error } = await supabase.from('players').select('*');
-      if (data) {
-        setPlayers(data);
-      } else {
-        console.error(error);
-      }
+    const fetchData = async () => {
+      setLoading(true);
+      const { data: playersData, error: playersError } = await supabase.from('players').select('*');
+      const { data: tournamentsData, error: tournamentsError } = await supabase.from('tournaments').select('*');
+
+      if (playersData) setPlayers(playersData);
+      if (tournamentsData) setTournaments(tournamentsData);
+
+      if (playersError) console.error(playersError);
+      if (tournamentsError) console.error(tournamentsError);
+
+      setLoading(false);
     };
 
-    fetchPlayers();
+    fetchData();
   }, []);
 
-  const playerStats = players.map((p: any) => ({
-    id: p.id,
-    number: p.number,
-    name: `${p.first_name} ${p.last_name}`,
-    matches: p.matches ?? 0,
-    goals: p.goals ?? 0,
-    assists: p.assists ?? 0,
-    yellowCards: p.yellow_cards ?? 0,
-    redCards: p.red_cards ?? 0,
-    saves: p.saves ?? 0,
-    photoUrl: p.photo ? p.photo.replace('images/players/', '') : '',
-  }));
+  if (loading) {
+    return (
+      <Stack alignItems="center" justifyContent="center" height="300px">
+        <CircularProgress />
+      </Stack>
+    );
+  }
 
   return (
     <Stack spacing={4}>
-      <PlayersTable players={playerStats} />
+      <PlayersTableWithFilters players={players} tournaments={tournaments} />
     </Stack>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 // import { motion, AnimatePresence } from 'framer-motion';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
@@ -52,264 +52,107 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
     return (b[sortBy] ?? 0) - (a[sortBy] ?? 0);
   });
 
+  // Helper function for rendering sortable header
+  const renderSortableHeader = (field: keyof PlayerStat, label: string) => (
+    <TableCell
+      align="center"
+      onClick={() => handleSort(field as any)}
+      sx={{
+        fontWeight: sortBy === field ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+        fontSize: theme.typography.h6.fontSize,
+        textTransform: 'uppercase',
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        backgroundColor: theme.palette.common.white,
+        color: sortBy === field ? theme.palette.primary.main : theme.palette.text.secondary,
+        cursor: 'pointer',
+        py: 2.5, // додано більше вертикального паддінгу для вищого хедера
+      }}
+    >
+      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ minWidth: 60, textAlign: 'center' }}>{label}</Box>
+        <Box
+          component="span"
+          sx={{
+            width: 20,
+            height: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'opacity 0.3s ease',
+            opacity: sortBy === field ? 1 : 0,
+          }}
+        >
+          {sortBy === field && (sortOrder === 'asc' ? (
+            <ArrowDropUpIcon sx={{ fontSize: 20 }} />
+          ) : (
+            <ArrowDropDownIcon sx={{ fontSize: 20 }} />
+          ))}
+        </Box>
+      </Box>
+    </TableCell>
+  );
+
   return (
     <>
-      {/* Table for desktop */}
-      <TableContainer
-        component={Paper}
+      {/* Фільтри, селектор року, чіпси турнірів, текст "Вибрано" */}
+      <Box
         sx={{
-          mb: 4,
-          borderRadius: 0,
-          boxShadow: 'none',
-          '@media (max-width: 600px)': {
-            display: 'none',
-          },
+          width: '100%',
+          mt: 2,
+          mb: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
         }}
       >
-        <Table>
+        {/* Тут має бути селектор року, чіпси турнірів і текст "Вибрано" */}
+        {/* TODO: Додайте сюди ваші фільтри, селектор та чіпси */}
+      </Box>
+      {/* Table for desktop */}
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+        <TableContainer
+          sx={{
+            mb: 4,
+            borderRadius: 0,
+            boxShadow: 'none',
+            overflowX: 'auto',
+            minWidth: 800,
+          }}
+        >
+          <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
-            <TableCell
-              align="center"
-              sx={{
-                fontWeight: theme.typography.fontWeightMedium,
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                textTransform: 'uppercase',
-              }}
-            >
-              #
-            </TableCell>
-            <TableCell
-              sx={{
-                fontWeight: theme.typography.fontWeightMedium,
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                textTransform: 'uppercase',
-              }}
-            >
-              Гравець
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                minWidth: 80,
-                fontWeight: sortBy === 'matches' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                color: sortBy === 'matches' ? theme.palette.primary.main : theme.palette.grey[500],
-                cursor: 'pointer',
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                textTransform: 'uppercase',
-              }}
-              onClick={() => handleSort('matches')}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Box sx={{ minWidth: 60, textAlign: 'center', display: 'inline-block' }}>
-                  Матчі
-                </Box>
-                <Box
-                  component="span"
-                  sx={{
-                    width: 20,
-                    height: 20,
-                    ml: -0.25,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: sortBy === 'matches' ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
-                  }}
-                >
-                  {sortBy === 'matches' && (sortOrder === 'asc' ? (
-                    <ArrowDropUpIcon sx={{ fontSize: 20 }} />
-                  ) : (
-                    <ArrowDropDownIcon sx={{ fontSize: 20 }} />
-                  ))}
-                </Box>
-              </span>
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                minWidth: 80,
-                fontWeight: sortBy === 'goals' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                color: sortBy === 'goals' ? theme.palette.primary.main : theme.palette.grey[500],
-                cursor: 'pointer',
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                textTransform: 'uppercase',
-              }}
-              onClick={() => handleSort('goals')}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Box sx={{ minWidth: 60, textAlign: 'center', display: 'inline-block' }}>
-                  Голи
-                </Box>
-                <Box
-                  component="span"
-                  sx={{
-                    width: 20,
-                    height: 20,
-                    ml: -0.25,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: sortBy === 'goals' ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
-                  }}
-                >
-                  {sortBy === 'goals' && (sortOrder === 'asc' ? (
-                    <ArrowDropUpIcon sx={{ fontSize: 20 }} />
-                  ) : (
-                    <ArrowDropDownIcon sx={{ fontSize: 20 }} />
-                  ))}
-                </Box>
-              </span>
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                minWidth: 80,
-                fontWeight: sortBy === 'assists' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                color: sortBy === 'assists' ? theme.palette.primary.main : theme.palette.grey[500],
-                cursor: 'pointer',
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                textTransform: 'uppercase',
-              }}
-              onClick={() => handleSort('assists')}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Box sx={{ minWidth: 60, textAlign: 'center', display: 'inline-block' }}>
-                  Асисти
-                </Box>
-                <Box
-                  component="span"
-                  sx={{
-                    width: 20,
-                    height: 20,
-                    ml: -0.25,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: sortBy === 'assists' ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
-                  }}
-                >
-                  {sortBy === 'assists' && (sortOrder === 'asc' ? (
-                    <ArrowDropUpIcon sx={{ fontSize: 20 }} />
-                  ) : (
-                    <ArrowDropDownIcon sx={{ fontSize: 20 }} />
-                  ))}
-                </Box>
-              </span>
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                minWidth: 80,
-                fontWeight: sortBy === 'yellowCards' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                color: sortBy === 'yellowCards' ? theme.palette.primary.main : theme.palette.grey[500],
-                cursor: 'pointer',
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                textTransform: 'uppercase',
-              }}
-              onClick={() => handleSort('yellowCards')}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Box sx={{ minWidth: 60, textAlign: 'center', display: 'inline-block' }}>
-                  Жовт.
-                </Box>
-                <Box
-                  component="span"
-                  sx={{
-                    width: 20,
-                    height: 20,
-                    ml: -0.25,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: sortBy === 'yellowCards' ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
-                  }}
-                >
-                  {sortBy === 'yellowCards' && (sortOrder === 'asc' ? (
-                    <ArrowDropUpIcon sx={{ fontSize: 20 }} />
-                  ) : (
-                    <ArrowDropDownIcon sx={{ fontSize: 20 }} />
-                  ))}
-                </Box>
-              </span>
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                minWidth: 80,
-                fontWeight: sortBy === 'redCards' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                color: sortBy === 'redCards' ? theme.palette.primary.main : theme.palette.grey[500],
-                cursor: 'pointer',
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                textTransform: 'uppercase',
-              }}
-              onClick={() => handleSort('redCards')}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Box sx={{ minWidth: 60, textAlign: 'center', display: 'inline-block' }}>
-                  Черв.
-                </Box>
-                <Box
-                  component="span"
-                  sx={{
-                    width: 20,
-                    height: 20,
-                    ml: -0.25,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: sortBy === 'redCards' ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
-                  }}
-                >
-                  {sortBy === 'redCards' && (sortOrder === 'asc' ? (
-                    <ArrowDropUpIcon sx={{ fontSize: 20 }} />
-                  ) : (
-                    <ArrowDropDownIcon sx={{ fontSize: 20 }} />
-                  ))}
-                </Box>
-              </span>
-            </TableCell>
-            <TableCell
-              align="center"
-              sx={{
-                minWidth: 80,
-                fontWeight: sortBy === 'saves' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                color: sortBy === 'saves' ? theme.palette.primary.main : theme.palette.grey[500],
-                cursor: 'pointer',
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                textTransform: 'uppercase',
-              }}
-              onClick={() => handleSort('saves')}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Box sx={{ minWidth: 60, textAlign: 'center', display: 'inline-block' }}>
-                  Сейви
-                </Box>
-                <Box
-                  component="span"
-                  sx={{
-                    width: 20,
-                    height: 20,
-                    ml: -0.25,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: sortBy === 'saves' ? 1 : 0,
-                    transition: 'opacity 0.3s ease',
-                  }}
-                >
-                  {sortBy === 'saves' && (sortOrder === 'asc' ? (
-                    <ArrowDropUpIcon sx={{ fontSize: 20 }} />
-                  ) : (
-                    <ArrowDropDownIcon sx={{ fontSize: 20 }} />
-                  ))}
-                </Box>
-              </span>
-            </TableCell>
+            <TableCell sx={{
+              fontWeight: theme.typography.fontWeightMedium,
+              fontSize: theme.typography.h6.fontSize,
+              textTransform: 'uppercase',
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              backgroundColor: theme.palette.common.white,
+              color: theme.palette.text.secondary,
+              textAlign: 'center',
+              py: 2.5, // збільшення висоти хедера
+              position: 'sticky',
+              left: 0,
+              zIndex: 6,
+            }}>#</TableCell>
+            <TableCell sx={{
+              fontWeight: theme.typography.fontWeightMedium,
+              fontSize: theme.typography.h6.fontSize,
+              textTransform: 'uppercase',
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              backgroundColor: theme.palette.common.white,
+              color: theme.palette.text.secondary,
+              py: 2.5, // збільшення висоти хедера
+              position: 'sticky',
+              left: 56,
+              zIndex: 6,
+            }}>Гравець</TableCell>
+            {renderSortableHeader('matches', 'Матчі')}
+            {renderSortableHeader('goals', 'Голи')}
+            {renderSortableHeader('assists', 'Асисти')}
+            {renderSortableHeader('yellowCards', 'Жовт.')}
+            {renderSortableHeader('redCards', 'Черв.')}
+            {renderSortableHeader('saves', 'Сейви')}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -319,16 +162,14 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               onClick={() => navigate(`/player/${player.number}`)}
               sx={{
                 cursor: 'pointer',
-                textDecoration: 'none',
-                color: 'inherit',
-                transition: 'background-color 0.2s ease, border-bottom-color 0.2s ease',
-                borderBottom: `1px solid ${theme.palette.divider}`,
+                transition: 'background-color 0.2s ease',
+                backgroundColor: theme.palette.common.white,
                 '&:hover': {
                   backgroundColor: theme.palette.grey[100],
                 },
               }}
             >
-              <TableCell align="center" sx={{ borderBottom: 'none' }}>
+              <TableCell align="center" sx={{ borderBottom: `1px solid ${theme.palette.divider}`, position: 'sticky', left: 0, backgroundColor: theme.palette.common.white, zIndex: 5 }}>
                 <span style={{
                   fontWeight: theme.typography.fontWeightLight,
                   fontSize: theme.typography.body1.fontSize,
@@ -337,45 +178,58 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
                   {index + 1}
                 </span>
               </TableCell>
-              <TableCell sx={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1.5), py: theme.spacing(1), borderBottom: 'none' }}>
-                <div
-                  style={{
-                    width: 56,
-                    height: 56,
+              <TableCell
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  py: 1,
+                  minWidth: { xs: 220, md: 200 },
+                  position: 'sticky',
+                  left: 56,
+                  backgroundColor: theme.palette.common.white,
+                  zIndex: 5,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: { xs: 48, md: 56 },
+                    height: { xs: 48, md: 56 },
                     borderRadius: '50%',
                     overflow: 'hidden',
-                    backgroundColor: 'transparent',
+                    flexShrink: 0, // заборонити стиснення
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    bgcolor: 'transparent',
                   }}
                 >
-                  <img
-                    src={`/images/players/${player.photoUrl || 'default-player.png'}`}
+                  <Box
+                    component="img"
+                    src={player.photoUrl || '/images/players/default-player.png'}
                     alt={player.name}
                     onError={(e) => { e.currentTarget.src = '/images/players/default-player.png'; }}
-                    style={{
+                    sx={{
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
-                      objectPosition: 'center -60%',
-                      transform: 'scale(1.5)',
+                      objectPosition: 'center -20%',
+                      borderRadius: '50%',
+                      transform: 'scale(1.2)',
                     }}
                   />
-                </div>
-                <span style={{
-                  fontWeight: theme.typography.fontWeightSemiBold,
-                  fontSize: theme.typography.h6.fontSize,
-                }}>
+                </Box>
+                <Typography variant="h6" fontWeight="600">
                   {player.name}
-                </span>
+                </Typography>
               </TableCell>
               <TableCell
                 align="center"
                 sx={{
-                  borderBottom: 'none',
                   minWidth: 80,
                   fontWeight: sortBy === 'matches' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
               >
                 {player.matches}
@@ -383,9 +237,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  borderBottom: 'none',
                   minWidth: 80,
                   fontWeight: sortBy === 'goals' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
               >
                 {player.goals}
@@ -393,9 +247,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  borderBottom: 'none',
                   minWidth: 80,
                   fontWeight: sortBy === 'assists' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
               >
                 {player.assists}
@@ -403,9 +257,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  borderBottom: 'none',
                   minWidth: 80,
                   fontWeight: sortBy === 'yellowCards' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
               >
                 {player.yellowCards}
@@ -413,9 +267,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  borderBottom: 'none',
                   minWidth: 80,
                   fontWeight: sortBy === 'redCards' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
               >
                 {player.redCards}
@@ -423,9 +277,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  borderBottom: 'none',
                   minWidth: 80,
                   fontWeight: sortBy === 'saves' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
               >
                 {player.saves}
@@ -433,53 +287,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
             </TableRow>
           ))}
         </TableBody>
-        </Table>
-      </TableContainer>
-      {/* Cards for mobile */}
-      <Box sx={{ '@media (min-width: 601px)': { display: 'none' } }}>
-        {sortedPlayers.map((player, index) => (
-          <Box
-            key={player.number}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              borderBottom: '1px solid #ddd',
-              padding: theme.spacing(2),
-              backgroundColor: 'transparent',
-              '&:hover': {
-                backgroundColor: theme.palette.grey[100],
-              },
-              cursor: 'pointer',
-            }}
-            onClick={() => navigate(`/player/${player.number}`)}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <img
-                src={`/images/players/${player.photoUrl || 'default-player.png'}`}
-                alt={player.name}
-                style={{
-                  width: 50,
-                  height: 50,
-                  objectFit: 'cover',
-                  borderRadius: '50%',
-                  marginRight: theme.spacing(2),
-                }}
-                onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/players/default-player.png'; }}
-              />
-              <span style={{
-                fontWeight: theme.typography.fontWeightSemiBold,
-                fontSize: theme.typography.h6.fontSize,
-              }}>
-                {player.name}
-              </span>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: theme.typography.body2.fontSize }}>
-              <span>Матчі: {player.matches}</span>
-              <span>Голи: {player.goals}</span>
-              <span>Асисти: {player.assists}</span>
-            </Box>
-          </Box>
-        ))}
+          </Table>
+        </TableContainer>
       </Box>
     </>
   );
