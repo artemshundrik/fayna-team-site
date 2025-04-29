@@ -66,6 +66,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
         color: sortBy === field ? theme.palette.primary.main : theme.palette.text.secondary,
         cursor: 'pointer',
         py: 2.5, // додано більше вертикального паддінгу для вищого хедера
+        width: 56,
+        minWidth: 56,
+        maxWidth: 72,
       }}
     >
       <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
@@ -119,7 +122,7 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
             minWidth: 800,
           }}
         >
-          <Table stickyHeader size="small">
+          <Table stickyHeader size="small" sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
             <TableCell sx={{
@@ -134,6 +137,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               position: 'sticky',
               left: 0,
               zIndex: 6,
+              width: 24,
+              minWidth: 24,
+              maxWidth: 24,
             }}>#</TableCell>
             <TableCell sx={{
               fontWeight: theme.typography.fontWeightMedium,
@@ -144,8 +150,11 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               color: theme.palette.text.secondary,
               py: 2.5, // збільшення висоти хедера
               position: 'sticky',
-              left: 56,
+              left: 24,
               zIndex: 6,
+              width: 220,
+              minWidth: 220,
+              maxWidth: 220,
             }}>Гравець</TableCell>
             {renderSortableHeader('matches', 'Матчі')}
             {renderSortableHeader('goals', 'Голи')}
@@ -160,16 +169,20 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
             <TableRow
               key={player.number}
               onClick={() => navigate(`/player/${player.number}`)}
+              hover={true}
               sx={{
                 cursor: 'pointer',
-                transition: 'background-color 0.2s ease',
-                backgroundColor: theme.palette.common.white,
-                '&:hover': {
+                '& td': {
+                  backgroundColor: theme.palette.common.white,
+                  transition: 'background-color 0.2s ease',
+                  verticalAlign: 'middle',
+                },
+                '&:hover td': {
                   backgroundColor: theme.palette.grey[100],
                 },
               }}
             >
-              <TableCell align="center" sx={{ borderBottom: `1px solid ${theme.palette.divider}`, position: 'sticky', left: 0, backgroundColor: theme.palette.common.white, zIndex: 5 }}>
+              <TableCell align="center" sx={{ borderBottom: `1px solid ${theme.palette.divider}`, position: 'sticky', left: 0, zIndex: 5, width: 24, minWidth: 24, maxWidth: 24 }}>
                 <span style={{
                   fontWeight: theme.typography.fontWeightLight,
                   fontSize: theme.typography.body1.fontSize,
@@ -184,10 +197,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
                   alignItems: 'center',
                   gap: 2,
                   py: 1,
-                  minWidth: { xs: 220, md: 200 },
+                  minWidth: { xs: 220, md: 300 },
                   position: 'sticky',
-                  left: 56,
-                  backgroundColor: theme.palette.common.white,
+                  left: 24,
                   zIndex: 5,
                   borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
@@ -227,7 +239,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  minWidth: 80,
+                  minWidth: 56,
+                  maxWidth: 72,
                   fontWeight: sortBy === 'matches' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
                   borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
@@ -237,7 +250,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  minWidth: 80,
+                  minWidth: 56,
+                  maxWidth: 72,
                   fontWeight: sortBy === 'goals' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
                   borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
@@ -247,7 +261,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  minWidth: 80,
+                  minWidth: 56,
+                  maxWidth: 72,
                   fontWeight: sortBy === 'assists' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
                   borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
@@ -257,7 +272,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  minWidth: 80,
+                  minWidth: 56,
+                  maxWidth: 72,
                   fontWeight: sortBy === 'yellowCards' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
                   borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
@@ -267,7 +283,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  minWidth: 80,
+                  minWidth: 56,
+                  maxWidth: 72,
                   fontWeight: sortBy === 'redCards' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
                   borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
@@ -277,7 +294,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
               <TableCell
                 align="center"
                 sx={{
-                  minWidth: 80,
+                  minWidth: 56,
+                  maxWidth: 72,
                   fontWeight: sortBy === 'saves' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
                   borderBottom: `1px solid ${theme.palette.divider}`,
                 }}
