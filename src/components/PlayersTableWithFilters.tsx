@@ -1,10 +1,20 @@
 import React from 'react';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Box, Select, MenuItem, Typography, Chip, Skeleton } from '@mui/material';
+import { Box, Select, MenuItem, Typography, Chip, Skeleton, useTheme } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
 import PlayersTable from './PlayersTable';
-import { Player } from '@/types/player'; // або адаптуй свій тип якщо в тебе інший
+import { Player } from '@/types/player'; // або адаптуй свій тип якщо в тебя інший
 import { Tournament } from '@/types/tournament'; // якщо є типи для турнірів
+
+// Map tournament titles to their active chip colors
+const tournamentColors: Record<string, string> = {
+  'R-CUP': '#603CB6',          // Red for R-CUP
+  'SFCK AUTUMN': '#FF2180',    // Pink for SFCK Autumn
+  'SFCK SPRING': '#FF2180',    // Purple for SFCK Spring
+  'V9KY': '#1B8B37',           // Green for V9KY
+  // Add more mappings as needed
+};
 
 interface PlayersTableWithFiltersProps {
   players: Player[];
@@ -12,118 +22,64 @@ interface PlayersTableWithFiltersProps {
 }
 
 export default function PlayersTableWithFilters({ players, tournaments }: PlayersTableWithFiltersProps) {
-  const years = useMemo(() => {
-    const allYears = new Set<string>();
-    players.forEach(player => {
-      if (player.statistics) {
-        Object.keys(player.statistics).forEach(year => allYears.add(year));
-      }
-    });
-    return Array.from(allYears).sort();
-  }, [players]);
-
-  const [selectedYear, setSelectedYear] = useState<string>('');
+  const theme = useTheme();
   const [selectedTournament, setSelectedTournament] = useState<string>('');
 
   // Мемоізуємо доступні турніри для вибраного року або всі турніри якщо рік не вибрано
   const availableTournaments = useMemo(() => {
     if (!players || players.length === 0) return [];
 
-    if (selectedYear === '') {
-      // Всі турніри за всі роки
-      const allTournaments = new Set<string>();
-      players.forEach(player => {
-        Object.values(player.statistics || {}).forEach(yearData => {
-          Object.keys(yearData).forEach(tournament => allTournaments.add(tournament));
-        });
+    // Всі турніри за всі роки
+    const allTournaments = new Set<string>();
+    players.forEach(player => {
+      Object.values(player.statistics || {}).forEach(yearData => {
+        Object.keys(yearData).forEach(tournament => allTournaments.add(tournament));
       });
-      return Array.from(allTournaments).sort();
-    } else {
-      // Турніри конкретного року
-      return Array.from(
-        new Set(
-          players.flatMap(player => Object.keys(player.statistics?.[selectedYear] || {}))
-        )
-      ).sort();
-    }
-  }, [players, selectedYear]);
-
-  // Прибрати цей useEffect:
-  // useEffect(() => {
-  //   if (years.length > 0 && !selectedYear) {
-  //     setSelectedYear(years[0]);
-  //   }
-  // }, [years, selectedYear]);
-
-  // Оновлений useEffect автоселекту турніру
-  useEffect(() => {
-    if (selectedYear !== '' && availableTournaments.length > 0 && !availableTournaments.includes(selectedTournament)) {
-      setSelectedTournament('');
-    }
-  }, [availableTournaments, selectedTournament, selectedYear]);
+    });
+    return Array.from(allTournaments).sort();
+  }, [players]);
 
   const filteredPlayers = useMemo(() => {
     return players.map(player => {
-      let playerStats = null;
-
-      if (selectedYear !== '' && selectedTournament !== '') {
-        // Конкретний рік + конкретний турнір
-        playerStats = player.statistics?.[selectedYear]?.[selectedTournament];
-      } else if (selectedYear !== '' && selectedTournament === '') {
-        // Конкретний рік + усі турніри
-        const allTournamentStats = Object.values(player.statistics?.[selectedYear] || {});
-        playerStats = allTournamentStats.reduce((acc: any, stats: any) => {
-          acc.goals = (acc.goals || 0) + (stats.goals || 0);
-          acc.matches = (acc.matches || 0) + (stats.matches || 0);
-          acc.assists = (acc.assists || 0) + (stats.assists || 0);
-          acc.saves = (acc.saves || 0) + (stats.saves || 0);
-          acc.yellow_cards = (acc.yellow_cards || 0) + (stats.yellow_cards || 0);
-          acc.red_cards = (acc.red_cards || 0) + (stats.red_cards || 0);
-          return acc;
-        }, {});
-      } else if (selectedYear === '' && selectedTournament !== '') {
-        // Усі роки + конкретний турнір
-        const allYears = Object.values(player.statistics || {});
-        const allTournamentsStats = allYears.flatMap(yearData => Object.entries(yearData))
-          .filter(([tournamentName]) => tournamentName === selectedTournament)
-          .map(([_, stats]) => stats);
-        playerStats = allTournamentsStats.reduce((acc: any, stats: any) => {
-          acc.goals = (acc.goals || 0) + (stats.goals || 0);
-          acc.matches = (acc.matches || 0) + (stats.matches || 0);
-          acc.assists = (acc.assists || 0) + (stats.assists || 0);
-          acc.saves = (acc.saves || 0) + (stats.saves || 0);
-          acc.yellow_cards = (acc.yellow_cards || 0) + (stats.yellow_cards || 0);
-          acc.red_cards = (acc.red_cards || 0) + (stats.red_cards || 0);
-          return acc;
-        }, {});
-      } else if (selectedYear === '' && selectedTournament === '') {
-        // Усі роки + усі турніри
-        const allYears = Object.values(player.statistics || {});
-        const allTournamentStats = allYears.flatMap(yearData => Object.values(yearData));
-        playerStats = allTournamentStats.reduce((acc: any, stats: any) => {
-          acc.goals = (acc.goals || 0) + (stats.goals || 0);
-          acc.matches = (acc.matches || 0) + (stats.matches || 0);
-          acc.assists = (acc.assists || 0) + (stats.assists || 0);
-          acc.saves = (acc.saves || 0) + (stats.saves || 0);
-          acc.yellow_cards = (acc.yellow_cards || 0) + (stats.yellow_cards || 0);
-          acc.red_cards = (acc.red_cards || 0) + (stats.red_cards || 0);
-          return acc;
-        }, {});
+      // Aggregate stats across all years for the selected tournament, or all if none selected
+      const yearMaps = Object.values(player.statistics || {});
+      let statsArray: any[] = [];
+      if (selectedTournament) {
+        // Specific tournament across all years
+        statsArray = yearMaps.flatMap(yearData =>
+          Object.entries(yearData)
+            .filter(([t]) => t === selectedTournament)
+            .map(([, stats]) => stats)
+        );
+      } else {
+        // All tournaments, all years
+        statsArray = yearMaps.flatMap(yearData =>
+          Object.values(yearData).flatMap(sub =>
+            typeof sub === 'object' ? Object.values(sub as Record<string, any>) : []
+          )
+        );
       }
-
+      const agg = statsArray.reduce((acc, stats) => ({
+        matches: acc.matches + (stats.matches || 0),
+        goals: acc.goals + (stats.goals || 0),
+        assists: acc.assists + (stats.assists || 0),
+        saves: acc.saves + (stats.saves || 0),
+        yellowCards: acc.yellowCards + (stats.yellow_cards || 0),
+        redCards: acc.redCards + (stats.red_cards || 0),
+      }), { matches: 0, goals: 0, assists: 0, saves: 0, yellowCards: 0, redCards: 0 });
       return {
         ...player,
         name: `${player.first_name} ${player.last_name}`.trim(),
-        matches: playerStats?.matches || 0,
-        goals: playerStats?.goals || 0,
-        assists: playerStats?.assists || 0,
-        saves: playerStats?.saves || 0,
-        yellowCards: playerStats?.yellow_cards || 0,
-        redCards: playerStats?.red_cards || 0,
+        matches: agg.matches,
+        goals: agg.goals,
+        assists: agg.assists,
+        saves: agg.saves,
+        yellowCards: agg.yellowCards,
+        redCards: agg.redCards,
         photoUrl: player.photo ? `/${player.photo}` : '',
       };
     });
-  }, [players, selectedYear, selectedTournament]);
+  }, [players, selectedTournament]);
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -148,32 +104,6 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
           gap: 2,
         }}
       >
-        <Box sx={{ maxWidth: 300 }}>
-          <Typography variant="subtitle2" mb={0.5}>Рік</Typography>
-          <Select
-            size="small"
-            value={selectedYear}
-            onChange={(e) => {
-              setSelectedYear(e.target.value);
-              setSelectedTournament('');
-            }}
-            fullWidth
-            variant="outlined"
-            displayEmpty
-            renderValue={(selected) => {
-              if (selected === '') {
-                return <span style={{ color: '#9e9e9e' }}>Усі роки</span>;
-              }
-              return selected;
-            }}
-          >
-            <MenuItem value="">Усі роки</MenuItem>
-            {years.map(year => (
-              <MenuItem key={year} value={year}>{year}</MenuItem>
-            ))}
-          </Select>
-        </Box>
-
         {availableTournaments.length > 0 && (
           <Box>
             <Typography variant="subtitle2" mb={0.5}>Турнір</Typography>
@@ -185,43 +115,57 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
               px: 0.5,
               '&::-webkit-scrollbar': { display: 'none' },
             }}>
-              <Chip
-                label="Усі турніри"
-                variant={selectedTournament === '' ? 'filled' : 'outlined'}
-                color={selectedTournament === '' ? 'primary' : 'default'}
-                size="medium"
-                sx={{
-                  borderRadius: '24px',
-                  fontSize: '0.95rem',
-                  fontWeight: 600,
-                  px: 1.5,
-                  height: 40,
-                  textTransform: 'none',
-                  backgroundColor: (theme) =>
-                    selectedTournament === '' ? theme.palette.primary.main : theme.palette.common.white,
-                }}
-                onClick={() => setSelectedTournament('')}
-              />
-              {availableTournaments.map(tournament => (
-                <Chip
-                  key={tournament}
-                  label={tournament}
-                  variant={selectedTournament === tournament ? 'filled' : 'outlined'}
-                  color={selectedTournament === tournament ? 'primary' : 'default'}
-                  size="medium"
-                  sx={{
-                    borderRadius: '24px',
-                    fontSize: '0.95rem',
-                    fontWeight: 600,
-                    px: 1.5,
-                    height: 40,
-                    textTransform: 'none',
-                    backgroundColor: (theme) =>
-                      selectedTournament === tournament ? theme.palette.primary.main : theme.palette.common.white,
-                  }}
-                  onClick={() => setSelectedTournament(tournament)}
-                />
-              ))}
+              {availableTournaments.map(tournamentName => {
+                const tournamentObj = tournaments.find(
+                  t => t.title.trim().toUpperCase() === tournamentName.trim().toUpperCase()
+                );
+                const logoSrc = tournamentObj?.logo_url || tournamentObj?.logoUrl || tournamentObj?.iconUrl || tournamentObj?.icon;
+                return (
+                  <Chip
+                    key={tournamentObj?.id || tournamentName}
+                    avatar={logoSrc ? (
+                      <Avatar
+                        src={logoSrc}
+                        alt={tournamentName}
+                        sx={{
+                          width: 24,
+                          height: 24,
+                        }}
+                      />
+                    ) : undefined}
+                    label={tournamentName}
+                    variant="outlined"
+                    size="medium"
+                    sx={{
+                      borderRadius: '24px',
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                      px: 1.5,
+                      height: 40,
+                      textTransform: 'none',
+                      border: selectedTournament === tournamentName
+                        ? `1px solid ${tournamentColors[tournamentName]}`
+                        : undefined,
+                      backgroundColor: selectedTournament === tournamentName
+                        ? tournamentColors[tournamentName]
+                        : undefined,
+                      color: selectedTournament === tournamentName
+                        ? '#FFFFFF'
+                        : undefined,
+                      '&:hover': {
+                        backgroundColor: selectedTournament === tournamentName
+                          ? tournamentColors[tournamentName]
+                          : theme.palette.action.hover,
+                      },
+                    }}
+                    onClick={() =>
+                      setSelectedTournament(prev =>
+                        prev === tournamentName ? '' : tournamentName
+                      )
+                    }
+                  />
+                );
+              })}
             </Box>
           </Box>
         )}
