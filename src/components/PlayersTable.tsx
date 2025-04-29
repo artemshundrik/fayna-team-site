@@ -1,12 +1,20 @@
 import React from 'react';
-// import { motion, AnimatePresence } from 'framer-motion';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, Typography } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Box,
+  Typography,
+  Avatar,
+  useMediaQuery,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-
-// const MotionTableRow = motion(TableRow);
 
 type PlayerStat = {
   id: string;
@@ -29,286 +37,210 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const [sortBy, setSortBy] = React.useState<
-    'matches' | 'goals' | 'assists' | 'saves' | 'yellowCards' | 'redCards'
-  >('matches');
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const [sortBy, setSortBy] = React.useState<keyof PlayerStat>('matches');
   const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
 
-  const handleSort = (
-    field: 'matches' | 'goals' | 'assists' | 'saves' | 'yellowCards' | 'redCards'
-  ) => {
-    if (sortBy === field) {
-      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+  const handleSort = (field: keyof PlayerStat) => {
+    if (field === sortBy) {
+      // Toggle sort order when clicking the same column
+      setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
     } else {
+      // When switching columns, start with ascending order
       setSortBy(field);
-      setSortOrder('desc');
+      setSortOrder('asc');
     }
   };
 
-  const sortedPlayers = [...players].sort((a, b) => {
-    if (sortOrder === 'asc') {
-      return (a[sortBy] ?? 0) - (b[sortBy] ?? 0);
-    }
-    return (b[sortBy] ?? 0) - (a[sortBy] ?? 0);
-  });
-
-  // Helper function for rendering sortable header
-  const renderSortableHeader = (field: keyof PlayerStat, label: string) => (
-    <TableCell
-      align="center"
-      onClick={() => handleSort(field as any)}
-      sx={{
-        fontWeight: sortBy === field ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-        fontSize: theme.typography.h6.fontSize,
-        textTransform: 'uppercase',
-        borderBottom: `1px solid ${theme.palette.divider}`,
-        backgroundColor: theme.palette.common.white,
-        color: sortBy === field ? theme.palette.primary.main : theme.palette.text.secondary,
-        cursor: 'pointer',
-        py: 2.5, // додано більше вертикального паддінгу для вищого хедера
-        width: 56,
-        minWidth: 56,
-        maxWidth: 72,
-      }}
-    >
-      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
-        <Box sx={{ minWidth: 60, textAlign: 'center' }}>{label}</Box>
-        <Box
-          component="span"
-          sx={{
-            width: 20,
-            height: 20,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'opacity 0.3s ease',
-            opacity: sortBy === field ? 1 : 0,
-          }}
-        >
-          {sortBy === field && (sortOrder === 'asc' ? (
-            <ArrowDropUpIcon sx={{ fontSize: 20 }} />
-          ) : (
-            <ArrowDropDownIcon sx={{ fontSize: 20 }} />
-          ))}
-        </Box>
-      </Box>
-    </TableCell>
+  const sortedPlayers = React.useMemo(
+    () =>
+      [...players].sort((a, b) => {
+        const aValue = a[sortBy] ?? 0;
+        const bValue = b[sortBy] ?? 0;
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      }),
+    [players, sortBy, sortOrder]
   );
 
+  const renderSortIcon = (field: keyof PlayerStat) => {
+    if (sortBy !== field) return null;
+    return sortOrder === 'asc' ? (
+      <ArrowDropUpIcon fontSize="small" />
+    ) : (
+      <ArrowDropDownIcon fontSize="small" />
+    );
+  };
+
   return (
-    <>
-      {/* Фільтри, селектор року, чіпси турнірів, текст "Вибрано" */}
-      <Box
-        sx={{
-          width: '100%',
-          mt: 2,
-          mb: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        {/* Тут має бути селектор року, чіпси турнірів і текст "Вибрано" */}
-        {/* TODO: Додайте сюди ваші фільтри, селектор та чіпси */}
-      </Box>
-      {/* Table for desktop */}
-      <Box sx={{ width: '100%', overflowX: 'auto' }}>
-        <TableContainer
-          sx={{
-            mb: 4,
-            borderRadius: 0,
-            boxShadow: 'none',
-            overflowX: 'auto',
-            minWidth: 800,
-          }}
-        >
-          <Table stickyHeader size="small" sx={{ tableLayout: 'fixed' }}>
+    <TableContainer
+      component={Box}
+      sx={{ width: '100%', overflowX: 'auto', bgcolor: theme.palette.common.white }}
+    >
+      <Table stickyHeader size="small" sx={{ minWidth: 650, tableLayout: 'fixed' }}>
         <TableHead>
-          <TableRow>
-            <TableCell sx={{
-              fontWeight: theme.typography.fontWeightMedium,
-              fontSize: theme.typography.h6.fontSize,
-              textTransform: 'uppercase',
-              borderBottom: `1px solid ${theme.palette.divider}`,
-              backgroundColor: theme.palette.common.white,
-              color: theme.palette.text.secondary,
-              textAlign: 'center',
-              py: 2.5, // збільшення висоти хедера
-              position: 'sticky',
-              left: 0,
-              zIndex: 6,
-              width: 24,
-              minWidth: 24,
-              maxWidth: 24,
-            }}>#</TableCell>
-            <TableCell sx={{
-              fontWeight: theme.typography.fontWeightMedium,
-              fontSize: theme.typography.h6.fontSize,
-              textTransform: 'uppercase',
-              borderBottom: `1px solid ${theme.palette.divider}`,
-              backgroundColor: theme.palette.common.white,
-              color: theme.palette.text.secondary,
-              py: 2.5, // збільшення висоти хедера
-              position: 'sticky',
-              left: 24,
-              zIndex: 6,
-              width: 220,
-              minWidth: 220,
-              maxWidth: 220,
-            }}>Гравець</TableCell>
-            {renderSortableHeader('matches', 'Матчі')}
-            {renderSortableHeader('goals', 'Голи')}
-            {renderSortableHeader('assists', 'Асисти')}
-            {renderSortableHeader('yellowCards', 'Жовт.')}
-            {renderSortableHeader('redCards', 'Черв.')}
-            {renderSortableHeader('saves', 'Сейви')}
+          <TableRow sx={{ height: 64 }}>
+            <TableCell
+              align="center"
+              sx={{
+                position: 'sticky',
+                left: 0,
+                zIndex: 3,
+                backgroundColor: theme.palette.common.white,
+                width: 32,
+                minWidth: 32,
+                textTransform: 'uppercase',
+                color: theme.palette.text.secondary,
+              }}
+            >
+              #
+            </TableCell>
+            <TableCell
+              sx={{
+                position: 'sticky',
+                left: 32,
+                zIndex: 3,
+                backgroundColor: theme.palette.common.white,
+                width: { xs: 180, sm: 260 },
+                minWidth: { xs: 180, sm: 260 },
+                textTransform: 'uppercase',
+                color: theme.palette.text.secondary,
+              }}
+            >
+              Гравець
+            </TableCell>
+            {(['matches', 'goals', 'assists', 'yellowCards', 'redCards', 'saves'] as Array<keyof PlayerStat>).map(field => (
+              <TableCell
+                key={field}
+                align="center"
+                onClick={() => handleSort(field)}
+                sx={{
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  fontWeight: sortBy === field ? 'bold' : 'normal',
+                  color: sortBy === field ? theme.palette.primary.main : theme.palette.text.secondary,
+                  textTransform: 'uppercase',
+                  width: { xs: 80, sm: 'auto' },
+                  minWidth: { xs: 80, sm: 0 },
+                }}
+              >
+                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                  {field === 'matches' && 'Матчі'}
+                  {field === 'goals' && 'Голи'}
+                  {field === 'assists' && 'Асисти'}
+                  {field === 'yellowCards' && 'Жовт.'}
+                  {field === 'redCards' && 'Черв.'}
+                  {field === 'saves' && 'Сейви'}
+                  {renderSortIcon(field)}
+                </Box>
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>
           {sortedPlayers.map((player, index) => (
             <TableRow
-              key={player.number}
+              key={player.id}
               onClick={() => navigate(`/player/${player.number}`)}
-              hover={true}
               sx={{
                 cursor: 'pointer',
-                '& td': {
-                  backgroundColor: theme.palette.common.white,
-                  transition: 'background-color 0.2s ease',
-                  verticalAlign: 'middle',
-                },
                 '&:hover td': {
-                  backgroundColor: theme.palette.grey[100],
+                  backgroundColor: theme.palette.action.selected,
                 },
+                height: 64,
               }}
             >
-              <TableCell align="center" sx={{ borderBottom: `1px solid ${theme.palette.divider}`, position: 'sticky', left: 0, zIndex: 5, width: 24, minWidth: 24, maxWidth: 24 }}>
-                <span style={{
-                  fontWeight: theme.typography.fontWeightLight,
-                  fontSize: theme.typography.body1.fontSize,
-                  color: 'inherit',
-                }}>
-                  {index + 1}
-                </span>
-              </TableCell>
-              <TableCell
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  py: 1,
-                  minWidth: { xs: 220, md: 300 },
-                  position: 'sticky',
-                  left: 24,
-                  zIndex: 5,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: { xs: 48, md: 56 },
-                    height: { xs: 48, md: 56 },
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    flexShrink: 0, // заборонити стиснення
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    bgcolor: 'transparent',
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={player.photoUrl || '/images/players/default-player.png'}
-                    alt={player.name}
-                    onError={(e) => { e.currentTarget.src = '/images/players/default-player.png'; }}
-                    sx={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center -20%',
-                      borderRadius: '50%',
-                      transform: 'scale(1.2)',
-                    }}
-                  />
-                </Box>
-                <Typography variant="h6" fontWeight="600">
-                  {player.name}
-                </Typography>
-              </TableCell>
               <TableCell
                 align="center"
                 sx={{
-                  minWidth: 56,
-                  maxWidth: 72,
-                  fontWeight: sortBy === 'matches' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  position: 'sticky',
+                  left: 0,
+                  zIndex: 2,
+                  backgroundColor: theme.palette.common.white
                 }}
+              >
+                {index + 1}
+              </TableCell>
+              <TableCell
+                sx={{
+                  position: 'sticky',
+                  left: 32,
+                  zIndex: 2,
+                  backgroundColor: theme.palette.common.white,
+                  width: { xs: 180, sm: 260 },
+                  minWidth: { xs: 180, sm: 260 }
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Avatar
+                    src={player.photoUrl}
+                    alt={player.name}
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      bgcolor: 'transparent',
+                      mt: '2px',
+                      '& img': {
+                        objectFit: 'cover',
+                        objectPosition: 'center -60%',
+                        transform: 'scale(1.2)',
+                      },
+                    }}
+                  />
+                  {isMobile ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                      {player.name.split(' ').map((part, idx) => (
+                        <Typography key={idx} variant="body2" sx={{ whiteSpace: 'normal', fontWeight: 600 }}>
+                          {part}
+                        </Typography>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography noWrap fontWeight={600}>{player.name}</Typography>
+                  )}
+                </Box>
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ fontWeight: sortBy === 'matches' ? 600 : 'normal' }}
               >
                 {player.matches}
               </TableCell>
               <TableCell
                 align="center"
-                sx={{
-                  minWidth: 56,
-                  maxWidth: 72,
-                  fontWeight: sortBy === 'goals' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                }}
+                sx={{ fontWeight: sortBy === 'goals' ? 600 : 'normal' }}
               >
                 {player.goals}
               </TableCell>
               <TableCell
                 align="center"
-                sx={{
-                  minWidth: 56,
-                  maxWidth: 72,
-                  fontWeight: sortBy === 'assists' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                }}
+                sx={{ fontWeight: sortBy === 'assists' ? 600 : 'normal' }}
               >
                 {player.assists}
               </TableCell>
               <TableCell
                 align="center"
-                sx={{
-                  minWidth: 56,
-                  maxWidth: 72,
-                  fontWeight: sortBy === 'yellowCards' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                }}
+                sx={{ fontWeight: sortBy === 'yellowCards' ? 600 : 'normal' }}
               >
                 {player.yellowCards}
               </TableCell>
               <TableCell
                 align="center"
-                sx={{
-                  minWidth: 56,
-                  maxWidth: 72,
-                  fontWeight: sortBy === 'redCards' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                }}
+                sx={{ fontWeight: sortBy === 'redCards' ? 600 : 'normal' }}
               >
                 {player.redCards}
               </TableCell>
               <TableCell
                 align="center"
-                sx={{
-                  minWidth: 56,
-                  maxWidth: 72,
-                  fontWeight: sortBy === 'saves' ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                }}
+                sx={{ fontWeight: sortBy === 'saves' ? 600 : 'normal' }}
               >
                 {player.saves}
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </>
+      </Table>
+    </TableContainer>
   );
 };
 

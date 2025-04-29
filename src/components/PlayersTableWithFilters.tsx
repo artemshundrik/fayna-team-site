@@ -194,7 +194,7 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
                   borderRadius: '24px',
                   fontSize: '0.95rem',
                   fontWeight: 600,
-                  px: 2.5,
+                  px: 1.5,
                   height: 40,
                   textTransform: 'none',
                   backgroundColor: (theme) =>
@@ -213,7 +213,7 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
                     borderRadius: '24px',
                     fontSize: '0.95rem',
                     fontWeight: 600,
-                    px: 2.5,
+                    px: 1.5,
                     height: 40,
                     textTransform: 'none',
                     backgroundColor: (theme) =>
