@@ -91,6 +91,7 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
                 minWidth: 32,
                 textTransform: 'uppercase',
                 color: theme.palette.text.secondary,
+                fontWeight: 600,
               }}
             >
               #
@@ -101,10 +102,11 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
                 left: 32,
                 zIndex: 3,
                 backgroundColor: theme.palette.common.white,
-                width: { xs: 180, sm: 260 },
-                minWidth: { xs: 180, sm: 260 },
+                width: { xs: 180, sm: 300 },
+                minWidth: { xs: 180, sm: 300 },
                 textTransform: 'uppercase',
                 color: theme.palette.text.secondary,
+                fontWeight: 600,
               }}
             >
               Гравець
@@ -117,11 +119,15 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
                 sx={{
                   cursor: 'pointer',
                   userSelect: 'none',
-                  fontWeight: sortBy === field ? 'bold' : 'normal',
+                  fontWeight: 600,
                   color: sortBy === field ? theme.palette.primary.main : theme.palette.text.secondary,
                   textTransform: 'uppercase',
-                  width: { xs: 80, sm: 'auto' },
-                  minWidth: { xs: 80, sm: 0 },
+                  width: field === 'assists' 
+                    ? { xs: 100, sm: 'auto' } 
+                    : { xs: 80, sm: 'auto' },
+                  minWidth: field === 'assists' 
+                    ? { xs: 100, sm: 0 } 
+                    : { xs: 80, sm: 0 },
                 }}
               >
                 <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
@@ -169,8 +175,8 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
                   left: 32,
                   zIndex: 2,
                   backgroundColor: theme.palette.common.white,
-                  width: { xs: 180, sm: 260 },
-                  minWidth: { xs: 180, sm: 260 }
+                  width: { xs: 180, sm: 300 },
+                  minWidth: { xs: 180, sm: 300 }
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
