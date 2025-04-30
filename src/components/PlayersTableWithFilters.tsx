@@ -41,22 +41,21 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
 
   const filteredPlayers = useMemo(() => {
     return players.map(player => {
-      // Aggregate stats across all years for the selected tournament, or all if none selected
-      const yearMaps = Object.values(player.statistics || {});
       let statsArray: any[] = [];
       if (selectedTournament) {
-        // Specific tournament across all years
-        statsArray = yearMaps.flatMap(yearData =>
-          Object.entries(yearData)
-            .filter(([t]) => t === selectedTournament)
-            .map(([, stats]) => stats)
+        // Sum only the selected tournament across all years
+        statsArray = Object.values(player.statistics || {}).flatMap(
+          yearData => {
+            const t = (yearData as Record<string, any>)[selectedTournament];
+            return t && typeof t === 'object' ? [t] : [];
+          }
         );
       } else {
-        // All tournaments, all years
-        statsArray = yearMaps.flatMap(yearData =>
-          Object.values(yearData).flatMap(sub =>
-            typeof sub === 'object' ? Object.values(sub as Record<string, any>) : []
-          )
+        // Aggregate all tournaments across all years
+        statsArray = Object.values(player.statistics || {}).flatMap(
+          yearData =>
+            // yearData is Record<tournamentName, statsObject>
+            Object.values(yearData)
         );
       }
       const agg = statsArray.reduce((acc, stats) => ({
@@ -106,7 +105,6 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
       >
         {availableTournaments.length > 0 && (
           <Box>
-            <Typography variant="subtitle2" mb={0.5}>Турнір</Typography>
             <Box sx={{
               display: 'flex',
               gap: 1,
@@ -114,6 +112,7 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
               py: 1,
               px: 0.5,
               '&::-webkit-scrollbar': { display: 'none' },
+              touchAction: 'manipulation',
             }}>
               {availableTournaments.map(tournamentName => {
                 const tournamentObj = tournaments.find(
@@ -136,6 +135,8 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
                     label={tournamentName}
                     variant="outlined"
                     size="medium"
+                    disableRipple
+                    disableTouchRipple
                     sx={{
                       borderRadius: '24px',
                       fontSize: '0.95rem',
@@ -143,26 +144,28 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
                       px: 1.5,
                       height: 40,
                       textTransform: 'none',
-                      border: selectedTournament === tournamentName
-                        ? `1px solid ${tournamentColors[tournamentName]}`
-                        : undefined,
+                      WebkitTapHighlightColor: 'transparent',
                       backgroundColor: selectedTournament === tournamentName
-                        ? tournamentColors[tournamentName]
+                        ? `${theme.palette.common.white} !important`
+                        : undefined,
+                      border: selectedTournament === tournamentName
+                        ? `1px solid ${tournamentColors[tournamentName]} !important`
                         : undefined,
                       color: selectedTournament === tournamentName
-                        ? '#FFFFFF'
-                        : undefined,
-                      '&:hover': {
-                        backgroundColor: selectedTournament === tournamentName
-                          ? tournamentColors[tournamentName]
-                          : theme.palette.action.hover,
-                      },
+                        ? `${theme.palette.text.primary} !important`
+                        : theme.palette.text.secondary,
                     }}
-                    onClick={() =>
+                    onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                       setSelectedTournament(prev =>
                         prev === tournamentName ? '' : tournamentName
-                      )
-                    }
+                      );
+                      // remove hover/focus state
+                      (e.currentTarget as HTMLDivElement).blur();
+                    }}
+                    onTouchEnd={(e: React.TouchEvent<HTMLDivElement>) => {
+                      // remove hover/focus state on mobile
+                      (e.currentTarget as HTMLDivElement).blur();
+                    }}
                   />
                 );
               })}
