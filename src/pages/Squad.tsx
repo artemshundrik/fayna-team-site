@@ -21,7 +21,9 @@ const Squad: React.FC = () => {
           maxWidth="lg"
           disableGutters
           sx={{
-            py: theme.spacing(4),
+            pt: { xs: theme.spacing(2), sm: theme.spacing(4) },
+            pb: { xs: theme.spacing(2), sm: theme.spacing(4) },
+            px: { xs: theme.spacing(2), sm: 0 },  // side padding on mobile
             backgroundColor: theme.palette.grey[100],
             color: theme.palette.text.primary,
             fontFamily: theme.typography.fontFamily,

@@ -95,7 +95,7 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
       <Box
         sx={{
           width: '100%',
-          px: { xs: 2, md: 0 },
+          px: { xs: 0, md: 0 },
           mt: 0,
           mb: 2,
           display: 'flex',
@@ -109,8 +109,8 @@ export default function PlayersTableWithFilters({ players, tournaments }: Player
               display: 'flex',
               gap: 1,
               overflowX: 'auto',
-              py: 1,
-              px: 0.5,
+              py: 0,
+              px: 0,
               '&::-webkit-scrollbar': { display: 'none' },
               touchAction: 'manipulation',
             }}>
