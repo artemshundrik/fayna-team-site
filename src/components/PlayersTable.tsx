@@ -79,6 +79,9 @@ const PlayersTable: React.FC<PlayersTableProps> = ({ players }) => {
         width: '100%',
         overflowX: 'auto',
         bgcolor: theme.palette.common.white,
+        border: `1px solid ${theme.palette.grey[100]}`,
+        borderRadius: '8px',
+        boxSizing: 'border-box',
       }}
     >
       <Table stickyHeader size="small" sx={{ minWidth: 650, tableLayout: 'fixed' }}>

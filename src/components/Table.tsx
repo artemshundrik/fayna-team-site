@@ -175,7 +175,14 @@ const columns: Column[] = [
           Щоб побачити повну таблицю — переверніть телефон у горизонтальне положення
         </Box>
         <Box sx={{ overflowX: 'auto' }}>
-          <TableContainer sx={{ width: '100%' }}>
+          <TableContainer
+            sx={{
+              width: '100%',
+              border: `1px solid ${theme.palette.grey[100]}`,
+              borderRadius: '8px',
+              overflow: 'hidden',
+            }}
+          >
             <Table sx={{ minWidth: '100%', width: '100%', tableLayout: 'auto' }}>
               <TableHead>
                 <TableRow>

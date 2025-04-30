@@ -10,6 +10,18 @@ import { supabase } from '../supabase';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
 
+import { styled } from '@mui/material/styles';
+// Example Card styled component, adjust as per actual usage
+const Card = styled(Box, { shouldForwardProp: (prop) => prop !== 'full' })<{ full?: boolean }>`
+  /* card styles here */
+`;
+
+
+const fadeSlide = {
+  hidden: { opacity: 0, y: -20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+
 
 const NextMatch = () => {
   const [data, setData] = useState<Database['public']['Tables']['matches']['Row'] & {
@@ -30,6 +42,41 @@ const NextMatch = () => {
     awayTeam?: string;
     finishedManually?: boolean;
   } | null>(null);
+  const [form1, setForm1] = useState<string[]>([]);
+  const [form2, setForm2] = useState<string[]>([]);
+  useEffect(() => {
+    if (!data?.team1?.id || !data?.team2?.id) return;
+    async function getLast5Forms(teamId: number): Promise<string[]> {
+      const { data: hist, error } = await supabase
+        .from('matches')
+        .select('team1_id, team2_id, score_team1, score_team2')
+        .or(`team1_id.eq.${teamId},team2_id.eq.${teamId}`)
+        .not('score_team1', 'is', null)
+        .not('score_team2', 'is', null)
+        .order('date', { ascending: false })
+        .order('time', { ascending: false })
+        .limit(5);
+      if (error || !hist) return [];
+      return hist.map(m => {
+        const isHome = m.team1_id === teamId;
+        const gf = isHome ? m.score_team1! : m.score_team2!;
+        const ga = isHome ? m.score_team2! : m.score_team1!;
+        if (gf > ga) return 'w';
+        if (gf < ga) return 'l';
+        return 'd';
+      });
+    }
+    (async () => {
+      const [f1, f2] = await Promise.all([
+        getLast5Forms(data.team1.id),
+        getLast5Forms(data.team2.id),
+      ]);
+      const fallback1 = data.team1?.form ? data.team1.form.toLowerCase().split(',').slice(0,5) : [];
+      const fallback2 = data.team2?.form ? data.team2.form.toLowerCase().split(',').slice(0,5) : [];
+      setForm1(f1.length > 0 ? f1 : fallback1);
+      setForm2(f2.length > 0 ? f2 : fallback2);
+    })();
+  }, [data]);
   const [matchIsOver, setMatchIsOver] = useState(false);
 
   useEffect(() => {
@@ -137,10 +184,10 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
     <>
       <Box
         component={motion.section}
-        initial={{ opacity: 0, y: 80 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial="hidden"
+        whileInView="visible"
+        variants={fadeSlide}
         viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.9, ease: 'easeOut' }}
         sx={{
           backgroundImage: "url('/images/matches/next-match-bg.png')",
           backgroundRepeat: 'no-repeat',
@@ -175,14 +222,18 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
             mb: '1.5rem',
           }}
         >
-          <a href="https://r-cup.com.ua/" target="_blank" rel="noopener noreferrer">
+          <Link
+            href={data?.tournament?.url || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Box
               component="img"
               src={data?.tournament?.logo_url || '/images/matches/logo-rejo.png'}
               alt={data?.tournament?.title || 'Турнір'}
-              sx={{ height: 80, mb: 0.3 }}
+              sx={{ height: { xs: 60, sm: 80 }, mb: { xs: 0.2, sm: 0.3 } }}
             />
-          </a>
+          </Link>
           <Box
             sx={{
               textAlign: 'center',
@@ -319,10 +370,10 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            flexWrap: 'wrap',
+            // Remove flexWrap so items stay on one line
             gap: { xs: 1, sm: 2 },
             mb: 2,
-            flexDirection: { xs: 'column', md: 'row' },
+            flexDirection: { xs: 'row', md: 'row' },
             position: 'relative',
           }}
         >
@@ -339,9 +390,9 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
               className="team"
               sx={{
                 display: 'flex',
-                flexDirection: { xs: 'column-reverse', sm: 'row' },
+                flexDirection: { xs: 'row', sm: 'row' },
                 alignItems: 'center',
-                gap: { xs: '1rem', sm: '2rem' },
+                gap: { xs: '0.5rem', sm: '2rem' },
                 fontSize: { xs: '1.4rem', sm: '2rem' },
                 fontWeight: 'bold',
                 color: 'white',
@@ -353,7 +404,8 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                 <>
                   <Box
                     sx={{
-                      minWidth: 160,
+                      minWidth: 0,
+                      flexShrink: 1,
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: { xs: 'center', sm: 'flex-end' },
@@ -363,7 +415,7 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                   >
                     <Typography
                       sx={{
-                        fontSize: '2rem',
+                        fontSize: { xs: '1rem', sm: '2rem' },
                         fontWeight: 'bold',
                         color: 'white',
                         textTransform: 'uppercase',
@@ -383,35 +435,30 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                         textAlign: { xs: 'center', sm: 'right' },
                       }}
                     >
-                      {data.team1?.form && (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: { xs: 'center', sm: 'flex-end' },
-                            gap: '0.5rem',
-                            mt: '0.5rem',
-                            width: '100%',
-                          }}
-                        >
-                          {data.team1.form.slice(0, 5).toLowerCase().split('').map((item, i) => {
-                            const label = item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н';
-                            const bg = item === 'w' ? '#4caf50' : item === 'l' ? '#f44336' : '#9e9e9e';
+                      {form1.length > 0 && (
+                        <Box sx={{
+                          display: 'flex',
+                          justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+                          gap: '0.5rem',
+                          mt: '0.5rem',
+                          width: '100%',
+                        }}>
+                          {form1.map((ch, i) => {
+                            const label = ch === 'w' ? 'В' : ch === 'l' ? 'П' : 'Н';
+                            const bg = ch === 'w' ? '#4caf50' : ch === 'l' ? '#f44336' : '#9e9e9e';
                             return (
-                              <Box
-                                key={i}
-                                sx={{
-                                  width: 20,
-                                  height: 20,
-                                  fontSize: '0.7rem',
-                                  color: 'white',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontWeight: 'bold',
-                                  borderRadius: '4px',
-                                  backgroundColor: bg,
-                                }}
-                              >
+                              <Box key={i} sx={{
+                                width: { xs: 16, sm: 20 },
+                                height: { xs: 16, sm: 20 },
+                                fontSize: { xs: '0.6rem', sm: '0.7rem' },
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 'bold',
+                                borderRadius: '4px',
+                                backgroundColor: bg,
+                              }}>
                                 {label}
                               </Box>
                             );
@@ -441,15 +488,16 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                       )}
                     </Box>
                   </Box>
-                  <img
+                  <Box
+                    component="img"
                     src={data.team1.logo || '/images/placeholder.svg'}
                     alt={data.team1.name}
-                    style={{
-                      width: 80,
-                      height: 80,
+                    sx={{
+                      width: { xs: 50, sm: 80 },
+                      height: { xs: 50, sm: 80 },
                       borderRadius: '50%',
                       objectFit: 'contain',
-                      marginBottom: 8,
+                      mb: { xs: 0.5, sm: 1 },
                     }}
                   />
                 </>
@@ -464,10 +512,10 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              fontSize: '2rem',
+              fontSize: { xs: '1.2rem', sm: '2rem' },
               fontWeight: 'bold',
-              minWidth: 80,
-              px: 2,
+              minWidth: { xs: 60, sm: 80 },
+              px: { xs: 1, sm: 2 },
               background: 'rgba(0, 0, 0, 0.6)',
               backdropFilter: 'blur(8px)',
               borderRadius: 2,
@@ -489,7 +537,7 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
               flex: 1,
               maxWidth: 300,
               display: 'flex',
-              justifyContent: { xs: 'center', sm: 'space-between' },
+              justifyContent: { xs: 'flex-start', sm: 'space-between' },
               alignItems: 'center',
             }}
           >
@@ -497,9 +545,9 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
               className="team reverse"
               sx={{
                 display: 'flex',
-                flexDirection: { xs: 'column-reverse', sm: 'row-reverse' },
+                flexDirection: { xs: 'row-reverse', sm: 'row-reverse' },
                 alignItems: 'center',
-                gap: { xs: '1rem', sm: '2rem' },
+                gap: { xs: '0.5rem', sm: '2rem' },
                 fontSize: { xs: '1.4rem', sm: '2rem' },
                 fontWeight: 'bold',
                 color: 'white',
@@ -515,7 +563,8 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                 <>
                   <Box
                     sx={{
-                      minWidth: 160,
+                      minWidth: 0,
+                      flexShrink: 1,
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: { xs: 'center', sm: 'flex-start' },
@@ -525,7 +574,7 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                   >
                     <Typography
                       sx={{
-                        fontSize: '2rem',
+                        fontSize: { xs: '1rem', sm: '2rem' },
                         fontWeight: 'bold',
                         color: 'white',
                         textTransform: 'uppercase',
@@ -545,35 +594,30 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                         textAlign: { xs: 'center', sm: 'left' },
                       }}
                     >
-                      {data.team2?.form && (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: { xs: 'center', sm: 'flex-start' },
-                            gap: '0.5rem',
-                            mt: '0.5rem',
-                            width: '100%',
-                          }}
-                        >
-                          {data.team2.form.slice(0, 5).toLowerCase().split('').map((item, i) => {
-                            const label = item === 'w' ? 'В' : item === 'l' ? 'П' : 'Н';
-                            const bg = item === 'w' ? '#4caf50' : item === 'l' ? '#f44336' : '#9e9e9e';
+                      {form2.length > 0 && (
+                        <Box sx={{
+                          display: 'flex',
+                          justifyContent: { xs: 'flex-start', sm: 'flex-start' },
+                          gap: '0.5rem',
+                          mt: '0.5rem',
+                          width: '100%',
+                        }}>
+                          {form2.map((ch, i) => {
+                            const label = ch === 'w' ? 'В' : ch === 'l' ? 'П' : 'Н';
+                            const bg = ch === 'w' ? '#4caf50' : ch === 'l' ? '#f44336' : '#9e9e9e';
                             return (
-                              <Box
-                                key={i}
-                                sx={{
-                                  width: 20,
-                                  height: 20,
-                                  fontSize: '0.7rem',
-                                  color: 'white',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontWeight: 'bold',
-                                  borderRadius: '4px',
-                                  backgroundColor: bg,
-                                }}
-                              >
+                              <Box key={i} sx={{
+                                width: { xs: 16, sm: 20 },
+                                height: { xs: 16, sm: 20 },
+                                fontSize: { xs: '0.6rem', sm: '0.7rem' },
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 'bold',
+                                borderRadius: '4px',
+                                backgroundColor: bg,
+                              }}>
                                 {label}
                               </Box>
                             );
@@ -603,15 +647,16 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                       )}
                     </Box>
                   </Box>
-                  <img
+                  <Box
+                    component="img"
                     src={data.team2.logo || '/images/placeholder.svg'}
                     alt={data.team2.name}
-                    style={{
-                      width: 80,
-                      height: 80,
+                    sx={{
+                      width: { xs: 50, sm: 80 },
+                      height:{ xs: 50, sm: 80 },
                       borderRadius: '50%',
                       objectFit: 'contain',
-                      marginBottom: 8,
+                      mb: { xs: 0.5, sm: 1 },
                     }}
                   />
                 </>

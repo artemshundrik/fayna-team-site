@@ -209,8 +209,8 @@ const Matches: React.FC = () => {
                         sm: '0.75rem 1.25rem',
                       },
                       minHeight: '110px',
-                      borderRadius: 0,
-                      // boxShadow removed
+                      borderRadius: '8px',
+                      border: `1px solid ${theme.palette.grey[100]}`,
                       transition: 'box-shadow 0.3s ease-in-out',
                       flexDirection: {
                         xs: 'column',
@@ -411,8 +411,8 @@ const Matches: React.FC = () => {
                         sm: '0.75rem 1.25rem',
                       },
                       minHeight: '110px',
-                      borderRadius: 0,
-                      // boxShadow removed
+                      borderRadius: '8px',
+                      border: `1px solid ${theme.palette.grey[100]}`,
                       flexWrap: 'wrap',
                       cursor: 'default',
                       transition: 'box-shadow 0.3s ease-in-out',
