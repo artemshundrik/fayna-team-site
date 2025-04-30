@@ -14,7 +14,7 @@ const Squad: React.FC = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: theme.palette.grey[100] }}>
+    <Box sx={{ backgroundColor: theme.palette.grey[50] }}>
       <Layout>
         <Container
           component="main"
@@ -24,7 +24,7 @@ const Squad: React.FC = () => {
             pt: { xs: theme.spacing(2), sm: theme.spacing(4) },
             pb: { xs: theme.spacing(2), sm: theme.spacing(4) },
             px: { xs: theme.spacing(2), sm: 0 },  // side padding on mobile
-            backgroundColor: theme.palette.grey[100],
+            backgroundColor: theme.palette.grey[50],
             color: theme.palette.text.primary,
             fontFamily: theme.typography.fontFamily,
           }}

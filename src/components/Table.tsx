@@ -414,44 +414,70 @@ const columns: Column[] = [
                               sx={{
                                 fontSize: theme.typography.body1.fontSize,
                                 fontFamily: theme.typography.fontFamily,
-                                width: '180px',
-                                minWidth: '180px',
-                                maxWidth: '180px',
-                                whiteSpace: 'nowrap',
+                                // Removed width/minWidth/maxWidth/whiteSpace for form cell
                                 paddingLeft: { xs: '4px', sm: '8px' },
                                 paddingRight: { xs: '4px', sm: '8px' },
                                 display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                               }}
                             >
-                              {typeof team.form === 'string' && (
-                                <Stack direction="row" justifyContent="flex-start" spacing={0.3}>
-                                  {Array(5).fill('').map((_, idx) => {
-                                    const res = team.form?.[idx];
-                                    const resUA = res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : '';
-                                    const title = resUA === 'В' ? 'Перемога' : resUA === 'Н' ? 'Нічия' : resUA === 'П' ? 'Поразка' : '';
-                                    return resUA ? (
-                                      <Tooltip key={idx} title={title} arrow>
-                                        <span
-                                          style={{
+                              {typeof team.form === 'string' && (() => {
+                                // Map backend codes to UA letters and show most recent 5, newest at left
+                                const rawForm = team.form || '';
+                                const mapped = rawForm
+                                  .split('')
+                                  .map(res => (res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : ''));
+
+                                const sliced = mapped.slice(-5);
+                                const reversed = sliced.reverse();
+                                const filled = reversed.concat(Array(5 - reversed.length).fill(''));
+                                return (
+                                  <Box
+                                    component="div"
+                                    sx={{
+                                      display: 'grid',
+                                      gridTemplateColumns: 'repeat(5, 1fr)',
+                                      columnGap: theme.spacing(0.5),
+                                      justifyItems: 'start',
+                                    }}
+                                  >
+                                    {filled.map((resUA, idx) => {
+                                      const title =
+                                        resUA === 'В'
+                                          ? 'Перемога'
+                                          : resUA === 'Н'
+                                          ? 'Нічия'
+                                          : resUA === 'П'
+                                          ? 'Поразка'
+                                          : '';
+                                      return resUA ? (
+                                        <Tooltip key={idx} title={title} arrow>
+                                          <Box component="span" sx={{
                                             ...formBoxStyle,
                                             backgroundColor: getFormColor(resUA),
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                          }}>
+                                            {resUA}
+                                          </Box>
+                                        </Tooltip>
+                                      ) : (
+                                        <Box
+                                          key={idx}
+                                          component="span"
+                                          sx={{
+                                            ...formBoxStyle,
+                                            backgroundColor: theme.palette.grey[300],
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
                                           }}
-                                        >
-                                          {resUA}
-                                        </span>
-                                      </Tooltip>
-                                    ) : (
-                                      <span
-                                        key={idx}
-                                        style={{
-                                          ...formBoxStyle,
-                                          backgroundColor: theme.palette.grey[300],
-                                        }}
-                                      />
-                                    );
-                                  })}
-                                </Stack>
-                              )}
+                                        />
+                                      );
+                                    })}
+                                  </Box>
+                                );
+                              })()}
                             </TableCell>
                           );
                         default:

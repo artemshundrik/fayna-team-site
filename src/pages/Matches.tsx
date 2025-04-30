@@ -147,7 +147,7 @@ const Matches: React.FC = () => {
           fontFamily: `'FixelDisplay', sans-serif`,
           minHeight: '100vh',
           padding: { xs: '1rem', sm: '2rem' },
-          backgroundColor: theme.palette.grey[100],
+          backgroundColor: theme.palette.grey[50],
           color: theme.palette.text.primary,
           textAlign: 'center',
           width: '100%',
@@ -203,7 +203,7 @@ const Matches: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      backgroundColor: theme.palette.background.paper,
+                      backgroundColor: theme.palette.background.default,
                       padding: {
                         xs: '0.75rem 0.5rem',
                         sm: '0.75rem 1.25rem',
@@ -405,7 +405,7 @@ const Matches: React.FC = () => {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      backgroundColor: theme.palette.background.paper,
+                      backgroundColor: theme.palette.background.default,
                       padding: {
                         xs: '0.75rem 0.5rem',
                         sm: '0.75rem 1.25rem',

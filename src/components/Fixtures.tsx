@@ -1,10 +1,11 @@
 import React from 'react';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useEffect, useState } from 'react';
-import { supabase } from '../supabase'; // шлях залежить від твого проєкту
-import styled from 'styled-components';
+import { supabase } from '../supabase';
+import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { Box, Button, Typography } from '@mui/material';
+import { Box as MuiBox } from '@mui/material';
 
 const Section = motion(Box);
 
@@ -13,12 +14,13 @@ const ContentWrapper = styled(motion.div)`
   margin: 0 auto;
 `;
 
-
 const Grid = styled(motion.div)`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 2rem;
-  max-width: 1200px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
 
   @media (max-width: 900px) {
@@ -27,8 +29,12 @@ const Grid = styled(motion.div)`
   }
 `;
 
-const Card = styled.div<{ full?: boolean }>`
+const Card = styled(MuiBox)<{ full?: boolean }>`
   background: #fff;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.palette.grey[100]};
+  width: 100%;
+  box-sizing: border-box;
   position: relative;
   padding: 1.5rem;
   display: flex;
@@ -50,21 +56,7 @@ const Card = styled.div<{ full?: boolean }>`
         grid-column: span 1;
       }
     `}
-
-  &:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  }
 `;
-
-const Teams = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-`;
-
-
 
 const Fixtures = () => {
   const [fixtures, setFixtures] = useState<any[]>([]);
@@ -73,11 +65,11 @@ const Fixtures = () => {
     const fetchFixtures = async () => {
       const { data, error } = await supabase
         .from('matches')
-      .select(`
+        .select(`
           *,
           team1:team1_id ( name, logo ),
           team2:team2_id ( name, logo ),
-          tournament:tournament_id ( logo_url, stadium, address )
+          tournament:tournament_id ( logo_url, stadium, address, url )
         `)
         .order('date', { ascending: true });
 
@@ -92,7 +84,6 @@ const Fixtures = () => {
             minute: '2-digit',
           });
           const weekdayName = weekdays[dateObj.getDay()];
-
           return {
             ...match,
             date_text: `${weekdayName}, ${formatter.format(dateObj)}`,
@@ -106,24 +97,18 @@ const Fixtures = () => {
         const pastMatches = formatted
           .filter(m => new Date(`${m.date}T${m.time}`) < now)
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
         const upcomingMatches = formatted
           .filter(m => new Date(`${m.date}T${m.time}`) >= now)
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-        const sliced = [
-          pastMatches[0], // last match
-          upcomingMatches[0], // next match
-        ].filter(Boolean);
-
+        const sliced = [pastMatches[0], upcomingMatches[0]].filter(Boolean);
         setFixtures(sliced);
       } else {
         console.error('Помилка завантаження матчів:', error);
       }
     };
-
     fetchFixtures();
   }, []);
+
   return (
     <Section
       sx={(theme) => ({
@@ -150,34 +135,23 @@ const Fixtures = () => {
             mx: 'auto',
           }}
         >
-          <Typography
-            variant="h5"
-            component="h2"
-            sx={{
-              fontSize: '1.1rem',
-              textTransform: 'uppercase',
-              fontWeight: 600,
-              textAlign: 'left',
-            }}
-          >
+          <Typography variant="h5" component="h2" sx={{
+            fontSize: '1.1rem',
+            textTransform: 'uppercase',
+            fontWeight: 600,
+          }}>
             Розклад матчів
           </Typography>
-
-          <Button
-            href="/matches"
-            variant="outlined"
-            endIcon={<ArrowForwardIcon />}
-            sx={(theme) => ({
-              textTransform: 'none',
-              fontWeight: 600,
-              borderColor: theme.palette.grey[400],
-              color: theme.palette.text.primary,
-              '&:hover': {
-                borderColor: theme.palette.primary.main,
-                color: theme.palette.primary.main,
-              },
-            })}
-          >
+          <Button href="/matches" variant="outlined" endIcon={<ArrowForwardIcon />} sx={(theme)=>({
+            textTransform:'none',
+            fontWeight:600,
+            borderColor:theme.palette.grey[400],
+            color:theme.palette.text.primary,
+            '&:hover':{
+              borderColor:theme.palette.primary.main,
+              color:theme.palette.primary.main
+            }
+          })}>
             Всі матчі
           </Button>
         </Box>
@@ -191,133 +165,89 @@ const Fixtures = () => {
           {fixtures.map((match, index) => (
             <Card key={index} full={index === 1}>
               {(index === 0 || index === fixtures.length - 1) && (
-                <Box
-                  sx={(theme) => ({
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    backgroundColor: index === 0 ? theme.palette.grey[200] : theme.palette.secondary.dark,
-                    color: index === 0 ? theme.palette.text.secondary : theme.palette.common.white,
-                    fontSize: '0.875rem',
-                    px: 2,
-                    py: 1,
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
-                  })}
-                >
-                  {index === 0 ? 'Минула гра' : 'Наступна гра'}
+                <Box sx={(theme)=>({
+                  position:'absolute', top:0, left:0,
+                  backgroundColor: index===0 ? theme.palette.grey[200] : theme.palette.secondary.dark,
+                  color:index===0?theme.palette.text.secondary:theme.palette.common.white,
+                  fontSize:'0.875rem', px:2, py:1, textTransform:'uppercase', fontWeight:600,
+                  borderTopLeftRadius: '8px',
+                  borderBottomRightRadius: '8px',
+                })}>
+                  {index===0?'Минула гра':'Наступна гра'}
                 </Box>
               )}
+
               <Box
-                component="img"
-                src={match.tournament?.logo_url || '/default-tournament.png'}
-                alt="Tournament"
-                height={64}
-                sx={{ mb: '6px' }}
-              />
-              <Box sx={{ fontSize: '1.1rem', opacity: 0.8, fontWeight: 600 }}>{match.date_text}</Box>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: { xs: '1fr auto 1fr', sm: '1fr auto 1fr' },
-                  alignItems: 'center',
-                  justifyItems: 'center',
-                  gap: '0.75rem',
-                  mt: '0.5rem',
-                }}
+                component="a"
+                href={match.tournament?.url || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ mb: '6px', display: 'inline-block' }}
               >
                 <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    gap: { xs: '0.25rem', sm: '0.6rem' },
-                    minWidth: 'auto',
-                    maxWidth: '100%',
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={match.team1?.logo || '/default-logo.png'}
-                    alt={match.team1?.name || 'Команда 1'}
-                    sx={{
-                      height: 'clamp(36px, 6vw, 48px)',
-                      width: 'clamp(36px, 6vw, 48px)',
-                      borderRadius: '50%',
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      fontSize: '1.2rem',
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {match.team1?.name || 'Команда 1'}
-                  </Box>
+                  component="img"
+                  src={match.tournament?.logo_url || '/default-tournament.png'}
+                  alt="Tournament"
+                  height={64}
+                  sx={{ display: 'block' }}
+                />
+              </Box>
+              <Box sx={{fontSize: { xs: '0.9rem', sm: '1.1rem' },opacity:0.8,fontWeight:600}}>{match.date_text}</Box>
+
+              <Box sx={{
+                display:'grid',
+                width: '100%',
+                gridTemplateColumns:{ xs:'1fr auto 1fr', sm:'1fr auto 1fr' },
+                justifyItems:'center',
+                alignItems:'center',
+                gap:'0.75rem',
+                mt:'0.5rem',
+                minWidth: 0
+              }}>
+                <Box sx={{ justifySelf: 'end', display:'flex', alignItems:'center', gap:{ xs:'0.25rem', sm:'0.6rem' }, minWidth: 0 }}>
+                  <Box sx={{
+                    fontSize: { xs: '1rem', sm: '1.2rem' }, fontWeight:600,
+                    whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                    overflow: { xs: 'visible', sm: 'hidden' },
+                    textOverflow: { xs: 'clip', sm: 'ellipsis' },
+                    wordBreak: 'break-word',
+                  }}>{match.team1?.name}</Box>
+                  <Box component="img" src={match.team1?.logo||'/default-logo.png'} alt={match.team1?.name} sx={{
+                    height:'clamp(36px,6vw,48px)',
+                    width:'clamp(36px,6vw,48px)',
+                    borderRadius:'50%'
+                  }} />
                 </Box>
 
-                <Box
-                  sx={(theme) => ({
-                    backgroundColor:
-                      match.score_team1 != null && match.score_team2 != null
-                        ? theme.palette.secondary.dark
-                        : theme.palette.grey[200],
-                    color:
-                      match.score_team1 != null && match.score_team2 != null
-                        ? theme.palette.common.white
-                        : theme.palette.text.secondary,
-                    padding: '0.4rem 0.8rem',
-                    borderRadius: '0.4rem',
-                    fontSize: '1.1rem',
-                    fontWeight: 600,
-                    minWidth: '2.2rem',
-                    textAlign: 'center',
-                  })}
-                >
-                  {match.score || match.time}
+                <Box sx={{ justifySelf: 'center' }}>
+                  <Box sx={(theme)=>({
+                    backgroundColor: match.score_team1!=null&&match.score_team2!=null?theme.palette.secondary.dark:theme.palette.grey[200],
+                    color: match.score_team1!=null&&match.score_team2!=null?theme.palette.common.white:theme.palette.text.secondary,
+                    padding:'0.4rem 0.8rem', borderRadius:'0.4rem',
+                    fontSize: { xs: '0.9rem', sm: '1.1rem' }, fontWeight:600, minWidth:'2.2rem',
+                    textAlign:'center'
+                  })}>{match.score||match.time}</Box>
                 </Box>
 
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    gap: { xs: '0.25rem', sm: '0.6rem' },
-                    minWidth: 'auto',
-                    maxWidth: '100%',
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={match.team2?.logo || '/default-logo.png'}
-                    alt={match.team2?.name || 'Команда 2'}
-                    sx={{
-                      height: 'clamp(36px, 6vw, 48px)',
-                      width: 'clamp(36px, 6vw, 48px)',
-                      borderRadius: '50%',
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      fontSize: '1.2rem',
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {match.team2?.name || 'Команда 2'}
-                  </Box>
+                <Box sx={{ justifySelf: 'start', display:'flex', alignItems:'center', gap:{ xs:'0.25rem', sm:'0.6rem' }, minWidth: 0 }}>
+                  <Box component="img" src={match.team2?.logo||'/default-logo.png'} alt={match.team2?.name} sx={{
+                    height:'clamp(36px,6vw,48px)',
+                    width:'clamp(36px,6vw,48px)',
+                    borderRadius:'50%'
+                  }} />
+                  <Box sx={{
+                    fontSize: { xs: '1rem', sm: '1.2rem' }, fontWeight:600,
+                    whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                    overflow: { xs: 'visible', sm: 'hidden' },
+                    textOverflow: { xs: 'clip', sm: 'ellipsis' },
+                    wordBreak: 'break-word',
+                  }}>{match.team2?.name}</Box>
                 </Box>
               </Box>
-              <Box sx={{ fontSize: '1rem', opacity: 0.9, lineHeight: 1.8, mt: '0.5rem' }}>
-                <Box sx={{ fontWeight: 600 }}>🏟 {match.tournament?.stadium || 'Манеж REJO-ВДНХ №1'}</Box>
-                <Box sx={(theme) => ({ color: theme.palette.text.secondary })}>📍 {match.tournament?.address || 'вул. Академіка Глушкова, 1, Київ'}</Box>
+
+              <Box sx={{fontSize: { xs: '0.9rem', sm: '1rem' },opacity:0.9,lineHeight:1.8,mt:'0.5rem'}}>
+                <Box sx={{fontWeight:600}}>🏟 {match.tournament?.stadium}</Box>
+                <Box sx={(theme)=>({color:theme.palette.text.secondary})}>📍 {match.tournament?.address}</Box>
               </Box>
             </Card>
           ))}
