@@ -88,11 +88,11 @@ const Matches: React.FC = () => {
     const fetchMatches = async () => {
       const { data, error } = await supabase
         .from('matches')
-      .select(`
+        .select(`
           *,
           team1:team1_id ( name, logo ),
           team2:team2_id ( name, logo ),
-          tournament:tournament_id ( logo_url, stadium, league_name ),
+          tournament:tournament_id ( logo_url, stadium, league_name, url ),
           round_number, highlight_link
         `)
         .order('date', { ascending: true });
@@ -111,8 +111,9 @@ const Matches: React.FC = () => {
             dateFormatted: formattedDate,
             stadium: match.tournament?.stadium || '',
             score,
-          tournamentLogo: match.tournament?.logo_url || '',
+            tournamentLogo: match.tournament?.logo_url || '',
             leagueName: match.tournament?.league_name || '',
+            tournamentUrl: match.tournament?.url || '',
             tour: match.round_number,
             team1Logo: match.team1?.logo || '',
             team2Logo: match.team2?.logo || '',
@@ -229,11 +230,13 @@ const Matches: React.FC = () => {
                   >
                     {/* LEFT */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-                      <img
-                        src={match.tournamentLogo}
-                        alt="Турнір"
-                        style={{ height: '56px' }}
-                      />
+                      <a href={match.tournamentUrl || '#'} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={match.tournamentLogo}
+                          alt="Турнір"
+                          style={{ height: '56px' }}
+                        />
+                      </a>
                       <Box
                         sx={(theme) => ({
                           fontSize: '0.95rem',
@@ -432,11 +435,13 @@ const Matches: React.FC = () => {
                   >
                     {/* LEFT */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-                      <img
-                        src={match.tournamentLogo}
-                        alt="Турнір"
-                        style={{ height: '56px' }}
-                      />
+                      <a href={match.tournamentUrl || '#'} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={match.tournamentLogo}
+                          alt="Турнір"
+                          style={{ height: '56px' }}
+                        />
+                      </a>
                       <Box
                         sx={(theme) => ({
                           fontSize: '0.95rem',
