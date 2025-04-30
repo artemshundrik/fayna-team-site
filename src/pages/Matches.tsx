@@ -161,10 +161,6 @@ const Matches: React.FC = () => {
             onChange={(_, newValue) => setActiveTab(newValue)}
             textColor="primary"
             indicatorColor="primary"
-            sx={{
-              borderBottom: 1,
-              borderColor: 'divider',
-            }}
           >
             <Tab label="МАЙБУТНІ" value="upcoming" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
             <Tab label="ЗІГРАНІ" value="past" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
