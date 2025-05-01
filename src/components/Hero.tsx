@@ -7,20 +7,20 @@ const Section = styled.section`
   position: relative;
   height: 100svh;
   box-sizing: border-box;
-  background-image: url('/images/hero-team-photo.webp');
+  background-image: url('/images/hero-team-photo.png');
   background-size: cover;
-  background-position: center;
+  background-position: center 20%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: 0 1rem 6rem;
   overflow: hidden;
-  border-radius: 0px;
 
   @media (max-width: 768px) {
-    height: 75vh;
-    padding-bottom: 4rem;
-    justify-content: flex-start;
+    height: 75svh;
+    padding: 0 1rem;
+    justify-content: flex-end;
+    background-position: center top;
   }
 
   &::before {
@@ -29,13 +29,12 @@ const Section = styled.section`
     inset: 0;
     background-image: inherit;
     background-size: cover;
-    background-position: center;
+    background-position: inherit;
     transform: scale(1.1) translateY(-2%);
     will-change: transform;
     z-index: 0;
     transition: transform 1.5s ease;
     animation: zoomOut 1.5s ease forwards;
-    border-radius: 0px;
   }
 `;
 
@@ -46,8 +45,8 @@ const Overlay = styled.div`
   z-index: 1;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 70%, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 70%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 100%);
 `;
 
 const Content = styled.div`
@@ -56,10 +55,10 @@ const Content = styled.div`
   z-index: 10;
   opacity: 0;
   animation: fadeInUp 1s ease-out 0.3s forwards;
-  padding-top: 20vh;
+  padding-top: 10vh;
   margin-bottom: 2rem;
   @media (max-width: 768px) {
-    padding-top: 23vh;
+    padding-top: 16vh;
   }
 `;
 
@@ -72,6 +71,9 @@ const Logo = styled.div`
   img {
     width: 100%;
     height: auto;
+  }
+  @media (max-width: 600px) {
+    margin-bottom: 2rem;
   }
 `;
 
@@ -94,8 +96,9 @@ const Buttons = styled.div`
   margin-top: 1rem;
   @media (max-width: 600px) {
     flex-direction: column-reverse;
-    gap: 1rem;
+    gap: 0.8rem;
     align-items: center;
+    margin-top: 2rem;
     & > * {
       width: 90%;
       margin: 0 auto;
@@ -135,8 +138,13 @@ const Social = styled.div`
   opacity: 0;
   transform: translateY(40px);
   animation: fadeInUp 1s ease-out 0.9s forwards;
+
   @media (max-width: 600px) {
-    gap: 1rem;
+    gap: 0.5rem; /* reduced gap */
+  }
+
+  img {
+    max-height: 48px; /* reduce logo size on mobile */
   }
 `;
 
@@ -144,9 +152,11 @@ const Divider = styled.div`
   width: 1px;
   height: 60px;
   background-color: rgba(255, 255, 255, 0.4);
+  
   @media (max-width: 600px) {
-    height: 40px;
-    margin: 0 0.5rem;
+    height: 32px; /* reduced height for mobile */
+    margin: 0 0.25rem; /* smaller margin */
+    display: block; /* explicitly ensure visibility */
   }
 `;
 

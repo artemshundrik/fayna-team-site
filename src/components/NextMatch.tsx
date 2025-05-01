@@ -390,8 +390,8 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
               className="team"
               sx={{
                 display: 'flex',
-                flexDirection: { xs: 'row', sm: 'row' },
-                alignItems: 'center',
+                flexDirection: { xs: 'column-reverse', sm: 'row' },
+                alignItems: { xs: 'center', sm: 'center' },
                 gap: { xs: '0.5rem', sm: '2rem' },
                 fontSize: { xs: '1.4rem', sm: '2rem' },
                 fontWeight: 'bold',
@@ -545,8 +545,8 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
               className="team reverse"
               sx={{
                 display: 'flex',
-                flexDirection: { xs: 'row-reverse', sm: 'row-reverse' },
-                alignItems: 'center',
+                flexDirection: { xs: 'column-reverse', sm: 'row-reverse' },
+                alignItems: { xs: 'center', sm: 'center' },
                 gap: { xs: '0.5rem', sm: '2rem' },
                 fontSize: { xs: '1.4rem', sm: '2rem' },
                 fontWeight: 'bold',

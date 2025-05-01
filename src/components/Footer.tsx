@@ -1,10 +1,28 @@
 import React from 'react';
-import { Box, Typography, Link, Container } from '@mui/material';
+import { Box, Typography, Link, Container, Stack, Tooltip } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import InstagramIcon from '@mui/icons-material/Instagram';
+
+const sponsors = [
+  {
+    name: 'Tosho agency',
+    href: 'https://tosho.agency/',
+    src: '/images/sponsors/logo-sponsor-tosho-white.svg',
+  },
+  {
+    name: 'Wookie agency',
+    href: 'https://wookie.com.ua/ua/',
+    src: '/images/sponsors/logo-sponsor-wookie-white.svg',
+  },
+  {
+    name: 'Minimal Coffee Room',
+    href: 'https://www.instagram.com/minimal_coffeeroom',
+    src: '/images/sponsors/logo-sponsor-minimal-white.svg',
+  },
+];
 
 const footerLinkStyle = (theme) => ({
   fontWeight: 500,
@@ -16,82 +34,58 @@ const footerLinkStyle = (theme) => ({
   },
 });
 
-const FooterSponsors = () => {
-  return (
-    <Box
-      sx={(theme) => ({
-        background: 'linear-gradient(90deg, #111 0%, #000 100%)',
-        backgroundColor: theme.palette.grey[900],
-        py: 3,
-        width: '100%',
-      })}
-    >
-      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4 } }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '3rem',
-            flexWrap: 'wrap',
-          }}
-        >
-          <Link href="https://tosho.agency/" aria-label="Tosho agency" target="_blank" rel="noopener noreferrer" sx={{ display: 'inline-block' }}>
-            <Box
-              component="img"
-              src="/images/sponsors/logo-sponsor-tosho-white.svg"
-              alt="Tosho"
-              height={32}
-              sx={(theme) => ({
-                filter: 'grayscale(1)',
-                opacity: 0.8,
-                transition: 'filter 0.3s ease, opacity 0.3s ease',
-                '&:hover': {
-                  filter: 'none',
-                  opacity: 1,
-                },
-              })}
-            />
-          </Link>
-          <Link href="https://wookie.com.ua/ua/" aria-label="Wookie agency" target="_blank" rel="noopener noreferrer" sx={{ display: 'inline-block' }}>
-            <Box
-              component="img"
-              src="/images/sponsors/logo-sponsor-wookie-white.svg"
-              alt="Wookie"
-              height={32}
-              sx={(theme) => ({
-                filter: 'grayscale(1)',
-                opacity: 0.8,
-                transition: 'filter 0.3s ease, opacity 0.3s ease',
-                '&:hover': {
-                  filter: 'none',
-                  opacity: 1,
-                },
-              })}
-            />
-          </Link>
-          <Link href="https://www.instagram.com/minimal_coffeeroom" aria-label="Minimal agency" target="_blank" rel="noopener noreferrer" sx={{ display: 'inline-block' }}>
-            <Box
-              component="img"
-              src="/images/sponsors/logo-sponsor-minimal-white.svg"
-              alt="Minimal"
-              height={32}
-              sx={(theme) => ({
-                filter: 'grayscale(1)',
-                opacity: 0.8,
-                transition: 'filter 0.3s ease, opacity 0.3s ease',
-                '&:hover': {
-                  filter: 'none',
-                  opacity: 1,
-                },
-              })}
-            />
-          </Link>
-        </Box>
-      </Container>
-    </Box>
-  );
-};
+const FooterSponsors = () => (
+  <Box
+    sx={(theme) => ({
+      background: 'linear-gradient(90deg, #111 0%, #000 100%)',
+      backgroundColor: theme.palette.grey[900],
+      pt: { xs: 2, sm: 2 },
+      pb: { xs: 2, sm: 2 },
+      mb: { xs: 2, sm: 2 },
+      width: '100%',
+    })}
+  >
+    <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 4 } }}>
+      <Stack
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        flexWrap="wrap"
+        spacing={{ xs: 3, sm: 6 }}
+        rowGap={{ xs: 3, sm: 4 }}
+      >
+        {sponsors.map((sponsor) => (
+          <Tooltip key={sponsor.name} title={sponsor.name} arrow>
+            <Link
+              href={sponsor.href}
+              aria-label={sponsor.name}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ display: 'inline-block', lineHeight: 0 }}
+            >
+              <Box
+                component="img"
+                src={sponsor.src}
+                alt={sponsor.name}
+                loading="lazy"
+                height={{ xs: 28, sm: 32 }}
+                sx={(theme) => ({
+                  filter: 'grayscale(1)',
+                  opacity: 0.4,
+                  transition: 'filter 0.3s ease, opacity 0.3s ease',
+                  '&:hover': {
+                    filter: 'none',
+                    opacity: 1,
+                  },
+                })}
+              />
+            </Link>
+          </Tooltip>
+        ))}
+      </Stack>
+    </Container>
+  </Box>
+);
 
 const FooterLinks = () => {
   return (

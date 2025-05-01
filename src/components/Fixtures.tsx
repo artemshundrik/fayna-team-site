@@ -113,7 +113,7 @@ const Fixtures = () => {
     <Section
       sx={(theme) => ({
         px: 2,
-        py: 8,
+        py: { xs: 4, sm: 8 },
         backgroundColor: theme.palette.background.paper,
         color: theme.palette.text.primary,
         fontFamily: 'FixelDisplay, sans-serif',
