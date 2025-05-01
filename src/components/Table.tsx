@@ -460,15 +460,15 @@ const columns: Column[] = [
                                   }}
                                 >
                                   {typeof team.form === 'string' && (() => {
-                                    // Map backend codes to UA letters and show most recent 5, newest at left
                                     const rawForm = team.form || '';
                                     const mapped = rawForm
-                                      .split('')
+                                      .split(', ')
                                       .map(res => (res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : ''));
 
                                     const sliced = mapped.slice(-5);
                                     const reversed = sliced.reverse();
                                     const filled = reversed.concat(Array(5 - reversed.length).fill(''));
+
                                     return (
                                       <Box
                                         component="div"
