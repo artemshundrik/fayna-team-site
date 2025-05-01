@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import {
@@ -12,6 +12,13 @@ import {
   Button
 } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
+const buildSrcSet = (url: string): string => {
+  const widths = [300, 600, 900];
+  return widths
+    .map((w) => `${url}${url.includes('?') ? '&' : '?'}w=${w} ${w}w`)
+    .join(', ');
+};
 
 /* ---------- Types ---------- */
 interface Product {
@@ -86,6 +93,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
   // Format price once for performance
   const formattedPrice = new Intl.NumberFormat('uk-UA').format(product.price);
 
+  const primarySrcSet = useMemo(
+    () => buildSrcSet(product.image_1_url),
+    [product.image_1_url]
+  );
+  const secondarySrcSet = useMemo(
+    () => (product.image_2_url ? buildSrcSet(product.image_2_url) : ''),
+    [product.image_2_url]
+  );
+
   return (
     <Box sx={{ width: '100%', p: 0 }}>
       <StyledCard
@@ -120,6 +136,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
               component="img"
               loading="eager"
               src={product.image_1_url}
+              srcSet={primarySrcSet}
+              sizes="(max-width:600px) 50vw, 33vw"
               alt={product.title}
               visible={!hover}
               zoom={hover}
@@ -131,6 +149,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 component="img"
                 loading="eager"
                 src={product.image_2_url}
+                srcSet={secondarySrcSet}
+                sizes="(max-width:600px) 50vw, 33vw"
                 alt={product.title}
                 visible={hover}
                 zoom={hover}
