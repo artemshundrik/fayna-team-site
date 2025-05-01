@@ -9,8 +9,7 @@ import {
   CardActions,
   Box,
   Typography,
-  Button,
-  Skeleton
+  Button
 } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
@@ -36,19 +35,18 @@ const StyledCard = styled(Card)(({ theme }) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
-  border: `1px solid ${theme.palette.grey[200]}`,
-  backgroundColor: theme.palette.grey[50],
   position: 'relative',
   overflow: 'hidden',
-  boxShadow: 'none'
+  boxShadow: 'none',
+  backgroundColor: 'transparent'
 }));
 
-const ImageWrapper = styled(Box)({
+const ImageWrapper = styled(Box)(() => ({
   position: 'relative',
   width: '100%',
   paddingTop: '100%',
-  overflow: 'hidden'
-});
+  overflow: 'hidden',
+}));
 
 interface FadeImageProps {
   visible: boolean;
@@ -64,8 +62,10 @@ const FadeImage = styled(CardMedia, {
   width: '100%',
   height: '100%',
   opacity: visible ? 1 : 0,
-  transform: zoom ? 'scale(1.05)' : 'scale(1)',
-  transition: 'opacity 0.3s ease, transform 0.3s ease'
+  transform: zoom && visible ? 'scale(1.05)' : 'scale(1)',
+  zIndex: visible ? 2 : 1,
+  willChange: 'opacity, transform',
+  transition: 'opacity 0.2s ease, transform 0.2s ease',
 }));
 
 /* ---------- Component ---------- */
@@ -73,33 +73,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
   product
 }) => {
   const [hover, setHover] = useState(false);
-  const [loadedPrimary, setLoadedPrimary] = useState(false);
+  const [loadedSecondary, setLoadedSecondary] = useState(false);
 
   useEffect(() => {
     if (product.image_2_url) {
-      const img = new Image();
+      const img = new window.Image();
       img.src = product.image_2_url;
+      img.onload = () => setLoadedSecondary(true);
     }
   }, [product.image_2_url]);
-
-  if (!loadedPrimary) {
-    return (
-      <Box sx={{ width: '100%', p: 0, position: 'relative' }}>
-        <Skeleton variant="rectangular" width="100%" sx={{ paddingTop: '100%' }} />
-        <Box sx={{ p: 2 }}>
-          <Skeleton width="40%" />
-          <Skeleton width="60%" sx={{ mt: 0.5 }} />
-        </Box>
-        {/* Hidden image to trigger load */}
-        <img
-          src={product.image_1_url}
-          alt=""
-          style={{ display: 'none' }}
-          onLoad={() => setLoadedPrimary(true)}
-        />
-      </Box>
-    );
-  }
 
   // Format price once for performance
   const formattedPrice = new Intl.NumberFormat('uk-UA').format(product.price);
@@ -114,10 +96,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* ======== IMAGE & ACTION AREA ======== */}
         <CardActionArea
           disableRipple
+          disableTouchRipple
           component={RouterLink}
           to={`/product/${product.id}`}
           aria-label={`Переглянути ${product.title}`}
-          sx={{ flexGrow: 1 }}
+          sx={{
+            flexGrow: 1,
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent'
+            },
+            '.MuiTouchRipple-root': {
+              display: 'none'
+            },
+            '& .MuiCardActionArea-focusHighlight': {
+              display: 'none'
+            }
+          }}
         >
           <ImageWrapper>
             {/* --- Primary image --- */}
@@ -128,11 +123,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
               alt={product.title}
               visible={!hover}
               zoom={hover}
-              onLoad={() => setLoadedPrimary(true)}
             />
 
             {/* --- Secondary image (hover) --- */}
-            {product.image_2_url && (
+            {product.image_2_url && loadedSecondary && (
               <FadeImage
                 component="img"
                 loading="eager"

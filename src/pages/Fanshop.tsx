@@ -1,25 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { supabase } from '../supabase'; // make sure this path is correct
 
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
-const AnimatedWrapper = styled.div`
-  animation: ${fadeIn} 0.6s ease-out both;
-`;
 
 const StyledLink = styled(Link)`
   display: inline-flex;
