@@ -6,10 +6,13 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
+  CardActions,
   Box,
   Typography,
-  Button
+  Button,
+  Skeleton
 } from '@mui/material';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 /* ---------- Types ---------- */
 interface Product {
@@ -70,6 +73,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   product
 }) => {
   const [hover, setHover] = useState(false);
+  const [loadedPrimary, setLoadedPrimary] = useState(false);
 
   useEffect(() => {
     if (product.image_2_url) {
@@ -77,6 +81,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
       img.src = product.image_2_url;
     }
   }, [product.image_2_url]);
+
+  if (!loadedPrimary) {
+    return (
+      <Box sx={{ width: '100%', p: 0, position: 'relative' }}>
+        <Skeleton variant="rectangular" width="100%" sx={{ paddingTop: '100%' }} />
+        <Box sx={{ p: 2 }}>
+          <Skeleton width="40%" />
+          <Skeleton width="60%" sx={{ mt: 0.5 }} />
+        </Box>
+        {/* Hidden image to trigger load */}
+        <img
+          src={product.image_1_url}
+          alt=""
+          style={{ display: 'none' }}
+          onLoad={() => setLoadedPrimary(true)}
+        />
+      </Box>
+    );
+  }
 
   // Format price once for performance
   const formattedPrice = new Intl.NumberFormat('uk-UA').format(product.price);
@@ -100,11 +123,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
             {/* --- Primary image --- */}
             <FadeImage
               component="img"
-              loading="lazy"
-              image={product.image_1_url}
+              loading="eager"
+              src={product.image_1_url}
               alt={product.title}
               visible={!hover}
               zoom={hover}
+              onLoad={() => setLoadedPrimary(true)}
             />
 
             {/* --- Secondary image (hover) --- */}
@@ -112,7 +136,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <FadeImage
                 component="img"
                 loading="eager"
-                image={product.image_2_url}
+                src={product.image_2_url}
                 alt={product.title}
                 visible={hover}
                 zoom={hover}
@@ -133,9 +157,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
             component={RouterLink}
             to={`/product/${product.id}`}
             variant="text"
-            sx={{ mt: 1, p: 0, textTransform: 'none' }}
+            sx={{
+              mt: 1,
+              p: 0,
+              textTransform: 'none',
+              transition: 'none',
+              '&:hover': {
+                backgroundColor: 'transparent'
+              },
+              '& .MuiSvgIcon-root': {
+                ml: 0.5,
+                transition: 'margin 0.2s ease'
+              },
+              '&:hover .MuiSvgIcon-root': {
+                ml: 1
+              }
+            }}
           >
             Придбати
+            <ChevronRightIcon fontSize="small" />
           </Button>
         </CardContent>
       </StyledCard>
