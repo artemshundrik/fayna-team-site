@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
 import styled, { keyframes } from 'styled-components';
+import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { supabase } from '../supabase'; // make sure this path is correct
@@ -113,13 +114,20 @@ function Fanshop() {
   return (
     <Layout>
       <ContentWrapper>
-        <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '2rem' }}>
+        <div style={{ maxWidth: '1200px', width: '100%', margin: '0 auto', padding: '1rem' }}>
           <h1 style={{ fontSize: '3rem', marginBottom: '2rem', textAlign: 'center' }}>FAYNA Fan Shop</h1>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '2rem'
-          }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: 'repeat(1, 1fr)',  // phones
+                sm: 'repeat(2, 1fr)',  // ≥600px
+                md: 'repeat(4, 1fr)',  // ≥900px
+                lg: 'repeat(4, 1fr)'   // ≥1200px
+              },
+              gap: '1rem',
+            }}
+          >
           {Array.isArray(products) && products.length > 0 &&
             Array.from(new Map(products.map(p => [p.id, p])).values()).map((product, i) => (
               <ProductCard
@@ -133,7 +141,7 @@ function Fanshop() {
               />
             ))
           }
-          </div>
+          </Box>
         </div>
       </ContentWrapper>
     </Layout>

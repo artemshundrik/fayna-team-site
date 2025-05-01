@@ -1,6 +1,17 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Box,
+  Typography,
+  Button
+} from '@mui/material';
 
+/* ---------- Types ---------- */
 interface Product {
   id: string;
   type: 'simple' | 'variant';
@@ -13,227 +24,122 @@ interface Product {
 }
 
 interface ProductCardProps {
-  index: number;
-  isHovered: boolean;
-  setHoveredIndex: (i: number | null) => void;
-  selectedSizeIndex: number | null;
-  setSelectedSizeIndex: (i: number) => void;
   product: Product;
 }
 
+/* ---------- Styled Components ---------- */
+const StyledCard = styled(Card)(({ theme }) => ({
+  height: '100%',
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  border: `1px solid ${theme.palette.grey[200]}`,
+  backgroundColor: theme.palette.grey[50],
+  position: 'relative',
+  overflow: 'hidden',
+  boxShadow: 'none'
+}));
+
+const ImageWrapper = styled(Box)({
+  position: 'relative',
+  width: '100%',
+  paddingTop: '100%',
+  overflow: 'hidden'
+});
+
+interface FadeImageProps {
+  visible: boolean;
+  zoom?: boolean;
+}
+
+const FadeImage = styled(CardMedia, {
+  shouldForwardProp: (prop) => prop !== 'visible' && prop !== 'zoom'
+})<FadeImageProps>(({ visible, zoom }) => ({
+  position: 'absolute',
+  inset: 0,
+  objectFit: 'contain',
+  width: '100%',
+  height: '100%',
+  opacity: visible ? 1 : 0,
+  transform: zoom ? 'scale(1.05)' : 'scale(1)',
+  transition: 'opacity 0.3s ease, transform 0.3s ease'
+}));
+
+/* ---------- Component ---------- */
 const ProductCard: React.FC<ProductCardProps> = ({
-  index,
-  isHovered,
-  setHoveredIndex,
-  selectedSizeIndex,
-  setSelectedSizeIndex,
   product
 }) => {
+  const [hover, setHover] = useState(false);
+
+  useEffect(() => {
+    if (product.image_2_url) {
+      const img = new Image();
+      img.src = product.image_2_url;
+    }
+  }, [product.image_2_url]);
+
+  // Format price once for performance
+  const formattedPrice = new Intl.NumberFormat('uk-UA').format(product.price);
+
   return (
-    <>
-      <div
-        key={product.id}
-        onMouseEnter={() => setHoveredIndex(index)}
-        onMouseLeave={() => {
-          setHoveredIndex(null);
-          setSelectedSizeIndex(null);
-        }}
-        style={{
-          backgroundColor: '#f9f9f9',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          transition: 'all 0.2s ease-in-out',
-          border: '1px solid #eee',
-          boxShadow: isHovered ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
-          position: 'relative'
-        }}
+    <Box sx={{ width: '100%', p: 0 }}>
+      <StyledCard
+        role="group"
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
       >
-      <div style={{ position: 'relative', width: '100%', paddingTop: '100%', overflow: 'hidden' }}>
-        {!product.image_2_url ? (
-          <div style={{ overflow: 'hidden', transition: 'transform 0.3s ease' }}>
-            <img
-              src={product.image_1_url}
-              alt={product.title}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                transition: 'transform 0.3s ease',
-                opacity: 1,
-                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-              }}
-            />
-          </div>
-        ) : (
-          <>
-            <div style={{ overflow: 'hidden', transition: 'transform 0.3s ease' }}>
-              <img
-                src={product.image_1_url}
-                alt={product.title}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain',
-                  transition: 'none',
-                  opacity: isHovered ? 0 : 1,
-                  transform: 'scale(1)',
-                }}
-              />
-            </div>
-            <div style={{ overflow: 'hidden', transition: 'transform 0.3s ease' }}>
-              <img
-                src={product.image_2_url}
-                alt={product.title}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain',
-                  transition: 'transform 0.3s ease',
-                  opacity: isHovered ? 1 : 0,
-                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                }}
-              />
-            </div>
-          </>
-        )}
-        {product.type === 'simple' && (
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: isHovered ? '80px' : '2px',
-              transform: isHovered ? 'translateY(0)' : 'translateY(100%)',
-              opacity: isHovered ? 1 : 0,
-              pointerEvents: isHovered ? 'auto' : 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(8px)',
-              background: 'rgba(255, 255, 255, 0.3)',
-              transition: 'opacity 0.4s ease, transform 0.4s ease, height 0.4s ease'
-            }}
-          >
-            <Link to="/" className="order-button">
-              Замовити
-            </Link>
-          </div>
-        )}
-        {product.type === 'variant' && (
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: '80px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(8px)',
-              background: 'rgba(255, 255, 255, 0.3)',
-              transition: 'opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease',
-              opacity: isHovered && selectedSizeIndex !== index ? 1 : 0,
-              transform: isHovered && selectedSizeIndex !== index ? 'translateY(0)' : 'translateY(100%)',
-              visibility: isHovered && selectedSizeIndex !== index ? 'visible' : 'hidden'
-            }}
-          >
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              {Array.isArray(product.sizes) && product.sizes.map((size, j) => (
-                <button
-                  key={j}
-                  onClick={() => setSelectedSizeIndex(index)}
-                  className={`size-button ${selectedSizeIndex === index ? 'selected' : ''}`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: '80px',
-            display: 'flex',
-            visibility: selectedSizeIndex === index ? 'visible' : 'hidden',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backdropFilter: 'blur(8px)',
-            background: 'rgba(255, 255, 255, 0.3)',
-            transition: 'opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease',
-            opacity: selectedSizeIndex === index ? 1 : 0,
-            transform: selectedSizeIndex === index ? 'translateY(0)' : 'translateY(100%)'
-          }}
+        {/* ======== IMAGE & ACTION AREA ======== */}
+        <CardActionArea
+          disableRipple
+          component={RouterLink}
+          to={`/product/${product.id}`}
+          aria-label={`Переглянути ${product.title}`}
+          sx={{ flexGrow: 1 }}
         >
-          <Link
-            to="/"
-            className="order-button"
-          >
-            Замовити
-          </Link>
-        </div>
-      </div>
-      <div style={{ padding: '0.5rem 1rem 0.75rem', textAlign: 'left' }}>
-        <p style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem' }}>
-          {product.price?.toLocaleString('uk-UA') ?? '–––'} грн
-        </p>
-                <p style={{ fontSize: '1rem', color: '#333', margin: 0 }}>
-          {product.title ?? 'Назва товару'}
-        </p>
-      </div>
-      </div>
-      <style>{`
-        .order-button {
-          display: inline-block;
-          background: #000;
-          color: #fff;
-          padding: 0.6rem 1.5rem;
-          font-weight: 600;
-          text-decoration: none;
-          border-radius: 0;
-          text-transform: uppercase;
-          transition: background 0.3s ease;
-        }
-        .order-button:hover {
-          background: #222;
-        }
+          <ImageWrapper>
+            {/* --- Primary image --- */}
+            <FadeImage
+              component="img"
+              loading="lazy"
+              image={product.image_1_url}
+              alt={product.title}
+              visible={!hover}
+              zoom={hover}
+            />
 
-        .size-button {
-          padding: 0.4rem 1rem;
-          border: 1px solid #000;
-          background: transparent;
-          color: #000;
-          cursor: pointer;
-          text-transform: uppercase;
-          font-weight: 600;
-          transition: all 0.2s ease;
-        }
-        .size-button:hover {
-          background: #000;
-          color: #fff;
-        }
-        .size-button.selected {
-          background: #000;
-          color: #fff;
-        }
-      `}</style>
-    </>
+            {/* --- Secondary image (hover) --- */}
+            {product.image_2_url && (
+              <FadeImage
+                component="img"
+                loading="eager"
+                image={product.image_2_url}
+                alt={product.title}
+                visible={hover}
+                zoom={hover}
+              />
+            )}
+          </ImageWrapper>
+        </CardActionArea>
+
+        {/* ======== TEXT AREA ======== */}
+        <CardContent sx={{ py: 2, textAlign: 'left' }}>
+          <Typography variant="h6" fontWeight={700}>
+            {formattedPrice} грн
+          </Typography>
+          <Typography variant="body2" color="text.primary" noWrap title={product.title}>
+            {product.title}
+          </Typography>
+          <Button
+            component={RouterLink}
+            to={`/product/${product.id}`}
+            variant="text"
+            sx={{ mt: 1, p: 0, textTransform: 'none' }}
+          >
+            Придбати
+          </Button>
+        </CardContent>
+      </StyledCard>
+    </Box>
   );
 };
 
