@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { supabase } from '../supabase';
 import styled from 'styled-components';
 import { Box, Button, Container, Stack, Tabs, Tab } from '@mui/material';
@@ -20,6 +21,15 @@ const formatDateWithTime = (dateStr: string, time: string) => {
   const month = parts.find(p => p.type === 'month')?.value?.toLowerCase() || '';
 
   return `${dayOfWeek}, ${day} ${month}, ${time}`;
+};
+
+const listContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.15 } },
+};
+const listItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
 
@@ -193,11 +203,19 @@ const Matches: React.FC = () => {
               px: { xs: 0, sm: 2 },
             }}
           >
-            <Stack spacing={2}>
+            <Stack
+              component={motion.div}
+              initial="hidden"
+              animate="visible"
+              variants={listContainer}
+              spacing={2}
+            >
               {futureMatches.map((match, index) => {
                 const [team1, team2] = match.teams.split(' проти ');
                 return (
                   <Box
+                    component={motion.div}
+                    variants={listItem}
                     key={index}
                     sx={(theme) => ({
                       width: '100%',
@@ -302,7 +320,7 @@ const Matches: React.FC = () => {
                               flexDirection: { xs: 'column', sm: 'row-reverse' },
                             }}
                           >
-                            <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                            <img src={match.team1Logo} alt="Team 1" style={{ height: '36px', borderRadius: '50%' }} />
                             <Box sx={{ fontSize: '1rem', fontWeight: 500 }}>{team1}</Box>
                           </Box>
                         </Box>
@@ -340,7 +358,7 @@ const Matches: React.FC = () => {
                               flexDirection: { xs: 'column', sm: 'row' },
                             }}
                           >
-                            <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
+                            <img src={match.team2Logo} alt="Team 2" style={{ height: '36px', borderRadius: '50%' }} />
                             <Box sx={{ fontSize: '1rem', fontWeight: 500 }}>{team2}</Box>
                           </Box>
                         </Box>
@@ -397,11 +415,19 @@ const Matches: React.FC = () => {
               px: { xs: 0, sm: 2 },
             }}
           >
-            <Stack spacing={2}>
+            <Stack
+              component={motion.div}
+              initial="hidden"
+              animate="visible"
+              variants={listContainer}
+              spacing={2}
+            >
               {pastMatches.map((match, index) => {
                 const [team1, team2] = match.teams.split(' проти ');
                 return (
                   <Box
+                    component={motion.div}
+                    variants={listItem}
                     key={index}
                     sx={(theme) => ({
                       width: '100%',
@@ -507,7 +533,7 @@ const Matches: React.FC = () => {
                               flexDirection: { xs: 'column', sm: 'row-reverse' },
                             }}
                           >
-                            <img src={match.team1Logo} alt="Team 1" style={{ height: '36px' }} />
+                            <img src={match.team1Logo} alt="Team 1" style={{ height: '36px', borderRadius: '50%' }} />
                             <Box sx={{ fontSize: '1rem', fontWeight: 500 }}>{team1}</Box>
                           </Box>
                         </Box>
@@ -545,7 +571,7 @@ const Matches: React.FC = () => {
                               flexDirection: { xs: 'column', sm: 'row' },
                             }}
                           >
-                            <img src={match.team2Logo} alt="Team 2" style={{ height: '36px' }} />
+                            <img src={match.team2Logo} alt="Team 2" style={{ height: '36px', borderRadius: '50%' }} />
                             <Box sx={{ fontSize: '1rem', fontWeight: 500 }}>{team2}</Box>
                           </Box>
                         </Box>

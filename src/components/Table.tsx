@@ -13,7 +13,8 @@ import {
   Paper,
   Container,
   Tooltip,
-  Box
+  Box,
+  Skeleton
 } from '@mui/material';
 import ScreenRotationIcon from '@mui/icons-material/ScreenRotation';
 
@@ -87,14 +88,18 @@ const columns: Column[] = [
   { key: 'form', label: 'ФОРМА', width: '180px', align: 'left', hideOnMobile: true },
 ];
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchTeams = async () => {
+      setLoading(true);
       const { data, error } = await supabase
         .from('teams')
         .select('id, name, logo, is_our_team, games_played, wins, draws, losses, goals_for, goals_against, form')
         .returns<Database['public']['Tables']['teams']['Row'][]>();
       if (error) {
         console.error('Error fetching teams:', error);
+        setLoading(false);
         return;
       }
       if (data) {
@@ -126,6 +131,9 @@ const columns: Column[] = [
         });
 
         setTeams(teamsWithPlace);
+        setLoading(false);
+      } else {
+        setLoading(false);
       }
     };
     fetchTeams();
@@ -183,7 +191,21 @@ const columns: Column[] = [
               overflow: 'hidden',
             }}
           >
-            <Table sx={{ minWidth: '100%', width: '100%', tableLayout: 'auto' }}>
+            <Table
+              sx={{
+                minWidth: '100%',
+                width: '100%',
+                tableLayout: 'auto',
+                // Default padding for all columns
+                '& th, & td': {
+                  px: { xs: 3, sm: 4 },
+                },
+                // Override padding for the first two columns (# and Команда)
+                '& th:nth-of-type(1), & td:nth-of-type(1), & th:nth-of-type(2), & td:nth-of-type(2)': {
+                  px: { xs: 1, sm: 1 },
+                },
+              }}
+            >
               <TableHead>
                 <TableRow>
                   {columns.map((col, idx) => (
@@ -247,252 +269,263 @@ const columns: Column[] = [
                 </TableRow>
               </TableHead>
               <TableBody>
-                {teams.map((team, idx) => (
-                  <TableRow
-                    key={idx}
-                    sx={{
-                      backgroundColor: idx % 2 === 0 ? theme.palette.grey[100] : theme.palette.common.white,
-                      borderLeft: team.is_our_team ? `4px solid ${theme.palette.primary.main}` : 'none',
-                    }}
-                  >
-                    {columns.map((col, i) => {
-                      switch (col.key) {
-                        case 'place':
-                          return (
-                            <TableCell
-                              key={i}
-                              align={col.align}
-                              sx={{
-                                fontSize: theme.typography.body1.fontSize,
-                                fontFamily: theme.typography.fontFamily,
-                                paddingLeft: { xs: '8px', sm: '24px' },
-                                paddingRight: { xs: '4px', sm: '12px' },
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                              }}
-                            >
-                              <Stack
-                                direction="row"
-                                spacing={0.15}
-                                alignItems="center"
-                                justifyContent="center"
-                                sx={{ pl: 0, pr: 0 }}
-                              >
-                                <span>{team.place}</span>
-                                {getPositionIcon(team.positionChange)}
-                              </Stack>
-                            </TableCell>
-                          );
-                        case 'team':
-                          return (
-                            <TableCell
-                              key={i}
-                              align={col.align}
-                              sx={{
-                                fontSize: {
-                                  xs: '0.85rem',
-                                  sm: theme.typography.body1.fontSize
-                                },
-                                fontFamily: theme.typography.fontFamily,
-                                padding: { xs: '6px 8px', sm: '6px 16px' },
-                                width: '100%',
-                                maxWidth: '100%',
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                              }}
-                            >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <img src={team.logo || ''} alt={team.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                                <Box
-                                  component="span"
+                {loading
+                  ? Array.from({ length: 5 }).map((_, idx) => (
+                      <TableRow key={idx}>
+                        {columns.map((col, i) => (
+                          <TableCell key={i} align={col.align}>
+                            <Skeleton variant="text" width={col.width || '100%'} />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  : teams.map((team, idx) => (
+                      <TableRow
+                        key={idx}
+                        sx={{
+                          backgroundColor: idx % 2 === 0 ? theme.palette.grey[100] : theme.palette.common.white,
+                          borderLeft: team.is_our_team ? `4px solid ${theme.palette.primary.main}` : 'none',
+                        }}
+                      >
+                        {columns.map((col, i) => {
+                          switch (col.key) {
+                            case 'place':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align={col.align}
+                                  sx={{
+                                    fontSize: theme.typography.body1.fontSize,
+                                    fontFamily: theme.typography.fontFamily,
+                                    paddingLeft: { xs: '8px', sm: '24px' },
+                                    paddingRight: { xs: '4px', sm: '12px' },
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                  }}
+                                >
+                                  <Stack
+                                    direction="row"
+                                    spacing={0.15}
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    sx={{ pl: 0, pr: 0 }}
+                                  >
+                                    <span>{team.place}</span>
+                                    {getPositionIcon(team.positionChange)}
+                                  </Stack>
+                                </TableCell>
+                              );
+                            case 'team':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align={col.align}
                                   sx={{
                                     fontSize: {
                                       xs: '0.85rem',
                                       sm: theme.typography.body1.fontSize
                                     },
-                                    fontWeight: team.is_our_team ? theme.typography.fontWeightMedium : theme.typography.fontWeightMedium,
-                                    ml: 0,
-                                    color: team.is_our_team ? theme.palette.primary.main : 'inherit',
-                                    textShadow: team.is_our_team ? `0 0 1px ${theme.palette.primary.main}` : 'none',
                                     fontFamily: theme.typography.fontFamily,
+                                    padding: { xs: '6px 8px', sm: '6px 16px' },
+                                    width: '100%',
+                                    maxWidth: '100%',
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
                                   }}
                                 >
-                                  {team.name}
-                                </Box>
-                              </div>
-                            </TableCell>
-                          );
-                        case 'games_played':
-                          return (
-                            <TableCell
-                              key={i}
-                              align={col.align}
-                              sx={{
-                                fontSize: theme.typography.body1.fontSize,
-                                fontFamily: theme.typography.fontFamily,
-                                padding: { xs: '6px 8px', sm: '12px 16px' },
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                              }}
-                            >
-                              {team.games_played}
-                            </TableCell>
-                          );
-                        case 'wins':
-                          return (
-                            <TableCell
-                              key={i}
-                              align={col.align}
-                              sx={{
-                                fontSize: theme.typography.body1.fontSize,
-                                fontFamily: theme.typography.fontFamily,
-                                padding: { xs: '6px 4px', sm: '12px 16px' },
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                              }}
-                            >
-                              {team.wins}
-                            </TableCell>
-                          );
-                        case 'draws':
-                          return (
-                            <TableCell
-                              key={i}
-                              align={col.align}
-                              sx={{
-                                fontSize: theme.typography.body1.fontSize,
-                                fontFamily: theme.typography.fontFamily,
-                                padding: { xs: '6px 4px', sm: '12px 16px' },
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                              }}
-                            >
-                              {team.draws}
-                            </TableCell>
-                          );
-                        case 'losses':
-                          return (
-                            <TableCell
-                              key={i}
-                              align={col.align}
-                              sx={{
-                                fontSize: theme.typography.body1.fontSize,
-                                fontFamily: theme.typography.fontFamily,
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                              }}
-                            >
-                              {team.losses}
-                            </TableCell>
-                          );
-                        case 'goals':
-                          return (
-                            <TableCell
-                              key={i}
-                              align="center"
-                              sx={{
-                                fontSize: theme.typography.body1.fontSize,
-                                fontFamily: theme.typography.fontFamily,
-                                whiteSpace: 'nowrap',
-                                textAlign: 'center',
-                                padding: { xs: '6px 8px', sm: '12px 16px' },
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}
-                            >
-                              {team.goals_string}
-                            </TableCell>
-                          );
-                        case 'points':
-                          return (
-                            <TableCell
-                              key={i}
-                              align={col.align}
-                              sx={{
-                                fontSize: theme.typography.body1.fontSize,
-                                fontFamily: theme.typography.fontFamily,
-                                padding: { xs: '6px 16px', sm: '12px 16px' },
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                              }}
-                            >
-                              {team.points}
-                            </TableCell>
-                          );
-                        case 'form':
-                          return (
-                            <TableCell
-                              key={i}
-                              align={col.align as 'left' | 'center' | 'right' | 'justify' | 'inherit'}
-                              sx={{
-                                fontSize: theme.typography.body1.fontSize,
-                                fontFamily: theme.typography.fontFamily,
-                                // Removed width/minWidth/maxWidth/whiteSpace for form cell
-                                paddingLeft: { xs: '4px', sm: '8px' },
-                                paddingRight: { xs: '4px', sm: '8px' },
-                                display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
-                              }}
-                            >
-                              {typeof team.form === 'string' && (() => {
-                                // Map backend codes to UA letters and show most recent 5, newest at left
-                                const rawForm = team.form || '';
-                                const mapped = rawForm
-                                  .split('')
-                                  .map(res => (res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : ''));
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <img src={team.logo || ''} alt={team.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                                    <Box
+                                      component="span"
+                                      sx={{
+                                        fontSize: {
+                                          xs: '0.85rem',
+                                          sm: theme.typography.body1.fontSize
+                                        },
+                                        fontWeight: team.is_our_team ? theme.typography.fontWeightMedium : theme.typography.fontWeightMedium,
+                                        ml: 0,
+                                        color: team.is_our_team ? theme.palette.primary.main : 'inherit',
+                                        textShadow: team.is_our_team ? `0 0 1px ${theme.palette.primary.main}` : 'none',
+                                        fontFamily: theme.typography.fontFamily,
+                                      }}
+                                    >
+                                      {team.name}
+                                    </Box>
+                                  </div>
+                                </TableCell>
+                              );
+                            case 'games_played':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align={col.align}
+                                  sx={{
+                                    fontSize: theme.typography.body1.fontSize,
+                                    fontFamily: theme.typography.fontFamily,
+                                    padding: { xs: '6px 8px', sm: '12px 16px' },
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                  }}
+                                >
+                                  {team.games_played}
+                                </TableCell>
+                              );
+                            case 'wins':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align={col.align}
+                                  sx={{
+                                    fontSize: theme.typography.body1.fontSize,
+                                    fontFamily: theme.typography.fontFamily,
+                                    padding: { xs: '6px 4px', sm: '12px 16px' },
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                  }}
+                                >
+                                  {team.wins}
+                                </TableCell>
+                              );
+                            case 'draws':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align={col.align}
+                                  sx={{
+                                    fontSize: theme.typography.body1.fontSize,
+                                    fontFamily: theme.typography.fontFamily,
+                                    padding: { xs: '6px 4px', sm: '12px 16px' },
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                  }}
+                                >
+                                  {team.draws}
+                                </TableCell>
+                              );
+                            case 'losses':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align={col.align}
+                                  sx={{
+                                    fontSize: theme.typography.body1.fontSize,
+                                    fontFamily: theme.typography.fontFamily,
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                  }}
+                                >
+                                  {team.losses}
+                                </TableCell>
+                              );
+                            case 'goals':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align="center"
+                                  sx={{
+                                    fontSize: theme.typography.body1.fontSize,
+                                    fontFamily: theme.typography.fontFamily,
+                                    whiteSpace: 'nowrap',
+                                    textAlign: 'center',
+                                    padding: { xs: '6px 8px', sm: '12px 16px' },
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  {team.goals_string}
+                                </TableCell>
+                              );
+                            case 'points':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align={col.align}
+                                  sx={{
+                                    fontSize: theme.typography.body1.fontSize,
+                                    fontFamily: theme.typography.fontFamily,
+                                    padding: { xs: '6px 16px', sm: '12px 16px' },
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                  }}
+                                >
+                                  {team.points}
+                                </TableCell>
+                              );
+                            case 'form':
+                              return (
+                                <TableCell
+                                  key={i}
+                                  align={col.align as 'left' | 'center' | 'right' | 'justify' | 'inherit'}
+                                  sx={{
+                                    fontSize: theme.typography.body1.fontSize,
+                                    fontFamily: theme.typography.fontFamily,
+                                    // Removed width/minWidth/maxWidth/whiteSpace for form cell
+                                    paddingLeft: { xs: '4px', sm: '8px' },
+                                    paddingRight: { xs: '4px', sm: '8px' },
+                                    display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                  }}
+                                >
+                                  {typeof team.form === 'string' && (() => {
+                                    // Map backend codes to UA letters and show most recent 5, newest at left
+                                    const rawForm = team.form || '';
+                                    const mapped = rawForm
+                                      .split('')
+                                      .map(res => (res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : ''));
 
-                                const sliced = mapped.slice(-5);
-                                const reversed = sliced.reverse();
-                                const filled = reversed.concat(Array(5 - reversed.length).fill(''));
-                                return (
-                                  <Box
-                                    component="div"
-                                    sx={{
-                                      display: 'grid',
-                                      gridTemplateColumns: 'repeat(5, 1fr)',
-                                      columnGap: theme.spacing(0.5),
-                                      justifyItems: 'start',
-                                    }}
-                                  >
-                                    {filled.map((resUA, idx) => {
-                                      const title =
-                                        resUA === 'В'
-                                          ? 'Перемога'
-                                          : resUA === 'Н'
-                                          ? 'Нічия'
-                                          : resUA === 'П'
-                                          ? 'Поразка'
-                                          : '';
-                                      return resUA ? (
-                                        <Tooltip key={idx} title={title} arrow>
-                                          <Box component="span" sx={{
-                                            ...formBoxStyle,
-                                            backgroundColor: getFormColor(resUA),
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                          }}>
-                                            {resUA}
-                                          </Box>
-                                        </Tooltip>
-                                      ) : (
-                                        <Box
-                                          key={idx}
-                                          component="span"
-                                          sx={{
-                                            ...formBoxStyle,
-                                            backgroundColor: theme.palette.grey[300],
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                          }}
-                                        />
-                                      );
-                                    })}
-                                  </Box>
-                                );
-                              })()}
-                            </TableCell>
-                          );
-                        default:
-                          return null;
-                      }
-                    })}
-                  </TableRow>
-                ))}
+                                    const sliced = mapped.slice(-5);
+                                    const reversed = sliced.reverse();
+                                    const filled = reversed.concat(Array(5 - reversed.length).fill(''));
+                                    return (
+                                      <Box
+                                        component="div"
+                                        sx={{
+                                          display: 'grid',
+                                          gridTemplateColumns: 'repeat(5, 1fr)',
+                                          columnGap: theme.spacing(0.5),
+                                          justifyItems: 'start',
+                                        }}
+                                      >
+                                        {filled.map((resUA, idx) => {
+                                          const title =
+                                            resUA === 'В'
+                                              ? 'Перемога'
+                                              : resUA === 'Н'
+                                              ? 'Нічия'
+                                              : resUA === 'П'
+                                              ? 'Поразка'
+                                              : '';
+                                          return resUA ? (
+                                            <Tooltip key={idx} title={title} arrow>
+                                              <Box component="span" sx={{
+                                                ...formBoxStyle,
+                                                backgroundColor: getFormColor(resUA),
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                              }}>
+                                                {resUA}
+                                              </Box>
+                                            </Tooltip>
+                                          ) : (
+                                            <Box
+                                              key={idx}
+                                              component="span"
+                                              sx={{
+                                                ...formBoxStyle,
+                                                backgroundColor: theme.palette.grey[300],
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                              }}
+                                            />
+                                          );
+                                        })}
+                                      </Box>
+                                    );
+                                  })()}
+                                </TableCell>
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
+                      </TableRow>
+                    ))
+                }
               </TableBody>
             </Table>
           </TableContainer>

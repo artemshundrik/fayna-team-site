@@ -281,7 +281,7 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                 display: 'flex',
                 gap: '1rem',
                 justifyContent: 'center',
-                mb: '2rem',
+                mb: { xs: '1rem', sm: '2rem' },
               }}
             >
               {[{ value: days, label: 'дні' }, { value: hours, label: 'год' }, { value: minutes, label: 'хв' }, { value: seconds, label: 'сек' }].map((item, idx) => (
@@ -293,13 +293,13 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                     alignItems: 'center',
                   }}
                 >
-                  <Typography sx={{ fontSize: '2.88rem', fontWeight: 'bold' }}>
+                  <Typography sx={{ fontSize: { xs: '2rem', sm: '2.88rem' }, fontWeight: 'bold' }}>
                     {String(item.value).padStart(2, '0')}
                   </Typography>
                   <Typography
                     sx={{
                       mt: '-0.5rem',
-                      fontSize: '0.75rem',
+                      fontSize: { xs: '0.6rem', sm: '0.75rem' },
                       color: '#aaa',
                       fontWeight: 1000,
                       textTransform: 'uppercase',
@@ -357,9 +357,9 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
         {matchDate instanceof Date && !isNaN(matchDate.getTime()) && (
           <Typography
             sx={{
-              fontSize: '1.4rem',
-              fontWeight: 'bold',
-              mb: '0.25rem',
+              fontSize: { xs: '1rem', sm: '1.4rem' },
+              fontWeight: { xs: 300, sm: 'bold' },
+              mb: { xs: '0.5rem', sm: '0.25rem' },
             }}
           >
             {format(matchDate, 'EEEE, d MMMM', { locale: uk })}
