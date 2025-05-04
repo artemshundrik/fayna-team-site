@@ -29,6 +29,7 @@ type PlayerCardProps = {
   position: string;
   number: number;
   photoUrl?: string;
+  photoComponent?: React.ReactNode;
   birthDate?: string;
   matches?: number;
   goals?: number;
@@ -47,7 +48,7 @@ const StyledCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== 'isMobile',
 })<{ isMobile?: boolean }>(({ theme, isMobile }) => ({
   overflow: 'hidden',
-  borderRadius: 0,
+  borderRadius: theme.shape.medium,
   position: 'relative',
   color: theme.palette.common.white,
   width: '100%',
@@ -85,6 +86,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   position,
   number,
   photoUrl,
+  photoComponent,
   birthDate,
 }) => {
   const theme = useTheme();
@@ -170,32 +172,37 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
         overflow: 'hidden',
         height: isMobile ? 380 : 460,
         aspectRatio: isMobile ? undefined : '480 / 580',
+        background: 'repeating-linear-gradient(155deg, rgba(255,255,255,0.02) 0 6px, transparent 6px 18px), linear-gradient(145deg, #242424 0%, #020202 100%)',
       }}>
-        {photoUrl ? (
-          <CardMedia
-            component="img"
-            image={`/images/players/${photoUrl}`}
-            alt={name}
-            sx={{
-              position: 'relative',
-              width: '100%',
-              height: isMobile ? 380 : 'auto',
-              objectFit: 'cover',
-              objectPosition: 'top',
-              transition: 'transform 0.4s ease',
-              transform: hover ? 'scale(1.08)' : 'scale(1)',
-            }}
-          />
-        ) : (
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={isMobile ? 380 : 460}
-            animation="wave"
-            sx={{
-              bgcolor: 'grey.800',
-            }}
-          />
+        {photoComponent || (
+          photoUrl ? (
+            <CardMedia
+              component="img"
+              image={`/images/players/${photoUrl}`}
+              alt={name}
+              sx={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                objectPosition: 'center',
+                transition: 'transform 0.4s ease',
+                transform: hover ? 'scale(1.05)' : 'scale(1)',
+                transformOrigin: 'center center',
+                borderRadius: 0,
+              }}
+            />
+          ) : (
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={isMobile ? 380 : 460}
+              animation="wave"
+              sx={{
+                bgcolor: 'grey.800',
+              }}
+            />
+          )
         )}
         <Box
           sx={{
@@ -245,7 +252,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             fontSize: '3.2rem',
             fontWeight: 900,
             transition: 'opacity 0.4s ease, color 0.4s ease',
-            color: hover ? theme.palette.common.white : theme.palette.primary.main,
+            color: theme.palette.common.white,
             opacity: hover ? 0.3 : 1,
           }}
         >

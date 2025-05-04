@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
 import styled from 'styled-components';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { supabase } from '../supabase'; // make sure this path is correct
@@ -101,7 +101,39 @@ function Fanshop() {
     <Layout>
       <ContentWrapper>
         <div style={{ maxWidth: '1200px', width: '100%', margin: '0 auto', padding: '1rem' }}>
-          <h1 style={{ fontSize: '3rem', marginBottom: '2rem', textAlign: 'center' }}>FAYNA Fan Shop</h1>
+          {/* ---- HERO SECTION ---- */}
+          <Box
+            sx={{
+              width: '100%',
+              backgroundColor: 'common.black',
+              py: { xs: 4, sm: 6 },
+              px: 3,
+            }}
+          >
+            <Typography
+              variant="h3"
+              component="h1"
+              sx={{
+                color: 'common.white',
+                fontWeight: 800,
+                textAlign: 'center',
+              }}
+            >
+              FAYNA Fan Shop
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: 'common.white',
+                opacity: 0.8,
+                textAlign: 'center',
+                mt: 1,
+              }}
+            >
+              Офіційна фан-атрибутика FAYNA TEAM
+            </Typography>
+          </Box>
+          {/* ---- /HERO SECTION ---- */}
           <Box
             sx={{
               display: 'grid',
