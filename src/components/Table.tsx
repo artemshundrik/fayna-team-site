@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../supabase';
 import type { Database } from '../types/supabase';
 import { useTheme } from '@mui/material/styles';
@@ -22,7 +22,6 @@ type ExtendedTeam = Database['public']['Tables']['teams']['Row'] & {
   points: number;
   goals_string: string;
   place: number;
-  positionChange: 'up' | 'down' | 'same';
 };
 
 const calculateTeamStats = (teams: Database['public']['Tables']['teams']['Row'][]) => {
@@ -79,16 +78,19 @@ type Column = {
 const columns: Column[] = [
   { key: 'place', label: '#', width: '3rem', align: 'center' },
   { key: 'team', label: 'КОМАНДА', align: 'left', width: '100%' },
+  { key: 'points', label: 'О', align: 'center' },
   { key: 'games_played', label: 'І', align: 'center' },
   { key: 'wins', label: 'В', align: 'center', hideOnMobile: true },
   { key: 'draws', label: 'Н', align: 'center', hideOnMobile: true },
   { key: 'losses', label: 'П', align: 'center', hideOnMobile: true },
   { key: 'goals', label: '+/−', align: 'center', hideOnMobile: true },
-  { key: 'points', label: 'О', align: 'center' },
   { key: 'form', label: 'ФОРМА', width: '180px', align: 'left', hideOnMobile: true },
 ];
 
   const [loading, setLoading] = useState(true);
+
+  // Store teams state
+  const [teams, setTeams] = useState<ExtendedTeam[]>([]);
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -104,32 +106,19 @@ const columns: Column[] = [
       }
       if (data) {
         const teamsWithPoints = calculateTeamStats(data);
-
-        // Save previous positions by id
-        const previousPositions = new Map(teamsWithPoints.map((team, i) => [team.id, i]));
-
         const sortedTeams = teamsWithPoints
-          .slice() // ensure not in-place
+          .slice()
           .sort(
             (a, b) =>
               b.points - a.points ||
               ((b.goals_for ?? 0) - (b.goals_against ?? 0)) - ((a.goals_for ?? 0) - (a.goals_against ?? 0))
           );
-
         const teamsWithPlace: ExtendedTeam[] = sortedTeams.map((team, index) => {
-          const prevIndex = previousPositions.get(team.id);
-          let positionChange: 'up' | 'down' | 'same' = 'same';
-          if (typeof prevIndex === 'number') {
-            if (index < prevIndex) positionChange = 'up';
-            else if (index > prevIndex) positionChange = 'down';
-          }
           return {
             ...team,
             place: index + 1,
-            positionChange,
           };
         });
-
         setTeams(teamsWithPlace);
         setLoading(false);
       } else {
@@ -137,32 +126,9 @@ const columns: Column[] = [
       }
     };
     fetchTeams();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [teams, setTeams] = useState<ExtendedTeam[]>([]);
-
-  const getPositionIcon = (change: string) => {
-    switch (change) {
-      case 'up':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill={theme.palette.success.main} xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 4L6 10H10V20H14V10H18L12 4Z" />
-          </svg>
-        );
-      case 'down':
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill={theme.palette.error.main} xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 20L6 14H10V4H14V14H18L12 20Z" />
-          </svg>
-        );
-      default:
-        return (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill={theme.palette.grey[500]} xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 12L14 6V10H4V14H14V18L20 12Z" />
-          </svg>
-        );
-    }
-  };
 
   return (
     <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 0 } }}>
@@ -182,13 +148,15 @@ const columns: Column[] = [
           <ScreenRotationIcon sx={{ fontSize: '1.2rem' }} />
           Щоб побачити повну таблицю — переверніть телефон у горизонтальне положення
         </Box>
-        <Box sx={{ overflowX: 'auto' }}>
+        <Box>
           <TableContainer
             sx={{
               width: '100%',
               border: `1px solid ${theme.palette.grey[100]}`,
               borderRadius: '8px',
-              overflow: 'hidden',
+              overflowX: 'auto', // додано горизонтальний скрол
+              WebkitOverflowScrolling: 'touch', // плавний скрол на iOS
+              overflowY: 'hidden',
             }}
           >
             <Table
@@ -310,7 +278,6 @@ const columns: Column[] = [
                                     sx={{ pl: 0, pr: 0 }}
                                   >
                                     <span>{team.place}</span>
-                                    {getPositionIcon(team.positionChange)}
                                   </Stack>
                                 </TableCell>
                               );
@@ -440,6 +407,7 @@ const columns: Column[] = [
                                     fontFamily: theme.typography.fontFamily,
                                     padding: { xs: '6px 16px', sm: '12px 16px' },
                                     display: col.hideOnMobile ? { xs: 'none', sm: 'table-cell' } : 'table-cell',
+                                    fontWeight: theme.typography.fontWeightBold,
                                   }}
                                 >
                                   {team.points}
