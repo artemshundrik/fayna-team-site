@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
@@ -44,39 +43,22 @@ const NextMatch = () => {
   } | null>(null);
   const [form1, setForm1] = useState<string[]>([]);
   const [form2, setForm2] = useState<string[]>([]);
+  // --- Use form values that already exist in the "teams" table -----------------
   useEffect(() => {
-    if (!data?.team1?.id || !data?.team2?.id) return;
-    async function getLast5Forms(teamId: number): Promise<string[]> {
-      const { data: hist, error } = await supabase
-        .from('matches')
-        .select('team1_id, team2_id, score_team1, score_team2')
-        .or(`team1_id.eq.${teamId},team2_id.eq.${teamId}`)
-        .not('score_team1', 'is', null)
-        .not('score_team2', 'is', null)
-        .order('date', { ascending: false })
-        .order('time', { ascending: false })
-        .limit(5);
-      if (error || !hist) return [];
-      return hist.map(m => {
-        const isHome = m.team1_id === teamId;
-        const gf = isHome ? m.score_team1! : m.score_team2!;
-        const ga = isHome ? m.score_team2! : m.score_team1!;
-        if (gf > ga) return 'w';
-        if (gf < ga) return 'l';
-        return 'd';
-      });
-    }
-    (async () => {
-      const [f1, f2] = await Promise.all([
-        getLast5Forms(data.team1.id),
-        getLast5Forms(data.team2.id),
-      ]);
-      const fallback1 = data.team1?.form ? data.team1.form.toLowerCase().split(',').slice(0,5) : [];
-      const fallback2 = data.team2?.form ? data.team2.form.toLowerCase().split(',').slice(0,5) : [];
-      setForm1(f1.length > 0 ? f1 : fallback1);
-      setForm2(f2.length > 0 ? f2 : fallback2);
-    })();
+    if (!data) return;
+
+    const parseForm = (formStr?: string | null): string[] => {
+      if (!formStr) return [];
+      return formStr
+        .split(',')
+        .map(s => s.trim().toLowerCase())        // keep only first letter and trim spaces
+        .filter(ch => ['w', 'd', 'l'].includes(ch)); // ensure only valid markers
+    };
+
+    setForm1(parseForm((data.team1 as any)?.form));
+    setForm2(parseForm((data.team2 as any)?.form));
   }, [data]);
+  // ---------------------------------------------------------------------------
   const [matchIsOver, setMatchIsOver] = useState(false);
 
   useEffect(() => {
@@ -84,16 +66,6 @@ const NextMatch = () => {
       if (!(matchDate instanceof Date) || isNaN(matchDate.getTime())) return;
 
       const now = new Date();
-      const matchDateOnly = new Date(matchDate);
-      matchDateOnly.setHours(0, 0, 0, 0);
-      const nowDateOnly = new Date(now);
-      nowDateOnly.setHours(0, 0, 0, 0);
-      const isSameDay = matchDateOnly.getTime() === nowDateOnly.getTime();
-      const isPast = now > matchDate;
-      let calculatedDays = Math.floor((matchDateOnly.getTime() - nowDateOnly.getTime()) / (1000 * 60 * 60 * 24));
-      if (isSameDay || isPast) {
-        calculatedDays = 0;
-      }
       const distance = matchDate.getTime() - now.getTime();
 
       if (distance <= 0) {
@@ -105,13 +77,15 @@ const NextMatch = () => {
         return;
       }
 
-      const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((distance % (1000 * 60)) / 1000);
-      setDays(calculatedDays);
-      setHours(h);
-      setMinutes(m);
-      setSeconds(s);
+      const daysCount = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hoursCount = Math.floor((distance / (1000 * 60 * 60)) % 24);
+      const minutesCount = Math.floor((distance / (1000 * 60)) % 60);
+      const secondsCount = Math.floor((distance / 1000) % 60);
+
+      setDays(daysCount);
+      setHours(hoursCount);
+      setMinutes(minutesCount);
+      setSeconds(secondsCount);
     }, 1000);
 
     return () => clearInterval(interval);
