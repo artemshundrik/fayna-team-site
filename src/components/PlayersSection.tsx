@@ -1,4 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { keyframes } from '@mui/system';
+// Animation keyframes for fadeInUp
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 // Enable source-map debugging for easier tracing
 import { Box, Typography, IconButton } from '@mui/material';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -85,111 +97,124 @@ const PlayersSection: React.FC = () => {
 
   return (
     <Box component="section" sx={{ backgroundColor: 'common.white', py: 6 }}>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          px: { xs: 2, md: 10 },
-          mb: 4,
-        }}
-      >
-        <Typography
-          variant="h5"
+      <Box sx={{ width: '100%' }}>
+        <Box
           sx={{
-            color: 'text.primary',
-            textTransform: 'uppercase',
-            fontWeight: 600,
-            letterSpacing: '-0.03em',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: { xs: 2, md: 10 },
+            mb: 4,
           }}
         >
-          ГРАВЦІ
-        </Typography>
-        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-          <IconButton
-            onClick={() => handleScroll('left')}
-            aria-label="Scroll players left"
-            color="primary"
+          <Typography
+            variant="h5"
             sx={{
-              borderRadius: '50%',
-              width: 40,
-              height: 40,
-              border: theme => `1px solid ${theme.palette.grey[400]}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'border-color 0.3s, color 0.3s',
-              '&:hover': {
-                borderColor: theme => theme.palette.primary.main,
-              },
+              color: 'text.primary',
+              textTransform: 'uppercase',
+              fontWeight: 600,
+              letterSpacing: '-0.03em',
             }}
           >
-            <KeyboardArrowLeftIcon
+            ГРАВЦІ
+          </Typography>
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+            <IconButton
+              onClick={() => handleScroll('left')}
+              aria-label="Scroll players left"
+              color="primary"
               sx={{
-                fontSize: 24,
-                color: theme => theme.palette.text.primary,
-                transition: 'transform 0.3s ease, color 0.3s ease',
-                '.MuiIconButton-root:hover &': {
-                  transform: 'scale(1.05)',
-                  color: theme => theme.palette.primary.main,
+                borderRadius: '50%',
+                width: 40,
+                height: 40,
+                border: theme => `1px solid ${theme.palette.grey[400]}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'border-color 0.3s, color 0.3s',
+                '&:hover': {
+                  borderColor: theme => theme.palette.primary.main,
                 },
               }}
-            />
-          </IconButton>
-          <IconButton
-            onClick={() => handleScroll('right')}
-            aria-label="Scroll players right"
-            color="primary"
-            sx={{
-              borderRadius: '50%',
-              width: 40,
-              height: 40,
-              border: theme => `1px solid ${theme.palette.grey[400]}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'border-color 0.3s, color 0.3s',
-              '&:hover': {
-                borderColor: theme => theme.palette.primary.main,
-              },
-            }}
-          >
-            <KeyboardArrowRightIcon
+            >
+              <KeyboardArrowLeftIcon
+                sx={{
+                  fontSize: 24,
+                  color: theme => theme.palette.text.primary,
+                  transition: 'transform 0.3s ease, color 0.3s ease',
+                  '.MuiIconButton-root:hover &': {
+                    transform: 'scale(1.05)',
+                    color: theme => theme.palette.primary.main,
+                  },
+                }}
+              />
+            </IconButton>
+            <IconButton
+              onClick={() => handleScroll('right')}
+              aria-label="Scroll players right"
+              color="primary"
               sx={{
-                fontSize: 24,
-                color: theme => theme.palette.text.primary,
-                transition: 'transform 0.3s ease, color 0.3s ease',
-                '.MuiIconButton-root:hover &': {
-                  transform: 'scale(1.05)',
-                  color: theme => theme.palette.primary.main,
+                borderRadius: '50%',
+                width: 40,
+                height: 40,
+                border: theme => `1px solid ${theme.palette.grey[400]}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'border-color 0.3s, color 0.3s',
+                '&:hover': {
+                  borderColor: theme => theme.palette.primary.main,
                 },
               }}
-            />
-          </IconButton>
+            >
+              <KeyboardArrowRightIcon
+                sx={{
+                  fontSize: 24,
+                  color: theme => theme.palette.text.primary,
+                  transition: 'transform 0.3s ease, color 0.3s ease',
+                  '.MuiIconButton-root:hover &': {
+                    transform: 'scale(1.05)',
+                    color: theme => theme.palette.primary.main,
+                  },
+                }}
+              />
+            </IconButton>
+          </Box>
         </Box>
-      </Box>
-      <Box position="relative">
-        <Box sx={{ px: theme => theme.spacing(6) }}>
-          <Box
-            ref={scrollRef}
-            sx={{
-              display: 'flex',
-              overflowX: 'auto',
-              scrollSnapType: 'x mandatory',
-              '& > *': { scrollSnapAlign: 'start' },
-              gap: theme => theme.spacing(2),
-            }}
-          >
-            {players.map((p, index) => (
-              <Box key={p.number}>
-                <MemoPlayerCard
-                  name={`${p.first_name} ${p.last_name}`}
-                  position={p.position}
-                  number={p.number}
-                  photoComponent={<SafeImage src={p.photo} alt={p.first_name} />}
-                />
-              </Box>
-            ))}
+        <Box position="relative">
+          <Box>
+            <Box
+              ref={scrollRef}
+              sx={{
+                display: 'flex',
+                overflowX: 'auto',
+                scrollSnapType: 'x mandatory',
+                px: { xs: 4, md: 8 },
+                gap: theme => theme.spacing(2),
+              }}
+            >
+              {players.map((p, index) => (
+                <Box
+                  key={p.number}
+                  sx={{
+                    flex: '0 0 80%',
+                    maxWidth: 360,
+                    scrollSnapAlign: 'center',
+                    opacity: 0,
+                    transform: 'translateY(20px)',
+                    animation: `${fadeInUp} 0.5s ease forwards`,
+                    animationDelay: `${index * 0.05}s`,
+                  }}
+                >
+                  <MemoPlayerCard
+                    name={`${p.first_name} ${p.last_name}`}
+                    position={p.position}
+                    number={p.number}
+                    photoComponent={<SafeImage src={p.photo} alt={p.first_name} />}
+                  />
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Box>
       </Box>
