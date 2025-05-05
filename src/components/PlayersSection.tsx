@@ -189,7 +189,7 @@ const PlayersSection: React.FC = () => {
                 display: 'flex',
                 overflowX: 'auto',
                 scrollSnapType: 'x mandatory',
-                px: { xs: 4, md: 8 },
+                px: { xs: 2, md: 10 },
                 gap: theme => theme.spacing(2),
               }}
             >

@@ -205,7 +205,7 @@ const Hero: React.FC = () => {
         <Logo>
           <img src="/images/logo-hero-fayna.svg" alt="FAYNA TEAM" />
         </Logo>
-        <Slogan>"Перемагаємо разом!"</Slogan>
+        <Slogan>Єдність - наша сила!</Slogan>
         <Buttons>
           <StyledButton component={Link} to="/squad" variant="outlined" color="secondary">
             Склад команди

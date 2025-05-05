@@ -323,6 +323,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               justifyContent: 'flex-start',
               gap: theme.spacing(1),
               mt: theme.spacing(2),
+              px: theme.spacing(3),
             }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 300, color: theme.palette.common.white }}>
                 🎂 {formattedBirthDate}
