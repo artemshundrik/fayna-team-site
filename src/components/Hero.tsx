@@ -45,8 +45,8 @@ const Overlay = styled.div`
   z-index: 1;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 80%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 80%, black 100%);
 `;
 
 const Content = styled.div`
