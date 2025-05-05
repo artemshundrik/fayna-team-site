@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Button from '@mui/material/Button';
 
@@ -198,35 +198,45 @@ const SocialBox = styled.a<{ $bigger?: boolean }>`
 `;
 
 const Hero: React.FC = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/images/hero-team-photo.png';
+    img.onload = () => setIsLoaded(true);
+  }, []);
+
   return (
-    <Section>
-      <Overlay />
-      <Content>
-        <Logo>
-          <img src="/images/logo-hero-fayna.svg" alt="FAYNA TEAM" />
-        </Logo>
-        <Slogan>Єдність - наша сила!</Slogan>
-        <Buttons>
-          <StyledButton component={Link} to="/squad" variant="outlined" color="secondary">
-            Склад команди
-          </StyledButton>
-          <StyledButton component={Link} to="/matches" variant="contained" color="primary">
-            Дивитись матчі
-          </StyledButton>
-        </Buttons>
-        <Social>
-          <SocialBox href="https://www.youtube.com/@FCFAYNATEAM" target="_blank" rel="noopener noreferrer">
-            <img src="/images/icons/youtube-default.svg" className="default" alt="Перейти на YouTube канал FAYNA TEAM" />
-            <img src="/images/icons/youtube-hover.svg" className="hover" alt="Перейти на YouTube канал FAYNA TEAM" />
-          </SocialBox>
-          <Divider />
-          <SocialBox href="https://www.instagram.com/fc_fayna_team/?igsh=MWx4eXRlMW54NWR2eg%3D%3D&utm_source=qr#" target="_blank" rel="noopener noreferrer">
-            <img src="/images/icons/instagram-default.svg" className="default" alt="Перейти на Instagram FAYNA TEAM" />
-            <img src="/images/icons/instagram-hover.svg" className="hover" alt="Перейти на Instagram FAYNA TEAM" />
-          </SocialBox>
-        </Social>
-      </Content>
-    </Section>
+    <React.Fragment>
+      <Section style={{ visibility: isLoaded ? 'visible' : 'hidden' }}>
+        <Overlay />
+        <Content>
+          <Logo>
+            <img src="/images/logo-hero-fayna.svg" alt="FAYNA TEAM" />
+          </Logo>
+          <Slogan>Єдність - наша сила!</Slogan>
+          <Buttons>
+            <StyledButton component={Link} to="/squad" variant="outlined" color="secondary">
+              Склад команди
+            </StyledButton>
+            <StyledButton component={Link} to="/matches" variant="contained" color="primary">
+              Дивитись матчі
+            </StyledButton>
+          </Buttons>
+          <Social>
+            <SocialBox href="https://www.youtube.com/@FCFAYNATEAM" target="_blank" rel="noopener noreferrer">
+              <img src="/images/icons/youtube-default.svg" className="default" alt="Перейти на YouTube канал FAYNA TEAM" />
+              <img src="/images/icons/youtube-hover.svg" className="hover" alt="Перейти на YouTube канал FAYNA TEAM" />
+            </SocialBox>
+            <Divider />
+            <SocialBox href="https://www.instagram.com/fc_fayna_team/?igsh=MWx4eXRlMW54NWR2eg%3D%3D&utm_source=qr#" target="_blank" rel="noopener noreferrer">
+              <img src="/images/icons/instagram-default.svg" className="default" alt="Перейти на Instagram FAYNA TEAM" />
+              <img src="/images/icons/instagram-hover.svg" className="hover" alt="Перейти на Instagram FAYNA TEAM" />
+            </SocialBox>
+          </Social>
+        </Content>
+      </Section>
+    </React.Fragment>
   );
 };
 
