@@ -1,16 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { keyframes } from '@mui/system';
-// Animation keyframes for fadeInUp
-const fadeInUp = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
 // Enable source-map debugging for easier tracing
 import { Box, Typography, IconButton } from '@mui/material';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -58,6 +46,34 @@ const PlayersSection: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const [visibleCards, setVisibleCards] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+
+    const elements = document.querySelectorAll('[data-player-index]');
+    const newVisible = [...visibleCards];
+
+    elements.forEach((el, idx) => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            newVisible[idx] = true;
+            setVisibleCards([...newVisible]);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.3 }
+      );
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => {
+      observers.forEach(o => o.disconnect());
+    };
+  }, [players]);
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -188,6 +204,7 @@ const PlayersSection: React.FC = () => {
               sx={{
                 display: 'flex',
                 overflowX: 'auto',
+                overflowY: 'hidden',
                 scrollSnapType: 'x mandatory',
                 px: { xs: 2, md: 10 },
                 gap: theme => theme.spacing(2),
@@ -196,14 +213,14 @@ const PlayersSection: React.FC = () => {
               {players.map((p, index) => (
                 <Box
                   key={p.number}
+                  data-player-index={index}
                   sx={{
                     flex: '0 0 80%',
                     maxWidth: 360,
                     scrollSnapAlign: 'center',
-                    opacity: 0,
-                    transform: 'translateY(20px)',
-                    animation: `${fadeInUp} 0.5s ease forwards`,
-                    animationDelay: `${index * 0.05}s`,
+                    opacity: visibleCards[index] ? 1 : 0,
+                    transform: visibleCards[index] ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'opacity 0.5s ease, transform 0.5s ease',
                   }}
                 >
                   <MemoPlayerCard

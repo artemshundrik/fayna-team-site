@@ -1,6 +1,5 @@
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
@@ -16,10 +15,6 @@ const Card = styled(Box, { shouldForwardProp: (prop) => prop !== 'full' })<{ ful
 `;
 
 
-const fadeSlide = {
-  hidden: { opacity: 0, y: -20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-};
 
 
 const NextMatch = () => {
@@ -157,11 +152,7 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
   return (
     <>
       <Box
-        component={motion.section}
-        initial="hidden"
-        whileInView="visible"
-        variants={fadeSlide}
-        viewport={{ once: true, amount: 0.3 }}
+        component="section"
         sx={{
           backgroundImage: "url('/images/matches/next-match-bg.png')",
           backgroundRepeat: 'no-repeat',
