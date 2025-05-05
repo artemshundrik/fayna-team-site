@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { Box, Typography, CircularProgress, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { supabase } from '../supabase';
 import Layout from '../layout/Layout';
@@ -69,7 +69,16 @@ const PlayerProfile = () => {
             position: 'relative',
             width: '100vw',
             height: { xs: '60vh', md: '80vh' },
-            background: 'linear-gradient(180deg, rgb(37, 37, 37) 0%, rgb(16, 16, 17) 100%)',
+            background: `
+    repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,0.06) 0,
+      rgba(255,255,255,0.06) 2px,
+      transparent 2px,
+      transparent 6px
+    ),
+    linear-gradient(180deg, rgb(37, 37, 37) 0%, rgb(16, 16, 17) 100%)
+  `,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -109,7 +118,10 @@ const PlayerProfile = () => {
                 zIndex: 11,
                 bottom: 0,
                 position: 'absolute',
-                transform: 'translateY(-50%)',
+                transform: {
+                  xs: 'translateY(0)',
+                  md: 'translateY(-50%)'
+                },
               }}
             />
 
@@ -129,25 +141,30 @@ const PlayerProfile = () => {
             <Box
               sx={{
                 position: 'absolute',
-                top: '50%',
+                top: { xs: '50%', md: '50%' },
                 left: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: {
+                  xs: 'translate(-50%, 0)',
+                  md: 'translate(-50%, -50%)'
+                },
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'flex-start',
-                textAlign: 'left',
+                alignItems: { xs: 'center', md: 'flex-start' },
+                textAlign: { xs: 'center', md: 'left' },
                 zIndex: 10,
+                px: 2,
               }}
             >
               <Typography
                 variant="subtitle1"
                 sx={{
-                  fontSize: { xs: '1.4rem', md: '1.6rem' },
+                  fontSize: { xs: '1.1rem', md: '1.6rem' },
                   fontWeight: 500,
                   letterSpacing: '0.05rem',
                   color: theme.palette.common.white,
                   textTransform: 'uppercase',
                   mb: -4,
+                  textAlign: { xs: 'center', md: 'left' },
                 }}
               >
                 {player.first_name}
@@ -155,7 +172,7 @@ const PlayerProfile = () => {
               <Typography
                 variant="h1"
                 sx={{
-                  fontSize: { xs: '4rem', md: '10rem' },
+                  fontSize: { xs: '2.5rem', md: '10rem' },
                   fontWeight: 900,
                   letterSpacing: '-0.05rem',
                   background: `linear-gradient(to bottom, ${theme.palette.primary.main}, rgba(255, 51, 77, 0.4))`,
@@ -188,16 +205,62 @@ const PlayerProfile = () => {
           </Box>
         </Box>
 
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h6">Статистика</Typography>
-          <ul>
-            <li>Матчів: {player.matches ?? 0}</li>
-            <li>Голи: {player.goals ?? 0}</li>
-            <li>Асисти: {player.assists ?? 0}</li>
-            <li>Жовті картки: {player.yellow_cards ?? 0}</li>
-            <li>Червоні картки: {player.red_cards ?? 0}</li>
-            <li>Сейви: {player.saves ?? 0}</li>
-          </ul>
+        <Box
+          sx={{
+            mt: 4,
+            background: `linear-gradient(180deg, ${theme.palette.grey[100]} 0%, ${theme.palette.grey[200]} 100%)`,
+            px: { xs: 1, md: 4 },
+            py: { xs: 2, md: 3 },
+            mx: 'auto',
+            maxWidth: 900,
+          }}
+        >
+          <Grid container justifyContent="space-around">
+            {[
+              { label: 'Matches', value: player.matches ?? 0 },
+              { label: 'Goals', value: player.goals ?? 0 },
+              { label: 'Assists', value: player.assists ?? 0 },
+              { label: 'Yellow Cards', value: player.yellow_cards ?? 0 },
+              { label: 'Red Cards', value: player.red_cards ?? 0 },
+              { label: 'Saves', value: player.saves ?? 0 },
+            ].map((stat, idx) => (
+              <Grid
+                item
+                xs={6}
+                sm={3}
+                key={stat.label}
+                sx={{
+                  textAlign: 'center',
+                  py: { xs: 2, md: 3 },
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: theme.palette.primary.main,
+                    fontWeight: 600,
+                    letterSpacing: '0.03rem',
+                    fontFamily: 'MacPawFixelDisplay, sans-serif',
+                    fontSize: { xs: '0.9rem', md: '1.1rem' },
+                    mb: 1,
+                  }}
+                >
+                  {stat.label}
+                </Typography>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: 900,
+                    lineHeight: 1,
+                    fontFamily: 'MacPawFixelDisplay, sans-serif',
+                    fontSize: { xs: '2.8rem', sm: '3.6rem', md: '4.2rem' },
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+              </Grid>
+            ))}
+          </Grid>
         </Box>
       </Box>
     </Layout>
