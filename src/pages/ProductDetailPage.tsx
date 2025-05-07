@@ -84,9 +84,9 @@ const ProductDetailPage: React.FC = () => {
 
   return (
     <Layout>
-    <Box sx={{ p: { xs: 2, md: 4 }, display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ p: { xs: 2, md: 8 }, display: 'flex', justifyContent: 'center' }}>
       <Box sx={{ maxWidth: 1300, width: '100%' }}>
-        <Grid container spacing={4} alignItems="flex-start">
+        <Grid container spacing={6} alignItems="flex-start">
         {/* Image Gallery */}
         <Grid item xs={12} md={6}>
           <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
