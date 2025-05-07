@@ -24,6 +24,7 @@ type Player = {
   yellow_cards?: number;
   red_cards?: number;
   saves?: number;
+  birth_date?: string;
 };
 
 const PlayerProfile = () => {
@@ -37,9 +38,13 @@ const PlayerProfile = () => {
 
   useEffect(() => {
     const fetchPlayer = async () => {
+      if (!number || isNaN(Number(number))) {
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase
         .from('players')
-        .select('statistics, photo, first_name, last_name, position')
+        .select('statistics, photo, first_name, last_name, position, birth_date')
         .eq('number', Number(number))
         .single();
       if (data) {
@@ -77,6 +82,10 @@ const PlayerProfile = () => {
     };
     fetchPlayer();
   }, [number]);
+
+  if (!number || isNaN(Number(number))) {
+    return <Box sx={{ p: 4, textAlign: 'center' }}>Недійсний номер гравця</Box>;
+  }
 
   if (loading) {
     return <Box sx={{ p: 4, textAlign: 'center' }}><CircularProgress /></Box>;
@@ -301,7 +310,7 @@ const PlayerProfile = () => {
         <Box
           sx={{
             background: `linear-gradient(180deg, ${theme.palette.grey[100]} 0%, ${theme.palette.grey[200]} 100%)`,
-            px: { xs: 2, md: 18 },
+            px: { xs: 2, md: 20 },
             py: { xs: 2, md: 3 },
             width: '100%',
           }}
@@ -316,13 +325,17 @@ const PlayerProfile = () => {
               { label: 'Сейви', key: 'saves' },
             ]
               .filter(stat => !(stat.key === 'saves' && player.position.toLowerCase() === 'універсал'))
-              .map((stat, idx) => (
+              .map((stat) => (
                 <Grid
                   item
                   xs={6}
                   sm={3}
                   key={stat.label}
-                  sx={{ textAlign: 'center', py: { xs: 2, md: 3 } }}
+                  sx={{
+                    textAlign: 'left',
+                    py: { xs: 2, md: 3 },
+                    pr: { xs: 2, sm: 4, md: 6 },
+                  }}
                 >
                   <Typography
                     variant="subtitle2"
@@ -350,6 +363,80 @@ const PlayerProfile = () => {
                   </Typography>
                 </Grid>
               ))}
+          </Grid>
+        </Box>
+
+        <Box
+          sx={{
+            backgroundColor: theme.palette.common.white,
+            px: { xs: 4, md: 25 },
+            py: { xs: 3, md: 4 },
+            width: '100%',
+          }}
+        >
+          <Grid container spacing={18}>
+            {[
+              {
+                label: 'Номер',
+                value: number || '—',
+              },
+              {
+                label: 'Дата народження',
+                value: player.birth_date
+                  ? new Date(player.birth_date).toLocaleDateString('uk-UA', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
+                  : '—',
+              },
+              {
+                label: 'Вік',
+                value: player.birth_date
+                  ? Math.floor(
+                      (new Date().getTime() - new Date(player.birth_date).getTime()) /
+                        (1000 * 60 * 60 * 24 * 365.25)
+                    )
+                  : '—',
+              },
+              {
+                label: 'Позиція',
+                value: player.position || '—',
+              },
+            ].map((item) => (
+              <Grid
+                item
+                xs={12}
+                sm="auto"
+                key={item.label}
+                sx={{ textAlign: 'left', py: { xs: 2, md: 3 } }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: theme.palette.primary.main,
+                    fontWeight: 600,
+                    letterSpacing: '0.03rem',
+                    fontFamily: 'MacPawFixelDisplay, sans-serif',
+                    fontSize: { xs: '0.9rem', md: '1.1rem' },
+                    mb: 1,
+                  }}
+                >
+                  {item.label}
+                </Typography>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: 900,
+                    lineHeight: 1,
+                    fontFamily: 'MacPawFixelDisplay, sans-serif',
+                    fontSize: { xs: '0.9rem', sm: '0.9rem', md: '1.1rem' },
+                  }}
+                >
+                  {item.value}
+                </Typography>
+              </Grid>
+            ))}
           </Grid>
         </Box>
       </Box>
