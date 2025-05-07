@@ -414,7 +414,7 @@ const PlayerProfile = () => {
                 <Typography
                   variant="subtitle2"
                   sx={{
-                    color: theme.palette.primary.main,
+                    color: theme.palette.grey[500],
                     fontWeight: 600,
                     letterSpacing: '0.03rem',
                     fontFamily: 'MacPawFixelDisplay, sans-serif',
