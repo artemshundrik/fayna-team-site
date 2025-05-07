@@ -237,12 +237,18 @@ const PlayerProfile = () => {
                     color: theme.palette.common.white,
                     display: 'inline-flex',
                     alignItems: 'center',
-                    '&:hover': { textDecoration: 'underline' },
                     borderRadius: '4px',
                     padding: '4px 8px',
+                    '&:hover': {
+                      color: theme.palette.primary.main,
+                      textDecoration: 'none',
+                    },
                   }}
                 >
-                  <span style={{ color: theme.palette.primary.main }}>←</span> {prevPlayer.first_name} {prevPlayer.last_name}
+                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span style={{ color: theme.palette.primary.main }}>←</span>
+                    {prevPlayer.first_name} {prevPlayer.last_name}
+                  </Box>
                 </Typography>
               )}
               {nextPlayer && (
@@ -256,12 +262,18 @@ const PlayerProfile = () => {
                     color: theme.palette.common.white,
                     display: 'inline-flex',
                     alignItems: 'center',
-                    '&:hover': { textDecoration: 'underline' },
                     borderRadius: '4px',
                     padding: '4px 8px',
+                    '&:hover': {
+                      color: theme.palette.primary.main,
+                      textDecoration: 'none',
+                    },
                   }}
                 >
-                  {nextPlayer.first_name} {nextPlayer.last_name} <span style={{ color: theme.palette.primary.main }}>→</span>
+                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    {nextPlayer.first_name} {nextPlayer.last_name}
+                    <span style={{ color: theme.palette.primary.main }}>→</span>
+                  </Box>
                 </Typography>
               )}
             </Box>
@@ -288,12 +300,10 @@ const PlayerProfile = () => {
 
         <Box
           sx={{
-            mt: 4,
             background: `linear-gradient(180deg, ${theme.palette.grey[100]} 0%, ${theme.palette.grey[200]} 100%)`,
-            px: { xs: 1, md: 4 },
+            px: { xs: 2, md: 18 },
             py: { xs: 2, md: 3 },
-            mx: 'auto',
-            maxWidth: 900,
+            width: '100%',
           }}
         >
           <Grid container justifyContent="space-around">
