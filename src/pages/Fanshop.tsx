@@ -99,41 +99,40 @@ function Fanshop() {
 
   return (
     <Layout>
+      <Box
+        sx={{
+          backgroundColor: 'common.black',
+          py: { xs: 4, sm: 12 },
+          px: 3,
+          width: '100%',
+          mb: { xs: 2, sm: 4 },
+        }}
+      >
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{
+            color: 'common.white',
+            fontWeight: 800,
+            textAlign: 'center',
+          }}
+        >
+          FAYNA Fan Shop
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            color: 'common.white',
+            opacity: 0.8,
+            textAlign: 'center',
+            mt: 1,
+          }}
+        >
+          Офіційна фан-атрибутика FAYNA TEAM
+        </Typography>
+      </Box>
       <ContentWrapper>
         <div style={{ maxWidth: '1200px', width: '100%', margin: '0 auto', padding: '1rem' }}>
-          {/* ---- HERO SECTION ---- */}
-          <Box
-            sx={{
-              width: '100%',
-              backgroundColor: 'common.black',
-              py: { xs: 4, sm: 6 },
-              px: 3,
-            }}
-          >
-            <Typography
-              variant="h3"
-              component="h1"
-              sx={{
-                color: 'common.white',
-                fontWeight: 800,
-                textAlign: 'center',
-              }}
-            >
-              FAYNA Fan Shop
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                color: 'common.white',
-                opacity: 0.8,
-                textAlign: 'center',
-                mt: 1,
-              }}
-            >
-              Офіційна фан-атрибутика FAYNA TEAM
-            </Typography>
-          </Box>
-          {/* ---- /HERO SECTION ---- */}
           <Box
             sx={{
               display: 'grid',

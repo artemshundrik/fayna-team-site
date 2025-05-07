@@ -29,7 +29,7 @@ const NavLinks = ({ onClick }: { onClick?: () => void }) => (
       <Typography variant="navLink">Головна</Typography>
     </Link>
     <Link to="/squad" style={{ textDecoration: 'none' }} onClick={onClick}>
-      <Typography variant="navLink">Склад</Typography>
+      <Typography variant="navLink">Команда</Typography>
     </Link>
     <Link to="/fanshop" style={{ textDecoration: 'none' }} onClick={onClick}>
       <Typography variant="navLink">Фаншоп</Typography>

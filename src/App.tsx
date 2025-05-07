@@ -8,6 +8,7 @@ import PasswordGate from './PasswordGate';
 import Matches from './pages/Matches';
 import Squad from './pages/Squad';
 import Styleguide from './pages/Styleguide';
+import ProductDetailPage from './pages/ProductDetailPage';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
@@ -36,6 +37,7 @@ function App() {
             <Route path="/squad" element={<Squad />} />
             <Route path="/styleguide" element={<Styleguide />} />
             <Route path="/player/:number" element={<PlayerProfile />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
