@@ -14,19 +14,16 @@ const fadeIn = {
 };
 
 type Player = {
-  id: number;
   first_name: string;
   last_name: string;
-  number: number;
   position: string;
   photo: string;
-  birth_date: string;
-  matches: number;
-  goals: number;
-  assists: number;
-  yellow_cards: number;
-  red_cards: number;
-  saves: number;
+  matches?: number;
+  goals?: number;
+  assists?: number;
+  yellow_cards?: number;
+  red_cards?: number;
+  saves?: number;
 };
 
 const PlayerProfile = () => {
@@ -35,17 +32,47 @@ const PlayerProfile = () => {
   const [player, setPlayer] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [prevPlayer, setPrevPlayer] = useState<{ number: number; first_name: string; last_name: string } | null>(null);
+  const [nextPlayer, setNextPlayer] = useState<{ number: number; first_name: string; last_name: string } | null>(null);
+
   useEffect(() => {
     const fetchPlayer = async () => {
       const { data, error } = await supabase
         .from('players')
-        .select('*')
-        .eq('number', number)
+        .select('statistics, photo, first_name, last_name, position')
+        .eq('number', Number(number))
         .single();
       if (data) {
-        setPlayer(data);
+        const stats = data.statistics;
+        const flatStats = Object.values(stats || {})
+          .flatMap((season: any) => Object.values(season))
+          .reduce(
+            (acc: any, match: any) => {
+              acc.matches = (acc.matches || 0) + (match.matches || 0);
+              acc.goals = (acc.goals || 0) + (match.goals || 0);
+              acc.assists = (acc.assists || 0) + (match.assists || 0);
+              acc.yellow_cards = (acc.yellow_cards || 0) + (match.yellow_cards || 0);
+              acc.red_cards = (acc.red_cards || 0) + (match.red_cards || 0);
+              acc.saves = (acc.saves || 0) + (match.saves || 0);
+              return acc;
+            },
+            {}
+          );
+        setPlayer({ ...data, ...flatStats });
         console.log('Фото гравця:', data.photo);
       }
+
+      const { data: allPlayers } = await supabase
+        .from('players')
+        .select('number, first_name, last_name')
+        .order('number', { ascending: true });
+
+      if (allPlayers) {
+        const index = allPlayers.findIndex(p => p.number === Number(number));
+        setPrevPlayer(allPlayers[index - 1] || null);
+        setNextPlayer(allPlayers[index + 1] || null);
+      }
+
       setLoading(false);
     };
     fetchPlayer();
@@ -70,15 +97,14 @@ const PlayerProfile = () => {
             width: '100vw',
             height: { xs: '60vh', md: '80vh' },
             background: `
-    repeating-linear-gradient(
-      135deg,
-      rgba(255,255,255,0.06) 0,
-      rgba(255,255,255,0.06) 2px,
-      transparent 2px,
-      transparent 6px
-    ),
-    linear-gradient(180deg, rgb(37, 37, 37) 0%, rgb(16, 16, 17) 100%)
-  `,
+              repeating-linear-gradient(
+                135deg,
+                rgba(255,255,255,0.06) 0,
+                rgba(255,255,255,0.06) 2px,
+                transparent 2px,
+                transparent 6px
+              ),
+              linear-gradient(180deg, rgb(37, 37, 37) 0%, rgb(16, 16, 17) 100%)`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -185,6 +211,61 @@ const PlayerProfile = () => {
               </Typography>
             </Box>
 
+            <Box
+              sx={{
+                top: 0,
+                left: 0,
+                position: 'absolute',
+                width: '100%',
+                zIndex: 25,
+                px: { xs: 2, md: 4 },
+                pt: { xs: 6, md: 6 },
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: 'transparent',
+              }}
+            >
+              {prevPlayer && (
+                <Typography
+                  component="a"
+                  href={`/player/${prevPlayer.number}`}
+                  sx={{
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    color: theme.palette.common.white,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    '&:hover': { textDecoration: 'underline' },
+                    borderRadius: '4px',
+                    padding: '4px 8px',
+                  }}
+                >
+                  <span style={{ color: theme.palette.primary.main }}>←</span> {prevPlayer.first_name} {prevPlayer.last_name}
+                </Typography>
+              )}
+              {nextPlayer && (
+                <Typography
+                  component="a"
+                  href={`/player/${nextPlayer.number}`}
+                  sx={{
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    color: theme.palette.common.white,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    '&:hover': { textDecoration: 'underline' },
+                    borderRadius: '4px',
+                    padding: '4px 8px',
+                  }}
+                >
+                  {nextPlayer.first_name} {nextPlayer.last_name} <span style={{ color: theme.palette.primary.main }}>→</span>
+                </Typography>
+              )}
+            </Box>
+
             {/* <Typography
               variant="subtitle2"
               sx={{
@@ -217,49 +298,48 @@ const PlayerProfile = () => {
         >
           <Grid container justifyContent="space-around">
             {[
-              { label: 'Matches', value: player.matches ?? 0 },
-              { label: 'Goals', value: player.goals ?? 0 },
-              { label: 'Assists', value: player.assists ?? 0 },
-              { label: 'Yellow Cards', value: player.yellow_cards ?? 0 },
-              { label: 'Red Cards', value: player.red_cards ?? 0 },
-              { label: 'Saves', value: player.saves ?? 0 },
-            ].map((stat, idx) => (
-              <Grid
-                item
-                xs={6}
-                sm={3}
-                key={stat.label}
-                sx={{
-                  textAlign: 'center',
-                  py: { xs: 2, md: 3 },
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: theme.palette.primary.main,
-                    fontWeight: 600,
-                    letterSpacing: '0.03rem',
-                    fontFamily: 'MacPawFixelDisplay, sans-serif',
-                    fontSize: { xs: '0.9rem', md: '1.1rem' },
-                    mb: 1,
-                  }}
+              { label: 'Матчі', key: 'matches' },
+              { label: 'Голи', key: 'goals' },
+              { label: 'Асисти', key: 'assists' },
+              { label: 'Жовті картки', key: 'yellow_cards' },
+              { label: 'Червоні картки', key: 'red_cards' },
+              { label: 'Сейви', key: 'saves' },
+            ]
+              .filter(stat => !(stat.key === 'saves' && player.position.toLowerCase() === 'універсал'))
+              .map((stat, idx) => (
+                <Grid
+                  item
+                  xs={6}
+                  sm={3}
+                  key={stat.label}
+                  sx={{ textAlign: 'center', py: { xs: 2, md: 3 } }}
                 >
-                  {stat.label}
-                </Typography>
-                <Typography
-                  variant="h2"
-                  sx={{
-                    fontWeight: 900,
-                    lineHeight: 1,
-                    fontFamily: 'MacPawFixelDisplay, sans-serif',
-                    fontSize: { xs: '2.8rem', sm: '3.6rem', md: '4.2rem' },
-                  }}
-                >
-                  {stat.value}
-                </Typography>
-              </Grid>
-            ))}
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: theme.palette.primary.main,
+                      fontWeight: 600,
+                      letterSpacing: '0.03rem',
+                      fontFamily: 'MacPawFixelDisplay, sans-serif',
+                      fontSize: { xs: '0.9rem', md: '1.1rem' },
+                      mb: 1,
+                    }}
+                  >
+                    {stat.label}
+                  </Typography>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      fontFamily: 'MacPawFixelDisplay, sans-serif',
+                      fontSize: { xs: '2.8rem', sm: '3.6rem', md: '4.2rem' },
+                    }}
+                  >
+                    {player[stat.key as keyof Player] ?? 0}
+                  </Typography>
+                </Grid>
+              ))}
           </Grid>
         </Box>
       </Box>
