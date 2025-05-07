@@ -378,23 +378,23 @@ const Matches: React.FC = () => {
                             justifyContent: 'flex-end',
                             gap: '0.4rem',
                             fontWeight: 600,
-                            color: undefined, // will be set in sx below
+                            color: '#f44336',
                             textDecoration: 'none',
                             fontSize: '0.95rem',
                             transition: 'text-decoration 0.2s ease',
                           }}
-                          onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                          onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.textDecoration = 'underline';
+                            e.currentTarget.style.textDecorationColor = '#f44336'; // червоний
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.textDecoration = 'none';
+                            e.currentTarget.style.textDecorationColor = 'unset';
+                          }}
                         >
-                          <span
-                            style={{
-                              color: undefined,
-                            }}
-                          >
-                            <Box component="span" sx={(theme) => ({ color: theme.palette.error.main, fontWeight: 600, fontSize: '0.95rem' })}>
-                              Дивитись огляд
-                            </Box>
-                          </span>
+                          <Box component="span" sx={(theme) => ({ color: theme.palette.error.main, fontWeight: 600, fontSize: '0.95rem' })}>
+                            Дивитись огляд
+                          </Box>
                           <YouTubeIcon sx={{ fontSize: 20, color: (theme) => theme.palette.error.main }} />
                         </a>
                       )}
@@ -591,23 +591,23 @@ const Matches: React.FC = () => {
                             justifyContent: 'flex-end',
                             gap: '0.4rem',
                             fontWeight: 600,
-                            color: undefined, // will be set in sx below
+                            color: '#f44336',
                             textDecoration: 'none',
                             fontSize: '0.95rem',
                             transition: 'text-decoration 0.2s ease',
                           }}
-                          onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
-                          onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.textDecoration = 'underline';
+                            e.currentTarget.style.textDecorationColor = '#f44336'; // червоний
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.textDecoration = 'none';
+                            e.currentTarget.style.textDecorationColor = 'unset';
+                          }}
                         >
-                          <span
-                            style={{
-                              color: undefined,
-                            }}
-                          >
-                            <Box component="span" sx={(theme) => ({ color: theme.palette.error.main, fontWeight: 600, fontSize: '0.95rem' })}>
-                              Дивитись огляд
-                            </Box>
-                          </span>
+                          <Box component="span" sx={(theme) => ({ color: theme.palette.error.main, fontWeight: 600, fontSize: '0.95rem' })}>
+                            Дивитись огляд
+                          </Box>
                           <YouTubeIcon sx={{ fontSize: 20, color: (theme) => theme.palette.error.main }} />
                         </a>
                       )}
