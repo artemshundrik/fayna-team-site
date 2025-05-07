@@ -25,7 +25,7 @@ const ProductDetailPage: React.FC = () => {
     (async () => {
       const { data, error } = await supabase
         .from('products')
-        .select('id, title, description, price, type, image_1_url, image_2_url')
+        .select('id, title, description, price, type, image_1_url, image_2_url, sizes')
         .eq('id', id)
         .single();
       if (data) {
@@ -38,7 +38,7 @@ const ProductDetailPage: React.FC = () => {
           currency: undefined,
           images: [data.image_1_url, data.image_2_url].filter(Boolean),
           colors: [],
-          sizes: [],
+          sizes: data.sizes || [],
         });
       }
       setLoading(false);
@@ -156,7 +156,7 @@ const ProductDetailPage: React.FC = () => {
             </Typography>
           </Box>
           <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-            {product.currency || 'USD'} {product.price.toFixed(2)}
+            {product.price} грн
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
             <IconButton
@@ -200,17 +200,25 @@ const ProductDetailPage: React.FC = () => {
           {product.sizes.length > 0 && (
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>Size</Typography>
-              <Select
-                value={selectedSize}
-                onChange={(e) => setSelectedSize(e.target.value)}
-                size="small"
-              >
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 {product.sizes.map((size) => (
-                  <MenuItem value={size} key={size}>
+                  <Button
+                    key={size}
+                    variant={selectedSize === size ? 'contained' : 'outlined'}
+                    onClick={() => setSelectedSize(size)}
+                    size="small"
+                    sx={{
+                      minWidth: 48,
+                      px: 2,
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontWeight: 500,
+                    }}
+                  >
                     {size}
-                  </MenuItem>
+                  </Button>
                 ))}
-              </Select>
+              </Box>
             </Box>
           )}
         </Grid>
