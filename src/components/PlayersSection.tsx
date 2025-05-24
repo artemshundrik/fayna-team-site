@@ -10,10 +10,7 @@ import { supabase } from '../supabase';
 const resolvePhotoUrl = (raw: string | null): string => {
   if (!raw) return '/images/player-placeholder.png';
   const fileName = raw.replace(/^images\/players\//, '');
-  const filePath = `images/players/${fileName}`;
-  console.log('📷 Supabase filePath:', filePath);
-  const { data } = supabase.storage.from('players').getPublicUrl(filePath);
-  return data?.publicUrl || '/images/player-placeholder.png';
+  return `/images/players/${fileName}`;
 };
 
 const SafeImage: React.FC<{ src: string; alt: string; className?: string }> = ({ src, alt, className }) => {

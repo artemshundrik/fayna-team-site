@@ -477,15 +477,20 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              fontSize: { xs: '1.2rem', sm: '2rem' },
-              fontWeight: 'bold',
-              minWidth: { xs: 60, sm: 80 },
-              px: { xs: 1, sm: 2 },
-              background: 'rgba(0, 0, 0, 0.6)',
+              fontSize: { xs: '1.54rem', sm: '1.6rem', md: '1.89rem' },
+              fontWeight: 900,
+              minWidth: { xs: 66, sm: 70 },
+              px: { xs: 1.75, sm: 2.45 },
+              py: { xs: 0.5, sm: 0.84 },
+              background: 'rgba(0, 0, 0, 0.68)',
               backdropFilter: 'blur(8px)',
-              borderRadius: 2,
+              borderRadius: { xs: 1, sm: 2 },
               color: 'white',
               textAlign: 'center',
+              boxShadow: '0 2px 12px 0 rgba(0,0,0,0.12)',
+              letterSpacing: '0.03em',
+              // border: '2.5px solid rgba(255,255,255,0.18)', // removed as per instructions
+              transition: 'font-size 0.3s',
             }}
           >
             {matchIsOver && data?.score_team1 != null && data?.score_team2 != null

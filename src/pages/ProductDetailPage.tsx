@@ -49,6 +49,7 @@ const ProductDetailPage: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
 
   useEffect(() => {
     if (product) {
@@ -76,20 +77,49 @@ const ProductDetailPage: React.FC = () => {
   if (!product) return <Typography>Товар не знайдено</Typography>;
 
   const prevImage = () => {
-    setCurrentImageIndex((idx) => (idx > 0 ? idx - 1 : product.images.length - 1));
+    setSlideDirection('left');
+    setTimeout(() => {
+      setCurrentImageIndex((idx) => (idx > 0 ? idx - 1 : product.images.length - 1));
+      setSlideDirection(null);
+    }, 100);
   };
   const nextImage = () => {
-    setCurrentImageIndex((idx) => (idx < product.images.length - 1 ? idx + 1 : 0));
+    setSlideDirection('right');
+    setTimeout(() => {
+      setCurrentImageIndex((idx) => (idx < product.images.length - 1 ? idx + 1 : 0));
+      setSlideDirection(null);
+    }, 100);
   };
 
   return (
     <Layout>
-    <Box sx={{ p: { xs: 2, md: 8 }, display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ p: { xs: 2, md: 8 }, display: 'flex', justifyContent: 'center', px: { xs: 2, md: 0 } }}>
       <Box sx={{ maxWidth: 1300, width: '100%' }}>
-        <Grid container spacing={6} alignItems="flex-start">
+        <Grid container spacing={2} alignItems="flex-start">
         {/* Image Gallery */}
         <Grid item xs={12} md={6}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+          {/* MOBILE MAIN PHOTO — Edge-to-edge */}
+          <Box
+            component="img"
+            src={`/${product.images[currentImageIndex]}`}
+            alt={product.name}
+            sx={{
+              display: { xs: 'block', md: 'none' },
+              width: '100vw',
+              maxWidth: '100vw',
+              ml: '-16px',
+              mr: '-16px',
+              mt: 0,
+              borderRadius: 0,
+              objectFit: 'contain',
+              aspectRatio: '4/5',
+              maxHeight: 400,
+              transition: 'transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.32s cubic-bezier(.4,0,.2,1)',
+              transform: slideDirection === 'left' ? 'translateX(-32px)' : slideDirection === 'right' ? 'translateX(32px)' : 'translateX(0)',
+              opacity: slideDirection ? 0.6 : 1,
+            }}
+          />
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'flex-start' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mr: 2 }}>
               {product.images.map((img, idx) => (
                 <Box
@@ -99,24 +129,39 @@ const ProductDetailPage: React.FC = () => {
                   alt={`${product.name} ${idx}`}
                   onClick={() => setCurrentImageIndex(idx)}
                   sx={{
-                    width: 80,
-                    height: 80,
-                    objectFit: 'cover',
-                    borderRadius: 1,
+                    width: 92,
+                    height: 92,
+                    borderRadius: 2,
+                    boxShadow: '0 2px 10px 0 rgba(0,0,0,0.09)',
+                    border: idx === currentImageIndex ? (theme) => `3px solid ${theme.palette.success.main}` : '2px solid transparent',
                     cursor: 'pointer',
-                    border: idx === currentImageIndex
-                      ? (theme) => `2px solid ${theme.palette.primary.main}`
-                      : 'none',
+                    objectFit: 'cover',
                   }}
                 />
               ))}
             </Box>
             <Box sx={{ position: 'relative', flexGrow: 1 }}>
+              {/* EDGE-TO-EDGE IMAGE */}
               <Box
                 component="img"
                 src={`/${product.images[currentImageIndex]}`}
                 alt={product.name}
-                sx={{ width: '100%', borderRadius: 2, maxWidth: 700 }}
+                sx={{
+                  width: '100vw',
+                  maxWidth: '100vw',
+                  ml: { xs: '-16px', md: 0 },
+                  mr: { xs: '-16px', md: 0 },
+                  borderRadius: { xs: 0, md: 3 },
+                  boxShadow: { xs: 'none', md: '0 8px 32px 0 rgba(0,0,0,0.12)' },
+                  objectFit: 'contain',
+                  aspectRatio: { xs: '4/5', sm: '1/1' },
+                  maxHeight: { xs: 400, sm: 480, md: 540 },
+                  background: { xs: '#f7f7f7', md: '#fff' },
+                  display: 'block',
+                  transition: 'transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.32s cubic-bezier(.4,0,.2,1)',
+                  transform: slideDirection === 'left' ? 'translateX(-32px)' : slideDirection === 'right' ? 'translateX(32px)' : 'translateX(0)',
+                  opacity: slideDirection ? 0.6 : 1,
+                }}
               />
               <IconButton
                 onClick={prevImage}
@@ -144,83 +189,179 @@ const ProductDetailPage: React.FC = () => {
               </IconButton>
             </Box>
           </Box>
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'row', justifyContent: 'flex-start', gap: 1, mt: 2, ml: 0, mr: 0 }}>
+            {product.images.map((img, idx) => (
+              <Box
+                key={idx}
+                component="img"
+                src={`/${img}`}
+                alt={`${product.name} ${idx}`}
+                onClick={() => setCurrentImageIndex(idx)}
+                sx={{
+                  width: 67,
+                  height: 67,
+                  borderRadius: 1,
+                  border: idx === currentImageIndex
+                    ? '2px solid'
+                    : '1.5px solid',
+                  borderColor: idx === currentImageIndex ? 'grey.200' : 'grey.100',
+                  cursor: 'pointer',
+                  objectFit: 'cover',
+                }}
+              />
+            ))}
+          </Box>
         </Grid>
         {/* Product Info */}
         <Grid item xs={12} md={6}>
-          <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
+          <Box sx={{
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'stretch'
+    }}>
+          {/* BIG TITLE */}
+          <Typography
+            variant="h4"
+            sx={{
+              mb: 1.2,
+              fontSize: { xs: 17, sm: 19 },
+              fontWeight: 500,
+              textAlign: 'left',
+            }}
+          >
             {product.name}
           </Typography>
-          <Box sx={{ maxWidth: 500 }}>
-            <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
-              {product.description}
-            </Typography>
-          </Box>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+          {/* BIG GREEN PRICE */}
+          <Typography
+            variant="h3"
+            sx={{
+              fontSize: { xs: 19, sm: 22 },
+              fontWeight: 700,
+              color: 'grey.900',
+              mb: 2,
+              textAlign: 'left',
+            }}
+          >
             {product.price} грн
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-            <IconButton
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              disabled={quantity <= 1}
-            >
-              −
-            </IconButton>
-            <Typography>{quantity}</Typography>
-            <IconButton onClick={() => setQuantity((q) => q + 1)}>+</IconButton>
-            <Button variant="contained" sx={{ flexGrow: 1 }} onClick={() => {/* add to cart */}}>
-              Add to Cart
-            </Button>
-          </Box>
-          <Button variant="contained" color="secondary" fullWidth onClick={() => {/* buy logic */}}>
-            Buy with shop&nbsp;Pay
-          </Button>
-          <Box component="ul" sx={{ pl: 2, mb: 3 }}>
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: { xs: 15, sm: 16 },
+              lineHeight: 1.25,
+              mb: 1.5,
+              color: 'text.secondary',
+              textAlign: 'left',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {product.description || " "}
+          </Typography>
+          <Box component="ul" sx={{ pl: 0, mb: 1.5, listStyle: 'none' }}>
             {product.attributes.map((attr) => (
-              <Typography component="li" variant="body2" key={attr.label} sx={{ mb: 0.5 }}>
+              <Typography component="li" variant="body2" key={attr.label} sx={{ mb: 1.2, fontWeight: 600 }}>
                 <strong>{attr.label}:</strong> {attr.value}
               </Typography>
             ))}
           </Box>
           {product.colors.length > 0 && (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>Color</Typography>
-              <Select
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-                size="small"
-              >
-                {product.colors.map((color) => (
-                  <MenuItem value={color} key={color}>
-                    {color}
-                  </MenuItem>
-                ))}
-              </Select>
-            </Box>
-          )}
-          {product.sizes.length > 0 && (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>Size</Typography>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {product.sizes.map((size) => (
-                  <Button
-                    key={size}
-                    variant={selectedSize === size ? 'contained' : 'outlined'}
-                    onClick={() => setSelectedSize(size)}
-                    size="small"
-                    sx={{
-                      minWidth: 48,
-                      px: 2,
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {size}
-                  </Button>
-                ))}
+            <Box sx={{ mb: 1.5 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, textAlign: 'left' }}>Колір</Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                {product.colors.map((color) => {
+                  const selected = selectedColor === color;
+                  return (
+                    <Box
+                      key={color}
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: '50%',
+                        border: selected ? '3px solid #34C759' : '2px solid #eee',
+                        background: color,
+                        cursor: 'pointer',
+                        boxShadow: selected ? '0 2px 8px 0 rgba(46,204,113,0.15)' : undefined,
+                        mr: 2,
+                        mb: 1,
+                      }}
+                      onClick={() => setSelectedColor(color)}
+                    />
+                  );
+                })}
               </Box>
             </Box>
           )}
+          {product.sizes.length > 0 && (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 4 }}>
+        <Typography
+          variant="subtitle2"
+          sx={{
+            textAlign: 'left',
+            fontWeight: 500,
+            fontSize: 15,
+          }}
+        >
+          Розмір
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {product.sizes.map((size) => (
+            <Button
+              key={size}
+              variant="text"
+              onClick={() => setSelectedSize(size)}
+              sx={{
+                minWidth: 44,
+                height: 44,
+                borderRadius: 1,
+                px: 0,
+                fontWeight: 600,
+                fontSize: 15,
+                border: selectedSize === size ? '2px solid #222' : '1.5px solid #e3e3e3',
+                background: '#fff',
+                color: '#222',
+                mr: 0,
+                mb: 0,
+                textTransform: 'none',
+                '&:hover': {
+                  border: selectedSize === size ? '2px solid #222' : '1.5px solid #e3e3e3',
+                  background: '#fff',
+                },
+              }}
+            >
+              {size}
+            </Button>
+          ))}
+        </Box>
+      </Box>
+    )}
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              height: 48,
+              fontSize: 17,
+              borderRadius: 1,
+              fontWeight: 700,
+              py: 0,
+              mt: 0,
+              mb: 2,
+              backgroundColor: '#229ED9',
+              color: '#fff',
+              boxShadow: '0 3px 12px 0 rgba(34,158,217,0.15)',
+              textTransform: 'none',
+              width: '100%'
+            }}
+            startIcon={
+              <svg viewBox="0 0 240 240" width="24" height="24" fill="none"><circle cx="120" cy="120" r="120" fill="#229ED9"/><path d="M62.6 123.7c44.3-18.6 73.8-30.8 88.6-36.7 42.2-16.6 51.1-19.5 56.7-19.6 1.3 0 4.1.3 6 1.8 1.6 1.3 2 3 2.2 4.2.2 1.2.5 3.9.3 6-2.6 27-13.9 92.8-19.6 123.1-2.4 12.5-7.1 16.7-11.7 17.1-9.9.9-17.4-6.6-27-13-15-10.2-23.5-16.6-38.1-26.5-16.8-11-5.9-17.1 3.7-27.1 2.6-2.6 46.8-42.9 47.7-46.5.1-.5.2-2.5-.9-3.5s-2.4-.7-3.5-.5c-1.5.4-24.9 15.8-70.2 46-6.6 4.5-12.7 6.7-18.2 6.6-6-.1-17.5-3.4-26.1-6.2-10.6-3.4-19.1-5.2-18.4-11 .3-2.3 3.1-4.6 8.5-6.8z" fill="#fff"/></svg>
+            }
+          >
+            ЗАМОВИТИ
+          </Button>
+          </Box>
         </Grid>
         </Grid>
       </Box>
