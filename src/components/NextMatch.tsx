@@ -101,17 +101,28 @@ const NextMatch = () => {
 
       const now = new Date();
 
-      // знайти перший матч у майбутньому
-      const upcomingMatches = matches.filter(m => m.date && m.time);
-      let upcoming = upcomingMatches.find(m => new Date(`${m.date}T${m.time}+03:00`) > now);
+      // знайти всі майбутні матчі
+      const upcomingMatches = matches.filter(m => m.date && m.time && new Date(`${m.date}T${m.time}+03:00`) > now);
+      let upcoming = upcomingMatches[0];
 
-      // якщо нема — взяти останній зіграний
-      if (!upcoming) {
-        upcoming = matches[matches.length - 1];
+      // знайти останній завершений матч
+      const finishedMatches = matches.filter(m => m.date && m.time && new Date(`${m.date}T${m.time}+03:00`) <= now);
+      let lastFinished = finishedMatches.length > 0 ? finishedMatches[finishedMatches.length - 1] : null;
+
+      // Якщо є завершений матч < 48 годин тому — показуємо його
+      if (lastFinished) {
+        const finishedTime = new Date(`${lastFinished.date}T${lastFinished.time}+03:00`);
+        const timeSinceFinish = now.getTime() - finishedTime.getTime();
+        if (timeSinceFinish < 2 * 24 * 60 * 60 * 1000) {
+          setData(lastFinished);
+          setMatchDate(finishedTime);
+          return;
+        }
       }
 
-      setData(upcoming);
-      if (upcoming?.date && upcoming?.time) {
+      // Інакше показуємо наступний матч
+      if (upcoming) {
+        setData(upcoming);
         const dateTimeString = `${upcoming.date}T${upcoming.time}+03:00`;
         const parsedDate = new Date(dateTimeString);
         if (!isNaN(parsedDate.getTime())) {
