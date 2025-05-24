@@ -213,13 +213,7 @@ const ProductDetailPage: React.FC = () => {
           </Box>
         </Grid>
         {/* Product Info */}
-        <Grid item xs={12} md={6}>
-          <Box sx={{
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'stretch'
-    }}>
+        <Grid item xs={12} md={6} sx={{ minWidth: 320 }}>
           {/* BIG TITLE */}
           <Typography
             variant="h4"
@@ -353,7 +347,6 @@ const ProductDetailPage: React.FC = () => {
               color: '#fff',
               boxShadow: '0 3px 12px 0 rgba(34,158,217,0.15)',
               textTransform: 'none',
-              width: '100%'
             }}
             startIcon={
               <svg viewBox="0 0 240 240" width="24" height="24" fill="none"><circle cx="120" cy="120" r="120" fill="#229ED9"/><path d="M62.6 123.7c44.3-18.6 73.8-30.8 88.6-36.7 42.2-16.6 51.1-19.5 56.7-19.6 1.3 0 4.1.3 6 1.8 1.6 1.3 2 3 2.2 4.2.2 1.2.5 3.9.3 6-2.6 27-13.9 92.8-19.6 123.1-2.4 12.5-7.1 16.7-11.7 17.1-9.9.9-17.4-6.6-27-13-15-10.2-23.5-16.6-38.1-26.5-16.8-11-5.9-17.1 3.7-27.1 2.6-2.6 46.8-42.9 47.7-46.5.1-.5.2-2.5-.9-3.5s-2.4-.7-3.5-.5c-1.5.4-24.9 15.8-70.2 46-6.6 4.5-12.7 6.7-18.2 6.6-6-.1-17.5-3.4-26.1-6.2-10.6-3.4-19.1-5.2-18.4-11 .3-2.3 3.1-4.6 8.5-6.8z" fill="#fff"/></svg>
@@ -361,7 +354,6 @@ const ProductDetailPage: React.FC = () => {
           >
             ЗАМОВИТИ
           </Button>
-          </Box>
         </Grid>
         </Grid>
       </Box>
