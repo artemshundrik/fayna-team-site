@@ -224,10 +224,10 @@ const ProductDetailPage: React.FC = () => {
                 mb: 1.5,
                 color: 'text.secondary',
                 textAlign: 'left',
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
+                // display: '-webkit-box',
+                // WebkitLineClamp: 3,
+                // WebkitBoxOrient: 'vertical',
+                // overflow: 'hidden',
               }}
             >
               {product.description || " "}
