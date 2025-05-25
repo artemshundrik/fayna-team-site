@@ -54,23 +54,20 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
 
   if (players.length === 0) {
     if (loading) {
-      // show grid of skeletons
+      // show stack of skeletons
       return (
         <Box
           sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-            columnGap: theme.spacing(2),
-            rowGap: theme.spacing(2.5),
-            justifyItems: 'center',
-            width: '100%',
-            maxWidth: '100%',
-            m: 0,
-            p: 0,
+            display: { xs: 'flex', sm: 'grid' },
+            flexDirection: { xs: 'column', sm: 'initial' },
+            px: { xs: 1, sm: 'initial' },
+            gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+            rowGap: { sm: theme.spacing(2.5) },
+            justifyItems: { sm: 'center' },
           }}
         >
           {Array.from({ length: 6 }).map((_, idx) => (
-            <Box key={idx} sx={{ width: '100%', maxWidth: 280 }}>
+            <Box key={idx} sx={{ width: '100%', maxWidth: 280, mb: { xs: idx < 5 ? 2.5 : 0, sm: 0 } }}>
               <Skeleton variant="rectangular" width="100%" height={160} />
               <Skeleton variant="text" width="60%" />
               <Skeleton variant="text" width="40%" />
@@ -85,18 +82,16 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
   return (
     <Box
       sx={{
-        display: 'grid',
-        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-        columnGap: theme.spacing(2),
-        rowGap: theme.spacing(2.5),
-        justifyItems: 'center',
-        width: '100%',
-        maxWidth: '100%',
-        m: 0,
-        p: 0,
+        display: { xs: 'flex', sm: 'grid' },
+        flexDirection: { xs: 'column', sm: 'initial' },
+        px: { xs: 0, sm: 'initial' },
+        gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+        rowGap: { sm: theme.spacing(2.5) },
+        justifyItems: { sm: 'center' },
+        gap: 0,
       }}
     >
-      {players.map((player: Player) => (
+      {players.map((player: Player, index: number) => (
         <PlayerCard
           key={player.number}
           name={`${player.first_name} ${player.last_name}`}
@@ -110,6 +105,7 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
           yellowCards={player.yellow_cards}
           redCards={player.red_cards}
           saves={player.saves}
+          sx={{ mb: { xs: index < players.length - 1 ? 2.5 : 0, sm: 0 } }}
         />
       ))}
     </Box>

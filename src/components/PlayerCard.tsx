@@ -160,6 +160,104 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     fetchStats();
   }, [number]);
 
+  if (isMobile) {
+    const [firstName, ...rest] = name.split(' ');
+    const lastName = rest.join(' ');
+    return (
+      <Link to={`/player/${number}`} style={{ textDecoration: 'none' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            background: '#fff',
+            borderRadius: 1,
+            px: 0,
+            py: 1,
+            mb: 1.3,
+            minHeight: 92,
+            width: '100%',
+            cursor: 'pointer',
+            border: theme => `1.5px solid ${theme.palette.grey[100]}`,
+            position: 'relative',
+          }}
+        >
+          <Box sx={{ flexGrow: 1, minWidth: 0, pl: 2 }}>
+            <Typography
+              sx={{
+                fontSize: 28,
+                color: theme => theme.palette.grey[400],
+                fontWeight: 600,
+                lineHeight: 1,
+                minWidth: 34,
+                mr: 2,
+                fontFamily: 'FixelDisplay, sans-serif',
+                letterSpacing: 0.5,
+                textShadow: '0 1px 0 #fff5, 0 1px 6px #eee8'
+              }}
+            >
+              {number}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
+              <Typography
+                component="span"
+                sx={{
+                  fontWeight: 500,
+                  fontSize: 15,
+                  color: '#232323',
+                  mr: 0.5,
+                  fontFamily: 'FixelDisplay, sans-serif',
+                }}
+              >
+                {firstName}
+              </Typography>
+              <Typography
+                component="span"
+                sx={{
+                  fontWeight: 900,
+                  fontSize: 18,
+                  color: '#111',
+                  fontFamily: 'FixelDisplay, sans-serif',
+                }}
+              >
+                {lastName}
+              </Typography>
+            </Box>
+            <Typography
+              sx={{
+                fontSize: 12,
+                color: theme => theme.palette.primary.main,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: 0.3,
+                mt: 0.2,
+                fontFamily: 'FixelDisplay, sans-serif',
+              }}
+            >
+              {position}
+            </Typography>
+          </Box>
+          <Box sx={{ width: 72, height: 88, minWidth: 72, ml: 2, px: 2, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Box
+              component="img"
+              src={photoUrl ? `/images/players/${photoUrl}` : '/images/player-placeholder.png'}
+              alt={name}
+              sx={{
+                width: 72,
+                height: 88,
+                objectFit: 'contain',
+                borderRadius: '50%',
+                boxShadow: 'none',
+                background: 'none',
+                border: 'none',
+              }}
+            />
+          </Box>
+        </Box>
+      </Link>
+    );
+  }
+
   return (
     <Link to={`/player/${number}`} style={{ textDecoration: 'none' }}>
       <StyledCard
