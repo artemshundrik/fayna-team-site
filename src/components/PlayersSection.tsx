@@ -25,7 +25,7 @@ const SafeImage: React.FC<{ src: string; alt: string; className?: string }> = ({
         width: '100%',
         height: '100%',
         objectFit: 'contain',
-        objectPosition: 'center',
+        objectPosition: 'bottom',
       }}
     />
   );
@@ -212,8 +212,8 @@ const PlayersSection: React.FC = () => {
                   key={p.number}
                   data-player-index={index}
                   sx={{
-                    flex: '0 0 80%',
-                    maxWidth: 360,
+                    flex: { xs: '0 0 72%', sm: '0 0 360px', md: '0 0 360px' },
+                    maxWidth: { xs: '72%', sm: 360, md: 360 },
                     scrollSnapAlign: 'center',
                     opacity: visibleCards[index] ? 1 : 0,
                     transform: visibleCards[index] ? 'translateY(0)' : 'translateY(20px)',
