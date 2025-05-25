@@ -24,9 +24,15 @@ type PlayersListProps = {
   position?: string;
 };
 
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px);}
-  to { opacity: 1; transform: translateY(0);}
+const fadeSlideUp = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `;
 
 const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
@@ -57,11 +63,17 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
     fetchPlayers();
   }, [position]);
 
+  if (loading) {
+    return <Box sx={{ minHeight: '100vh' }} />;
+  }
+
   if (players.length === 0) {
     return null;
   }
 
-  const getAnimationDelay = (index: number) => `${index * 60}ms`;
+  const animationDuration = '0.5s';
+  const animationEasing = 'cubic-bezier(0.4, 0, 0.2, 1)';
+  const getAnimationDelay = (index: number) => `${index * 80}ms`;
 
   return (
     <Box
@@ -90,8 +102,8 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
           redCards={player.red_cards}
           saves={player.saves}
           sx={{
-            mb: { xs: index < players.length - 1 ? 2.5 : 0, sm: 0 },
-            animation: `${fadeIn} 0.7s cubic-bezier(0.22, 1, 0.36, 1)`,
+            mb: { xs: index < players.length - 1 ? 2 : 0, sm: 0 },
+            animation: `${fadeSlideUp} ${animationDuration} ${animationEasing}`,
             animationDelay: getAnimationDelay(index),
             animationFillMode: 'both',
           }}
