@@ -5,6 +5,7 @@ import { Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { supabase } from '../supabase'; // make sure this path is correct
+import { keyframes } from '@emotion/react';
 
 
 const StyledLink = styled(Link)`
@@ -68,10 +69,16 @@ const ContentWrapper = styled.div`
   padding: 2rem;
 `;
 
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
 function Fanshop() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [selectedSizeIndex, setSelectedSizeIndex] = useState<number | null>(null);
   const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -88,6 +95,7 @@ function Fanshop() {
         console.log('Fetched products from Supabase:', data);
         if (isMounted) setProducts(data || []);
       }
+      if (isMounted) setLoading(false);
     };
 
     fetchProducts();
@@ -96,6 +104,15 @@ function Fanshop() {
       isMounted = false;
     };
   }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        {/* Твої хедер, футер і заглушка */}
+        <Box sx={{ minHeight: '100vh' }} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -155,6 +172,11 @@ function Fanshop() {
                 setHoveredIndex={setHoveredIndex}
                 selectedSizeIndex={selectedSizeIndex}
                 setSelectedSizeIndex={setSelectedSizeIndex}
+                sx={{
+                  animation: `${fadeIn} 0.7s cubic-bezier(0.22, 1, 0.36, 1)`,
+                  animationDelay: `${i * 50}ms`,
+                  animationFillMode: 'both',
+                }}
               />
             ))
           }

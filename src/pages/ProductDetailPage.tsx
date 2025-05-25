@@ -73,7 +73,17 @@ const ProductDetailPage: React.FC = () => {
     }
   }, [product]);
 
-  if (loading) return <Typography>Завантаження...</Typography>;
+  if (loading) {
+    return (
+      <Layout>
+        <Box sx={{ p: { xs: 2, md: 8 }, display: 'flex', justifyContent: 'center', px: { xs: 2, md: 0 } }}>
+          <Box sx={{ maxWidth: 1300, width: '100%' }}>
+            <Box sx={{ width: '100%', minHeight: '100vh' }} />
+          </Box>
+        </Box>
+      </Layout>
+    );
+  }
   if (!product) return <Typography>Товар не знайдено</Typography>;
 
   const prevImage = () => {

@@ -9,7 +9,8 @@ import {
   CardActions,
   Box,
   Typography,
-  Button
+  Button,
+  SxProps
 } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
@@ -34,6 +35,7 @@ interface Product {
 
 interface ProductCardProps {
   product: Product;
+  sx?: SxProps;
 }
 
 /* ---------- Styled Components ---------- */
@@ -77,7 +79,8 @@ const FadeImage = styled(CardMedia, {
 
 /* ---------- Component ---------- */
 const ProductCard: React.FC<ProductCardProps> = ({
-  product
+  product,
+  sx
 }) => {
   const [hover, setHover] = useState(false);
   const [loadedSecondary, setLoadedSecondary] = useState(false);
@@ -103,11 +106,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
   );
 
   return (
-    <Box sx={{ width: '100%', p: 0 }}>
+    <Box sx={{ width: '100%', p: 0, ...(sx as object) }}>
       <StyledCard
         role="group"
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
+        sx={{ width: '100%', height: '100%' }}
       >
         {/* ======== IMAGE & ACTION AREA ======== */}
         <CardActionArea
