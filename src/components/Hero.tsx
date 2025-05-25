@@ -20,7 +20,11 @@ const Section = styled.section`
     height: 75svh;
     padding: 0 1rem;
     justify-content: flex-end;
+    background-image: url('/images/hero-team-photo-mobile.png');
+    background-size: contain;
     background-position: center top;
+    background-repeat: no-repeat;
+    background-color: #181818;
   }
 
   &::before {
@@ -174,6 +178,13 @@ const SocialBox = styled.a<{ $bigger?: boolean }>`
     transition: opacity 0.3s ease, transform 0.6s ease;
     display: block;
     margin: 0 auto;
+  }
+
+  @media (max-width: 600px) {
+    img {
+      max-width: 145px;
+      max-height: 60px;
+    }
   }
 
   &:hover img {
