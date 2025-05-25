@@ -313,9 +313,9 @@ const ProductDetailPage: React.FC = () => {
               variant="contained"
               fullWidth
               sx={{
-                height: 48,
-                fontSize: 17,
+                fontSize: 18,
                 borderRadius: 1,
+                minHeight: 56,
                 fontWeight: 700,
                 py: 0,
                 mt: 0,
