@@ -11,7 +11,7 @@ const Home = () => (
     <Hero />
     <Fixtures />
     <NextMatch />
-    <PlayersSection />
+    {/* <PlayersSection /> */}
     {/* <InstagramSection /> */}
   </Layout>
 );

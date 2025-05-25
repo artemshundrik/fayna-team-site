@@ -37,9 +37,6 @@ const NavLinks = ({ onClick }: { onClick?: () => void }) => (
     <Link to="/matches" style={{ textDecoration: 'none' }} onClick={onClick}>
       <Typography variant="navLink">Матчі</Typography>
     </Link>
-    <Link to="#" style={{ textDecoration: 'none' }} onClick={onClick}>
-      <Typography variant="navLink">Про нас</Typography>
-    </Link>
   </>
 );
 
