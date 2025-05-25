@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import PlayerCard from './PlayerCard';
 import { Box } from '@mui/material';
-import Skeleton from '@mui/material/Skeleton';
 import { useTheme } from '@mui/material/styles';
+import { keyframes } from '@emotion/react';
 
 type Player = {
   first_name: string;
@@ -23,6 +23,11 @@ type Player = {
 type PlayersListProps = {
   position?: string;
 };
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px);}
+  to { opacity: 1; transform: translateY(0);}
+`;
 
 const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -53,31 +58,10 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
   }, [position]);
 
   if (players.length === 0) {
-    if (loading) {
-      // show stack of skeletons
-      return (
-        <Box
-          sx={{
-            display: { xs: 'flex', sm: 'grid' },
-            flexDirection: { xs: 'column', sm: 'initial' },
-            px: { xs: 1, sm: 'initial' },
-            gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-            rowGap: { sm: theme.spacing(2.5) },
-            justifyItems: { sm: 'center' },
-          }}
-        >
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <Box key={idx} sx={{ width: '100%', maxWidth: 280, mb: { xs: idx < 5 ? 2.5 : 0, sm: 0 } }}>
-              <Skeleton variant="rectangular" width="100%" height={160} />
-              <Skeleton variant="text" width="60%" />
-              <Skeleton variant="text" width="40%" />
-            </Box>
-          ))}
-        </Box>
-      );
-    }
-    return <div style={{ textAlign: 'center', marginTop: '3rem' }}>Немає гравців 😕</div>;
+    return null;
   }
+
+  const getAnimationDelay = (index: number) => `${index * 60}ms`;
 
   return (
     <Box
@@ -105,7 +89,12 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
           yellowCards={player.yellow_cards}
           redCards={player.red_cards}
           saves={player.saves}
-          sx={{ mb: { xs: index < players.length - 1 ? 2.5 : 0, sm: 0 } }}
+          sx={{
+            mb: { xs: index < players.length - 1 ? 2.5 : 0, sm: 0 },
+            animation: `${fadeIn} 0.7s cubic-bezier(0.22, 1, 0.36, 1)`,
+            animationDelay: getAnimationDelay(index),
+            animationFillMode: 'both',
+          }}
         />
       ))}
     </Box>

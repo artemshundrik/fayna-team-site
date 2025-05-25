@@ -1,9 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Card, CardMedia, Typography, useTheme, styled, Skeleton } from '@mui/material';
+import { Box, Card, CardMedia, Typography, useTheme, styled } from '@mui/material';
 import { alpha } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import { supabase } from '../supabase';
+
+const fadeIn = keyframes`
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
 function getUkrainianYears(age: number): string {
   const lastDigit = age % 10;
@@ -37,12 +42,8 @@ type PlayerCardProps = {
   yellowCards?: number;
   redCards?: number;
   saves?: number;
+  sx?: object;
 };
-
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
 
 const StyledCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== 'isMobile',
@@ -88,6 +89,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   photoUrl,
   photoComponent,
   birthDate,
+  sx,
 }) => {
   const theme = useTheme();
   const [hover, setHover] = React.useState(false);
@@ -180,6 +182,8 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             cursor: 'pointer',
             border: theme => `1.5px solid ${theme.palette.grey[100]}`,
             position: 'relative',
+            animation: `${fadeIn} 0.7s cubic-bezier(0.22, 1, 0.36, 1)`,
+            ...sx
           }}
         >
           <Box sx={{ flexGrow: 1, minWidth: 0, pl: 2 }}>
@@ -290,17 +294,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
                 borderRadius: 0,
               }}
             />
-          ) : (
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={isMobile ? 380 : 460}
-              animation="wave"
-              sx={{
-                bgcolor: 'grey.800',
-              }}
-            />
-          )
+          ) : null
         )}
         <Box
           sx={{
