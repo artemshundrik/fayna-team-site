@@ -96,10 +96,9 @@ const FooterLinks = () => {
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           <Link href="/" sx={(theme) => footerLinkStyle(theme)}>ГОЛОВНА</Link>
-          <Link href="/squad" sx={(theme) => footerLinkStyle(theme)}>СКЛАД</Link>
+          <Link href="/squad" sx={(theme) => footerLinkStyle(theme)}>КОМАНДА</Link>
           <Link href="/fanshop" sx={(theme) => footerLinkStyle(theme)}>ФАНШОП</Link>
           <Link href="/matches" sx={(theme) => footerLinkStyle(theme)}>МАТЧІ</Link>
-          <Link href="/about" sx={(theme) => footerLinkStyle(theme)}>ПРО НАС</Link>
         </Box>
       </Box>
     </Box>
@@ -116,18 +115,6 @@ const FooterContacts = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 400, fontSize: '0.95rem' }}>
           <LocationOnIcon fontSize="small" />
           вул. Салютна 2, ЖК Файна Таун
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 400, fontSize: '0.95rem' }}>
-          <PhoneIcon fontSize="small" />
-          +380 44 123 4567
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontWeight: 400, fontSize: '0.95rem' }}>
-          <EmailIcon fontSize="small" />
-          <Link href="mailto:info@faynateam.com" sx={(theme) => ({
-            color: theme.palette.primary.main,
-            textDecoration: 'none',
-            '&:hover': { textDecoration: 'underline' }
-          })}>info@faynateam.com</Link>
         </Box>
       </Box>
     </Box>
@@ -197,7 +184,7 @@ const Footer = () => {
         backgroundColor: theme.palette.common.black,
         color: theme.palette.common.white,
         py: 4,
-        px: 2,
+        px: 0,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -220,8 +207,8 @@ const Footer = () => {
           }}
         >
           <FooterLinks />
-          <FooterContacts />
           <FooterSocial />
+          <FooterContacts />
         </Box>
       </Container>
 
