@@ -1,7 +1,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress, Grid } from '@mui/material';
+import { Box, Typography, CircularProgress, Grid, Stack } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { supabase } from '../supabase';
 import Layout from '../layout/Layout';
@@ -35,6 +36,8 @@ const PlayerProfile = () => {
 
   const [prevPlayer, setPrevPlayer] = useState<{ number: number; first_name: string; last_name: string } | null>(null);
   const [nextPlayer, setNextPlayer] = useState<{ number: number; first_name: string; last_name: string } | null>(null);
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     const fetchPlayer = async () => {
@@ -104,12 +107,13 @@ const PlayerProfile = () => {
           sx={{
             position: 'relative',
             width: '100vw',
-            height: { xs: '60vh', md: '80vh' },
+            height: { xs: '40vh', md: '80vh' },
+            minHeight: { xs: 300, md: 700 },
             background: `
               repeating-linear-gradient(
                 135deg,
-                rgba(255,255,255,0.06) 0,
-                rgba(255,255,255,0.06) 2px,
+                rgba(255,255,255,0.02) 0,
+                rgba(255,255,255,0.02) 2px,
                 transparent 2px,
                 transparent 6px
               ),
@@ -119,7 +123,7 @@ const PlayerProfile = () => {
             justifyContent: 'center',
             color: theme.palette.common.white,
             textAlign: 'center',
-            overflow: 'hidden',
+            overflow: 'visible',
             margin: 0,
             padding: 0,
           }}
@@ -146,17 +150,15 @@ const PlayerProfile = () => {
                 ...fadeIn,
                 animation: 'fadeInUp 1.2s ease-out forwards',
                 opacity: 0,
-                maxHeight: { xs: 400, md: 600 },
+                maxHeight: { xs: 260, md: 600 },
                 width: 'auto',
                 mx: 'auto',
                 display: 'block',
                 zIndex: 11,
                 bottom: 0,
                 position: 'absolute',
-                transform: {
-                  xs: 'translateY(0)',
-                  md: 'translateY(-50%)'
-                },
+                left: { xs: '45%', md: 'auto' },
+                transform: { xs: 'translateX(0)', md: 'translateX(-50%)' },
               }}
             />
 
@@ -179,13 +181,13 @@ const PlayerProfile = () => {
                 top: { xs: '50%', md: '50%' },
                 left: '50%',
                 transform: {
-                  xs: 'translate(-50%, 0)',
+                  xs: 'translate(-80%, 0)',
                   md: 'translate(-50%, -50%)'
                 },
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: { xs: 'center', md: 'flex-start' },
-                textAlign: { xs: 'center', md: 'left' },
+                alignItems: { xs: 'left', md: 'flex-start' },
+                textAlign: { xs: 'left', md: 'left' },
                 zIndex: 10,
                 px: 2,
               }}
@@ -193,13 +195,13 @@ const PlayerProfile = () => {
               <Typography
                 variant="subtitle1"
                 sx={{
-                  fontSize: { xs: '1.1rem', md: '1.6rem' },
+                  fontSize: { xs: '1.2rem', md: '1.6rem' },
                   fontWeight: 500,
                   letterSpacing: '0.05rem',
                   color: theme.palette.common.white,
                   textTransform: 'uppercase',
-                  mb: -4,
-                  textAlign: { xs: 'center', md: 'left' },
+                  mb: -1,
+                  textAlign: { xs: 'left', md: 'left' },
                 }}
               >
                 {player.first_name}
@@ -207,7 +209,7 @@ const PlayerProfile = () => {
               <Typography
                 variant="h1"
                 sx={{
-                  fontSize: { xs: '2.5rem', md: '10rem' },
+                  fontSize: { xs: '2rem', md: '7rem' },
                   fontWeight: 900,
                   letterSpacing: '-0.05rem',
                   background: `linear-gradient(to bottom, ${theme.palette.primary.main}, rgba(255, 51, 77, 0.4))`,
@@ -228,11 +230,13 @@ const PlayerProfile = () => {
                 width: '100%',
                 zIndex: 25,
                 px: { xs: 2, md: 4 },
-                pt: { xs: 6, md: 6 },
+                pt: { xs: 2, md: 6 },
+                mb: { xs: 3, md: 0 },
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 background: 'transparent',
+                pb: { xs: 7, md: 0 },
               }}
             >
               {prevPlayer && (
@@ -254,8 +258,8 @@ const PlayerProfile = () => {
                     },
                   }}
                 >
-                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <span style={{ color: theme.palette.primary.main }}>←</span>
+                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <span style={{ marginRight: 16, color: theme.palette.primary.main }}>←</span>
                     {prevPlayer.first_name} {prevPlayer.last_name}
                   </Box>
                 </Typography>
@@ -279,9 +283,9 @@ const PlayerProfile = () => {
                     },
                   }}
                 >
-                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center' }}>
                     {nextPlayer.first_name} {nextPlayer.last_name}
-                    <span style={{ color: theme.palette.primary.main }}>→</span>
+                    <span style={{ marginLeft: 16, color: theme.palette.primary.main }}>→</span>
                   </Box>
                 </Typography>
               )}
@@ -310,12 +314,12 @@ const PlayerProfile = () => {
         <Box
           sx={{
             background: `linear-gradient(180deg, ${theme.palette.grey[100]} 0%, ${theme.palette.grey[200]} 100%)`,
-            px: { xs: 2, md: 20 },
-            py: { xs: 2, md: 3 },
+            px: { xs: 3, md: 25 },
+            py: { xs: 1.5, md: 3 },
             width: '100%',
           }}
         >
-          <Grid container justifyContent="space-around">
+          <Grid container justifyContent="flex-start" spacing={{ xs: 3, md: 8 }}>
             {[
               { label: 'Матчі', key: 'matches' },
               { label: 'Голи', key: 'goals' },
@@ -332,9 +336,9 @@ const PlayerProfile = () => {
                   sm={3}
                   key={stat.label}
                   sx={{
-                    textAlign: 'left',
-                    py: { xs: 2, md: 3 },
-                    pr: { xs: 2, sm: 4, md: 6 },
+                    textAlign: { xs: 'left', md: 'left' },
+                    py: { xs: 0.5, md: 2 },
+                    pr: { xs: 3, sm: 4, md: 8 },
                   }}
                 >
                   <Typography
@@ -356,7 +360,7 @@ const PlayerProfile = () => {
                       fontWeight: 900,
                       lineHeight: 1,
                       fontFamily: 'MacPawFixelDisplay, sans-serif',
-                      fontSize: { xs: '2.8rem', sm: '3.6rem', md: '4.2rem' },
+                      fontSize: { xs: '2rem', sm: '3.6rem', md: '4.2rem' },
                     }}
                   >
                     {player[stat.key as keyof Player] ?? 0}
@@ -369,75 +373,138 @@ const PlayerProfile = () => {
         <Box
           sx={{
             backgroundColor: theme.palette.common.white,
-            px: { xs: 4, md: 25 },
-            py: { xs: 3, md: 4 },
+            px: { xs: 3, md: 25 },
+            py: { xs: 3, md: 3 },
             width: '100%',
           }}
         >
-          <Grid container spacing={18}>
-            {[
-              {
-                label: 'Номер',
-                value: number || '—',
-              },
-              {
-                label: 'Дата народження',
-                value: player.birth_date
-                  ? new Date(player.birth_date).toLocaleDateString('uk-UA', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : '—',
-              },
-              {
-                label: 'Вік',
-                value: player.birth_date
-                  ? Math.floor(
-                      (new Date().getTime() - new Date(player.birth_date).getTime()) /
-                        (1000 * 60 * 60 * 24 * 365.25)
-                    )
-                  : '—',
-              },
-              {
-                label: 'Позиція',
-                value: player.position || '—',
-              },
-            ].map((item) => (
-              <Grid
-                item
-                xs={12}
-                sm="auto"
-                key={item.label}
-                sx={{ textAlign: 'left', py: { xs: 2, md: 3 } }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: theme.palette.grey[500],
-                    fontWeight: 600,
-                    letterSpacing: '0.03rem',
-                    fontFamily: 'MacPawFixelDisplay, sans-serif',
-                    fontSize: { xs: '0.9rem', md: '1.1rem' },
-                    mb: 1,
-                  }}
+          {isMobile ? (
+            <Stack spacing={3} sx={{ width: '100%' }}>
+              {[
+                {
+                  label: 'Номер',
+                  value: number || '—',
+                },
+                {
+                  label: 'Дата народження',
+                  value: player.birth_date
+                    ? new Date(player.birth_date).toLocaleDateString('uk-UA', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    : '—',
+                },
+                {
+                  label: 'Вік',
+                  value: player.birth_date
+                    ? Math.floor(
+                        (new Date().getTime() - new Date(player.birth_date).getTime()) /
+                          (1000 * 60 * 60 * 24 * 365.25)
+                      )
+                    : '—',
+                },
+                {
+                  label: 'Позиція',
+                  value: player.position || '—',
+                },
+              ].map((item) => (
+                <Box
+                  key={item.label}
+                  sx={{ textAlign: 'left' }}
                 >
-                  {item.label}
-                </Typography>
-                <Typography
-                  variant="h2"
-                  sx={{
-                    fontWeight: 900,
-                    lineHeight: 1,
-                    fontFamily: 'MacPawFixelDisplay, sans-serif',
-                    fontSize: { xs: '0.9rem', sm: '0.9rem', md: '1.1rem' },
-                  }}
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: theme.palette.grey[500],
+                      fontWeight: 600,
+                      letterSpacing: '0.03rem',
+                      fontFamily: 'MacPawFixelDisplay, sans-serif',
+                      fontSize: { xs: '0.85rem', md: '1.1rem' },
+                      mb: 1,
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      fontFamily: 'MacPawFixelDisplay, sans-serif',
+                      fontSize: { xs: '0.95rem', sm: '0.95rem', md: '1.1rem' },
+                    }}
+                  >
+                    {item.value}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          ) : (
+            <Grid container spacing={12} justifyContent="flex-start" alignItems="center">
+              {[
+                {
+                  label: 'Номер',
+                  value: number || '—',
+                },
+                {
+                  label: 'Дата народження',
+                  value: player.birth_date
+                    ? new Date(player.birth_date).toLocaleDateString('uk-UA', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    : '—',
+                },
+                {
+                  label: 'Вік',
+                  value: player.birth_date
+                    ? Math.floor(
+                        (new Date().getTime() - new Date(player.birth_date).getTime()) /
+                          (1000 * 60 * 60 * 24 * 365.25)
+                      )
+                    : '—',
+                },
+                {
+                  label: 'Позиція',
+                  value: player.position || '—',
+                },
+              ].map((item) => (
+                <Grid
+                  item
+                  sm="auto"
+                  key={item.label}
+                  sx={{ textAlign: 'left' }}
                 >
-                  {item.value}
-                </Typography>
-              </Grid>
-            ))}
-          </Grid>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: theme.palette.grey[500],
+                      fontWeight: 600,
+                      letterSpacing: '0.03rem',
+                      fontFamily: 'MacPawFixelDisplay, sans-serif',
+                      fontSize: { xs: '0.85rem', md: '1.1rem' },
+                      mb: 0.5,
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      fontFamily: 'MacPawFixelDisplay, sans-serif',
+                      fontSize: { xs: '0.95rem', sm: '0.95rem', md: '1.1rem' },
+                    }}
+                  >
+                    {item.value}
+                  </Typography>
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Box>
       </Box>
     </Layout>
