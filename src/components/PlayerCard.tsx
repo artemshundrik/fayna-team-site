@@ -34,6 +34,7 @@ type PlayerCardProps = {
   position: string;
   number: number;
   photoUrl?: string;
+  hoverPhotoUrl?: string;
   photoComponent?: React.ReactNode;
   birthDate?: string;
   matches?: number;
@@ -87,6 +88,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   position,
   number,
   photoUrl,
+  hoverPhotoUrl,
   photoComponent,
   birthDate,
   sx,
@@ -106,6 +108,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
         year: 'numeric',
       })
     : '';
+
+  const basePhoto = photoUrl ?? '/images/player-placeholder.png';
+  const hoverPhoto = hoverPhotoUrl ?? null;
 
   const [overallStats, setOverallStats] = React.useState<{
     matches: number;
@@ -244,16 +249,16 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           <Box sx={{ width: 72, height: 88, minWidth: 72, ml: 2, px: 2, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             <Box
               component="img"
-              src={photoUrl ? `/images/players/${photoUrl}` : '/images/player-placeholder.png'}
+              src={hover && hoverPhoto ? hoverPhoto : basePhoto}
               alt={name}
+              onMouseEnter={() => hoverPhoto && setHover(true)}
+              onMouseLeave={() => hoverPhoto && setHover(false)}
               sx={{
                 width: 72,
                 height: 88,
                 objectFit: 'contain',
                 borderRadius: '50%',
-                boxShadow: 'none',
-                background: 'none',
-                border: 'none',
+                transition: 'opacity 0.4s ease',
               }}
             />
           </Box>
@@ -277,24 +282,20 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
         background: 'repeating-linear-gradient(155deg, rgba(255,255,255,0.02) 0 6px, transparent 6px 18px), linear-gradient(145deg, #242424 0%, #020202 100%)',
       }}>
         {photoComponent || (
-          photoUrl ? (
-            <CardMedia
-              component="img"
-              image={`/images/players/${photoUrl}`}
-              alt={name}
-              sx={{
-                position: 'relative',
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                objectPosition: 'center',
-                transition: 'transform 0.4s ease',
-                transform: hover ? 'scale(1.05)' : 'scale(1)',
-                transformOrigin: 'center center',
-                borderRadius: 0,
-              }}
-            />
-          ) : null
+          <Box
+            component="img"
+            src={hover && hoverPhoto ? hoverPhoto : basePhoto}
+            alt={name}
+            onMouseEnter={() => hoverPhoto && setHover(true)}
+            onMouseLeave={() => hoverPhoto && setHover(false)}
+            sx={{
+              width: isMobile ? 72 : '100%',
+              height: isMobile ? 88 : '100%',
+              objectFit: 'contain',
+              borderRadius: isMobile ? '50%' : 0,
+              transition: 'opacity 0.4s ease',
+            }}
+          />
         )}
         <Box
           sx={{

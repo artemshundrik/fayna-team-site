@@ -11,6 +11,7 @@ type Player = {
   position: string;
   number: number;
   photo: string;
+  hover_photo?: string;
   birth_date: string;
   matches: number;
   goals: number;
@@ -93,7 +94,8 @@ const PlayersList: React.FC<PlayersListProps> = ({ position }) => {
           name={`${player.first_name} ${player.last_name}`}
           position={player.position}
           number={player.number}
-          photoUrl={player.photo.replace('images/players/', '')}
+          photoUrl={player.photo}
+          hoverPhotoUrl={player.hover_photo}
           birthDate={player.birth_date}
           matches={player.matches}
           goals={player.goals}
