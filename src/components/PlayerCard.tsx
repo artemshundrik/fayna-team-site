@@ -81,6 +81,7 @@ const HoverOverlay = styled(Box)(({ theme }) => ({
   paddingLeft: theme.spacing(4),
   paddingRight: theme.spacing(4),
   paddingBottom: theme.spacing(4),
+  pointerEvents: 'none',
 }));
 
 const PlayerCard: React.FC<PlayerCardProps> = ({
@@ -251,8 +252,6 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
               component="img"
               src={hover && hoverPhoto ? hoverPhoto : basePhoto}
               alt={name}
-              onMouseEnter={() => hoverPhoto && setHover(true)}
-              onMouseLeave={() => hoverPhoto && setHover(false)}
               sx={{
                 width: 72,
                 height: 88,
@@ -279,15 +278,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
         overflow: 'hidden',
         height: isMobile ? 380 : 460,
         aspectRatio: isMobile ? undefined : '480 / 580',
-        background: 'repeating-linear-gradient(155deg, rgba(255,255,255,0.02) 0 6px, transparent 6px 18px), linear-gradient(145deg, #242424 0%, #020202 100%)',
+        background: 'linear-gradient(145deg, #242424 0%, #020202 100%)',
       }}>
         {photoComponent || (
           <Box
             component="img"
             src={hover && hoverPhoto ? hoverPhoto : basePhoto}
             alt={name}
-            onMouseEnter={() => hoverPhoto && setHover(true)}
-            onMouseLeave={() => hoverPhoto && setHover(false)}
             sx={{
               width: isMobile ? 72 : '100%',
               height: isMobile ? 88 : '100%',
