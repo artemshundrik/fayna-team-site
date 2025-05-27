@@ -109,15 +109,7 @@ const PlayerProfile = () => {
             width: '100vw',
             height: { xs: '40vh', md: '80vh' },
             minHeight: { xs: 300, md: 700 },
-            background: `
-              repeating-linear-gradient(
-                135deg,
-                rgba(255,255,255,0.02) 0,
-                rgba(255,255,255,0.02) 2px,
-                transparent 2px,
-                transparent 6px
-              ),
-              linear-gradient(180deg, rgb(37, 37, 37) 0%, rgb(16, 16, 17) 100%)`,
+            background: 'linear-gradient(180deg, rgb(37, 37, 37) 0%, rgb(16, 16, 17) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -374,7 +366,7 @@ const PlayerProfile = () => {
           sx={{
             backgroundColor: theme.palette.common.white,
             px: { xs: 3, md: 25 },
-            py: { xs: 3, md: 3 },
+            py: { xs: 6, md: 8 },
             width: '100%',
           }}
         >
