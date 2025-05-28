@@ -7,7 +7,7 @@ const Section = styled.section`
   position: relative;
   height: 100svh;
   box-sizing: border-box;
-  background-image: url('/images/hero-team-photo.webp');
+  background-image: url('/images/hero-team-photo.png');
   background-size: cover;
   background-position: center 20%;
   display: flex;
@@ -20,7 +20,7 @@ const Section = styled.section`
     height: 75svh;
     padding: 0 1rem;
     justify-content: flex-end;
-    background-image: url('/images/hero-team-photo-mobile.webp');
+    background-image: url('/images/hero-team-photo-mobile.png');
     background-size: contain;
     background-position: center top;
     background-repeat: no-repeat;
