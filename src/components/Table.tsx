@@ -97,7 +97,7 @@ const columns: Column[] = [
       setLoading(true);
       const { data, error } = await supabase
         .from('teams')
-        .select('id, name, logo, is_our_team, games_played, wins, draws, losses, goals_for, goals_against, form')
+        .select('id, name, logo, is_our_team, games_played, wins, draws, losses, goals_for, goals_against, form, url')
         .returns<Database['public']['Tables']['teams']['Row'][]>();
       if (error) {
         console.error('Error fetching teams:', error);
@@ -250,7 +250,9 @@ const columns: Column[] = [
                   : teams.map((team, idx) => (
                       <TableRow
                         key={idx}
+                        onClick={() => window.location.href = `https://r-cup.com.ua/teams/${team.id}`}
                         sx={{
+                          cursor: 'pointer',
                           backgroundColor: idx % 2 === 0 ? theme.palette.grey[100] : theme.palette.common.white,
                           borderLeft: team.is_our_team ? `4px solid ${theme.palette.primary.main}` : 'none',
                         }}
@@ -300,22 +302,53 @@ const columns: Column[] = [
                                 >
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     <img src={team.logo || ''} alt={team.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                                    <Box
-                                      component="span"
-                                      sx={{
-                                        fontSize: {
-                                          xs: '0.85rem',
-                                          sm: theme.typography.body1.fontSize
-                                        },
-                                        fontWeight: team.is_our_team ? theme.typography.fontWeightMedium : theme.typography.fontWeightMedium,
-                                        ml: 0,
-                                        color: team.is_our_team ? theme.palette.primary.main : 'inherit',
-                                        textShadow: team.is_our_team ? `0 0 1px ${theme.palette.primary.main}` : 'none',
-                                        fontFamily: theme.typography.fontFamily,
-                                      }}
-                                    >
-                                      {team.name}
-                                    </Box>
+                                    {team.url ? (
+                                      <a
+                                        href={team.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                          display: 'inline-block',
+                                          textDecoration: 'none',
+                                          color: 'inherit',
+                                        }}
+                                        onClick={e => e.stopPropagation()}
+                                      >
+                                        <Box
+                                          component="span"
+                                          sx={{
+                                            fontSize: {
+                                              xs: '0.85rem',
+                                              sm: theme.typography.body1.fontSize
+                                            },
+                                            fontWeight: team.is_our_team ? theme.typography.fontWeightMedium : theme.typography.fontWeightMedium,
+                                            ml: 0,
+                                            color: team.is_our_team ? theme.palette.primary.main : 'inherit',
+                                            textShadow: team.is_our_team ? `0 0 1px ${theme.palette.primary.main}` : 'none',
+                                            fontFamily: theme.typography.fontFamily,
+                                          }}
+                                        >
+                                          {team.name}
+                                        </Box>
+                                      </a>
+                                    ) : (
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          fontSize: {
+                                            xs: '0.85rem',
+                                            sm: theme.typography.body1.fontSize
+                                          },
+                                          fontWeight: team.is_our_team ? theme.typography.fontWeightMedium : theme.typography.fontWeightMedium,
+                                          ml: 0,
+                                          color: team.is_our_team ? theme.palette.primary.main : 'inherit',
+                                          textShadow: team.is_our_team ? `0 0 1px ${theme.palette.primary.main}` : 'none',
+                                          fontFamily: theme.typography.fontFamily,
+                                        }}
+                                      >
+                                        {team.name}
+                                      </Box>
+                                    )}
                                   </div>
                                 </TableCell>
                               );
