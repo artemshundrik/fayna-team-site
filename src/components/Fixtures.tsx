@@ -220,13 +220,36 @@ const Fixtures = () => {
                 </Box>
 
                 <Box sx={{ justifySelf: 'center' }}>
-                  <Box sx={(theme)=>({
-                    backgroundColor: match.score_team1!=null&&match.score_team2!=null?theme.palette.secondary.dark:theme.palette.grey[200],
-                    color: match.score_team1!=null&&match.score_team2!=null?theme.palette.common.white:theme.palette.text.secondary,
-                    padding:'0.4rem 0.8rem', borderRadius:'0.4rem',
-                    fontSize: { xs: '0.9rem', sm: '1.1rem' }, fontWeight:600, minWidth:'2.2rem',
-                    textAlign:'center'
-                  })}>{match.score||match.time}</Box>
+                  <Box sx={(theme) => {
+                    let bg = theme.palette.grey[200];
+                    let color = theme.palette.text.secondary;
+
+                    if (match.score_team1 != null && match.score_team2 != null) {
+                      if (match.score_team1 > match.score_team2) {
+                        bg = theme.palette.success.main;
+                        color = theme.palette.common.white;
+                      } else if (match.score_team1 === match.score_team2) {
+                        bg = theme.palette.grey[500];
+                        color = theme.palette.common.white;
+                      } else if (match.score_team1 < match.score_team2) {
+                        bg = theme.palette.error.main;
+                        color = theme.palette.common.white;
+                      }
+                    }
+                    return {
+                      backgroundColor: bg,
+                      color: color,
+                      padding: '0.4rem 0.8rem',
+                      borderRadius: '0.4rem',
+                      fontSize: { xs: '0.9rem', sm: '1.1rem' },
+                      fontWeight: 600,
+                      minWidth: '2.2rem',
+                      textAlign: 'center',
+                      transition: 'background 0.2s'
+                    };
+                  }}>
+                    {match.score || match.time}
+                  </Box>
                 </Box>
 
                 <Box sx={{ justifySelf: 'start', display:'flex', alignItems:'center', gap:{ xs:'0.25rem', sm:'0.6rem' }, minWidth: 0 }}>

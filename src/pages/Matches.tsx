@@ -539,18 +539,41 @@ const Matches: React.FC = () => {
                         </Box>
                         {/* Score */}
                         <Box
-                          sx={(theme) => ({
-                            backgroundColor: theme.palette.secondary.dark,
-                            color: theme.palette.common.white,
-                            padding: '0.4rem 0.8rem',
-                            borderRadius: '0.4rem',
-                            fontSize: '1.1rem',
-                            fontWeight: 600,
-                            minWidth: '2.5rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          })}
+                          sx={(theme) => {
+                            let bg = theme.palette.grey[200];
+                            let color = theme.palette.text.secondary;
+                            if (
+                              typeof match.score === 'string' &&
+                              match.score.includes('-')
+                            ) {
+                              const [score1, score2] = match.score.split('-').map(s => parseInt(s.trim(), 10));
+                              if (!isNaN(score1) && !isNaN(score2)) {
+                                if (score1 > score2) {
+                                  bg = theme.palette.success.main;
+                                  color = theme.palette.common.white;
+                                } else if (score1 === score2) {
+                                  bg = theme.palette.grey[500];
+                                  color = theme.palette.common.white;
+                                } else if (score1 < score2) {
+                                  bg = theme.palette.error.main;
+                                  color = theme.palette.common.white;
+                                }
+                              }
+                            }
+                            return {
+                              backgroundColor: bg,
+                              color: color,
+                              padding: '0.4rem 0.8rem',
+                              borderRadius: '0.4rem',
+                              fontSize: '1.1rem',
+                              fontWeight: 600,
+                              minWidth: '2.5rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              transition: 'background 0.2s'
+                            };
+                          }}
                         >
                           {match.score}
                         </Box>
