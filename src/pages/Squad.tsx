@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import PlayersList from '../components/PlayersList';
 import PlayerStatistics from '../components/PlayerStatistics';
@@ -7,10 +8,13 @@ import { useTheme } from '@mui/material/styles';
 
 const Squad: React.FC = () => {
   const theme = useTheme();
-  const [tab, setTab] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = parseInt(searchParams.get('tab') || '0', 10);
+  const [tab, setTab] = useState(tabParam);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
+    setSearchParams({ tab: newValue.toString() });
   };
 
   return (
