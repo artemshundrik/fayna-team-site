@@ -88,6 +88,7 @@ const columns: Column[] = [
 ];
 
   const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   // Store teams state
   const [teams, setTeams] = useState<ExtendedTeam[]>([]);
@@ -129,6 +130,16 @@ const columns: Column[] = [
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Fade-in effect after loading
+  useEffect(() => {
+    if (!loading) {
+      const timeout = setTimeout(() => setVisible(true), 300);
+      return () => clearTimeout(timeout);
+    } else {
+      setVisible(false);
+    }
+  }, [loading]);
+
 
   return (
     <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 0 } }}>
@@ -148,7 +159,12 @@ const columns: Column[] = [
           <ScreenRotationIcon sx={{ fontSize: '1.2rem' }} />
           Щоб побачити повну таблицю — переверніть телефон у горизонтальне положення
         </Box>
-        <Box>
+        <Box
+          sx={{
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 0.4s',
+          }}
+        >
           <TableContainer
             sx={{
               width: '100%',
@@ -242,38 +258,61 @@ const columns: Column[] = [
                       <TableRow key={idx} sx={{ height: 56 }}>
                         {/* Place */}
                         <TableCell align="center">
-                          <Skeleton variant="rectangular" width={24} height={24} sx={{ borderRadius: 1 }} />
+                          <Skeleton variant="rectangular" animation="wave" width={24} height={24} sx={{ borderRadius: 1 }} />
                         </TableCell>
-                        {/* Team with logo */}
+                        {/* Team with logo or placeholder */}
                         <TableCell align="left">
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Skeleton variant="circular" width={40} height={40} />
-                            <Skeleton variant="text" width={80 + Math.random() * 40} height={24} />
+                            <Box
+                              sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: '50%',
+                                background: theme.palette.grey[200],
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <Skeleton
+                                variant="circular"
+                                animation="wave"
+                                width={40}
+                                height={40}
+                                sx={{
+                                  position: 'absolute',
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: '50%',
+                                }}
+                              />
+                            </Box>
+                            <Skeleton variant="text" animation="wave" width={80 + Math.random() * 40} height={24} />
                           </Box>
                         </TableCell>
                         {/* Points */}
                         <TableCell align="center">
-                          <Skeleton variant="text" width={32} height={24} />
+                          <Skeleton variant="text" animation="wave" width={32} height={24} />
                         </TableCell>
                         {/* Games played */}
                         <TableCell align="center">
-                          <Skeleton variant="text" width={32} height={24} />
+                          <Skeleton variant="text" animation="wave" width={32} height={24} />
                         </TableCell>
                         {/* Wins */}
                         <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                          <Skeleton variant="text" width={32} height={24} />
+                          <Skeleton variant="text" animation="wave" width={32} height={24} />
                         </TableCell>
                         {/* Draws */}
                         <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                          <Skeleton variant="text" width={32} height={24} />
+                          <Skeleton variant="text" animation="wave" width={32} height={24} />
                         </TableCell>
                         {/* Losses */}
                         <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                          <Skeleton variant="text" width={32} height={24} />
+                          <Skeleton variant="text" animation="wave" width={32} height={24} />
                         </TableCell>
                         {/* Goals */}
                         <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                          <Skeleton variant="text" width={56} height={24} />
+                          <Skeleton variant="text" animation="wave" width={56} height={24} />
                         </TableCell>
                         {/* Form */}
                         <TableCell align="left" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
@@ -282,6 +321,7 @@ const columns: Column[] = [
                               <Skeleton
                                 key={i}
                                 variant="rectangular"
+                                animation="wave"
                                 width={24}
                                 height={24}
                                 sx={{ borderRadius: '0.4rem' }}
@@ -346,7 +386,27 @@ const columns: Column[] = [
                                   }}
                                 >
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <img src={team.logo || ''} alt={team.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                                    {team.logo ? (
+                                      <img src={team.logo} alt={team.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                                    ) : (
+                                      <Box
+                                        sx={{
+                                          width: 40,
+                                          height: 40,
+                                          borderRadius: '50%',
+                                          background: theme.palette.grey[200],
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          fontWeight: theme.typography.fontWeightBold,
+                                          color: theme.palette.grey[700],
+                                          fontSize: '1.1rem',
+                                          textTransform: 'uppercase',
+                                        }}
+                                      >
+                                        {team.name?.split(' ').map(w => w[0]).join('').slice(0,2)}
+                                      </Box>
+                                    )}
                                     {team.url ? (
                                       <a
                                         href={team.url}
