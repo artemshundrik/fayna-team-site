@@ -239,15 +239,60 @@ const columns: Column[] = [
               <TableBody>
                 {loading
                   ? Array.from({ length: 5 }).map((_, idx) => (
-                      <TableRow key={idx}>
-                        {columns.map((col, i) => (
-                          <TableCell key={i} align={col.align}>
-                            <Skeleton variant="text" width={col.width || '100%'} />
-                          </TableCell>
-                        ))}
+                      <TableRow key={idx} sx={{ height: 56 }}>
+                        {/* Place */}
+                        <TableCell align="center">
+                          <Skeleton variant="rectangular" width={24} height={24} sx={{ borderRadius: 1 }} />
+                        </TableCell>
+                        {/* Team with logo */}
+                        <TableCell align="left">
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Skeleton variant="circular" width={40} height={40} />
+                            <Skeleton variant="text" width={80 + Math.random() * 40} height={24} />
+                          </Box>
+                        </TableCell>
+                        {/* Points */}
+                        <TableCell align="center">
+                          <Skeleton variant="text" width={32} height={24} />
+                        </TableCell>
+                        {/* Games played */}
+                        <TableCell align="center">
+                          <Skeleton variant="text" width={32} height={24} />
+                        </TableCell>
+                        {/* Wins */}
+                        <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                          <Skeleton variant="text" width={32} height={24} />
+                        </TableCell>
+                        {/* Draws */}
+                        <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                          <Skeleton variant="text" width={32} height={24} />
+                        </TableCell>
+                        {/* Losses */}
+                        <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                          <Skeleton variant="text" width={32} height={24} />
+                        </TableCell>
+                        {/* Goals */}
+                        <TableCell align="center" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                          <Skeleton variant="text" width={56} height={24} />
+                        </TableCell>
+                        {/* Form */}
+                        <TableCell align="left" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
+                          <Box sx={{ display: 'flex', gap: 0.5 }}>
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Skeleton
+                                key={i}
+                                variant="rectangular"
+                                width={24}
+                                height={24}
+                                sx={{ borderRadius: '0.4rem' }}
+                              />
+                            ))}
+                          </Box>
+                        </TableCell>
                       </TableRow>
                     ))
                   : teams.map((team, idx) => (
+                      // залишити як є
                       <TableRow
                         key={idx}
                         onClick={() => window.location.href = `https://r-cup.com.ua/teams/${team.id}`}
