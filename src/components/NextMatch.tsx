@@ -90,7 +90,7 @@ const NextMatch = () => {
     const fetchMatch = async () => {
       const { data: matches, error } = await supabase
         .from('matches')
-        .select('*, team1:team1_ref(name, logo), team2:team2_ref(name, logo), tournament:tournament_id(logo_url, stadium, league_name, url)')
+        .select('*, team1:team1_ref(name, logo), team2:team2_ref(name, logo), tournament:tournament_id(logo_url, stadium, league_name, url, address)')
         .order('date', { ascending: true })
         .order('time', { ascending: true });
 
@@ -668,20 +668,22 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
             >
               🏟 {data?.tournament?.stadium}
             </Typography>
-            <Box
-              className="address"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                color: '#aaa',
-                fontWeight: 500,
-                fontSize: '0.95rem',
-              }}
-            >
-              <span style={{ color: 'red' }}>📍</span>
-              <span>{data?.tournament?.address}</span>
-            </Box>
+            {data?.tournament?.address && (
+              <Box
+                className="address"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  color: '#aaa',
+                  fontWeight: 500,
+                  fontSize: '0.95rem',
+                }}
+              >
+                <span style={{ color: 'red' }}>📍</span>
+                <span>{data.tournament.address}</span>
+              </Box>
+            )}
           </Box>
         </Box>
         <Box sx={{ mt: '2rem' }}>
