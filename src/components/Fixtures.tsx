@@ -67,8 +67,8 @@ const Fixtures = () => {
         .from('matches')
         .select(`
           *,
-          team1:team1_id ( name, logo ),
-          team2:team2_id ( name, logo ),
+          team1:team1_ref ( name, logo ),
+          team2:team2_ref ( name, logo ),
           tournament:tournament_id ( logo_url, stadium, address, url )
         `)
         .order('date', { ascending: true });

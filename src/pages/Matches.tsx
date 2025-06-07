@@ -100,8 +100,8 @@ const Matches: React.FC = () => {
         .from('matches')
         .select(`
           *,
-          team1:team1_id ( name, logo ),
-          team2:team2_id ( name, logo ),
+          team1:team1_ref ( name, logo ),
+          team2:team2_ref ( name, logo ),
           tournament:tournament_id ( logo_url, stadium, league_name, url ),
           round_number, highlight_link
         `)
@@ -454,7 +454,20 @@ const Matches: React.FC = () => {
               spacing={2}
             >
               {pastMatches.map((match, index) => {
+                // --- КОЛІР ДЛЯ SCORE (для FAYNA TEAM) ---
+                const MY_TEAM_NAME = 'FAYNA TEAM';
                 const [team1, team2] = match.teams.split(' проти ');
+
+                let myScore = null;
+                let opponentScore = null;
+                if (team1.trim() === MY_TEAM_NAME) {
+                  myScore = parseInt(match.score?.split('-')[0]?.trim(), 10);
+                  opponentScore = parseInt(match.score?.split('-')[1]?.trim(), 10);
+                } else if (team2.trim() === MY_TEAM_NAME) {
+                  myScore = parseInt(match.score?.split('-')[1]?.trim(), 10);
+                  opponentScore = parseInt(match.score?.split('-')[0]?.trim(), 10);
+                }
+                // --- END КОЛІР ДЛЯ SCORE ---
                 return (
                   <Box
                     component={motion.div}
@@ -587,22 +600,17 @@ const Matches: React.FC = () => {
                           sx={(theme) => {
                             let bg = theme.palette.grey[200];
                             let color = theme.palette.text.secondary;
-                            if (
-                              typeof match.score === 'string' &&
-                              match.score.includes('-')
-                            ) {
-                              const [score1, score2] = match.score.split('-').map(s => parseInt(s.trim(), 10));
-                              if (!isNaN(score1) && !isNaN(score2)) {
-                                if (score1 > score2) {
-                                  bg = theme.palette.success.main;
-                                  color = theme.palette.common.white;
-                                } else if (score1 === score2) {
-                                  bg = theme.palette.grey[500];
-                                  color = theme.palette.common.white;
-                                } else if (score1 < score2) {
-                                  bg = theme.palette.error.main;
-                                  color = theme.palette.common.white;
-                                }
+
+                            if (myScore !== null && opponentScore !== null) {
+                              if (myScore > opponentScore) {
+                                bg = theme.palette.success.main;
+                                color = theme.palette.common.white;
+                              } else if (myScore === opponentScore) {
+                                bg = theme.palette.grey[500];
+                                color = theme.palette.common.white;
+                              } else if (myScore < opponentScore) {
+                                bg = theme.palette.error.main;
+                                color = theme.palette.common.white;
                               }
                             }
                             return {

@@ -90,7 +90,7 @@ const NextMatch = () => {
     const fetchMatch = async () => {
       const { data: matches, error } = await supabase
         .from('matches')
-        .select('*, team1:team1_id(*), team2:team2_id(*), tournament:tournament_id(*), mvp:mvp_player_id(*)')
+        .select('*, team1:team1_ref(name, logo), team2:team2_ref(name, logo), tournament:tournament_id(logo_url, stadium, league_name, url)')
         .order('date', { ascending: true })
         .order('time', { ascending: true });
 
