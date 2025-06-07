@@ -335,7 +335,11 @@ const columns: Column[] = [
                       // залишити як є
                       <TableRow
                         key={idx}
-                        onClick={() => window.location.href = `https://r-cup.com.ua/teams/${team.id}`}
+                        onClick={() => {
+                          if (team.url) {
+                            window.open(team.url, '_blank');
+                          }
+                        }}
                         sx={{
                           cursor: 'pointer',
                           backgroundColor: idx % 2 === 0 ? theme.palette.grey[100] : theme.palette.common.white,
