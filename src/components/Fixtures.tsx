@@ -220,36 +220,51 @@ const Fixtures = () => {
                 </Box>
 
                 <Box sx={{ justifySelf: 'center' }}>
-                  <Box sx={(theme) => {
-                    let bg = theme.palette.grey[200];
-                    let color = theme.palette.text.secondary;
-
-                    if (match.score_team1 != null && match.score_team2 != null) {
-                      if (match.score_team1 > match.score_team2) {
-                        bg = theme.palette.success.main;
-                        color = theme.palette.common.white;
-                      } else if (match.score_team1 === match.score_team2) {
-                        bg = theme.palette.grey[500];
-                        color = theme.palette.common.white;
-                      } else if (match.score_team1 < match.score_team2) {
-                        bg = theme.palette.error.main;
-                        color = theme.palette.common.white;
-                      }
+                  {(() => {
+                    const MY_TEAM_NAME = "FAYNA TEAM";
+                    const isFaynaTeam1 = match.team1?.name === MY_TEAM_NAME;
+                    const isFaynaTeam2 = match.team2?.name === MY_TEAM_NAME;
+                    let myScore = null;
+                    let opponentScore = null;
+                    if (isFaynaTeam1) {
+                      myScore = match.score_team1;
+                      opponentScore = match.score_team2;
+                    } else if (isFaynaTeam2) {
+                      myScore = match.score_team2;
+                      opponentScore = match.score_team1;
                     }
-                    return {
-                      backgroundColor: bg,
-                      color: color,
-                      padding: '0.4rem 0.8rem',
-                      borderRadius: '0.4rem',
-                      fontSize: { xs: '0.9rem', sm: '1.1rem' },
-                      fontWeight: 600,
-                      minWidth: '2.2rem',
-                      textAlign: 'center',
-                      transition: 'background 0.2s'
-                    };
-                  }}>
-                    {match.score || match.time}
-                  </Box>
+                    return (
+                      <Box sx={(theme) => {
+                        let bg = theme.palette.grey[200];
+                        let color = theme.palette.text.secondary;
+                        if (myScore != null && opponentScore != null) {
+                          if (myScore > opponentScore) {
+                            bg = theme.palette.success.main;
+                            color = theme.palette.common.white;
+                          } else if (myScore === opponentScore) {
+                            bg = theme.palette.grey[500];
+                            color = theme.palette.common.white;
+                          } else if (myScore < opponentScore) {
+                            bg = theme.palette.error.main;
+                            color = theme.palette.common.white;
+                          }
+                        }
+                        return {
+                          backgroundColor: bg,
+                          color: color,
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '0.4rem',
+                          fontSize: { xs: '0.9rem', sm: '1.1rem' },
+                          fontWeight: 600,
+                          minWidth: '2.2rem',
+                          textAlign: 'center',
+                          transition: 'background 0.2s'
+                        };
+                      }}>
+                        {match.score || match.time}
+                      </Box>
+                    );
+                  })()}
                 </Box>
 
                 <Box sx={{ justifySelf: 'start', display:'flex', alignItems:'center', gap:{ xs:'0.25rem', sm:'0.6rem' }, minWidth: 0 }}>
