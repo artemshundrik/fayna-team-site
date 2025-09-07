@@ -5,6 +5,7 @@ import { supabase } from '../supabase';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { Box, Button, Typography } from '@mui/material';
+import { useTournament } from '../context/TournamentContext';
 import { Box as MuiBox } from '@mui/material';
 
 const Section = motion(Box);
@@ -60,6 +61,7 @@ const Card = styled(MuiBox)<{ full?: boolean }>`
 
 const Fixtures = () => {
   const [fixtures, setFixtures] = useState<any[]>([]);
+  const { effectiveTournamentId } = useTournament();
 
   useEffect(() => {
     const fetchFixtures = async () => {
@@ -73,9 +75,25 @@ const Fixtures = () => {
         `)
         .order('date', { ascending: true });
 
-      if (!error && data) {
+      // If a specific tournament selected (archive/current resolved), refetch with filter
+      let list = data || [];
+      if (!error && effectiveTournamentId) {
+        const { data: filtered, error: err2 } = await supabase
+          .from('matches')
+          .select(`
+            *,
+            team1:team1_ref ( name, logo ),
+            team2:team2_ref ( name, logo ),
+            tournament:tournament_id ( logo_url, stadium, address, url )
+          `)
+          .eq('tournament_id', effectiveTournamentId)
+          .order('date', { ascending: true });
+        if (!err2 && filtered) list = filtered;
+      }
+
+      if (!error && list) {
         const weekdays = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', "п'ятниця", 'субота'];
-        const formatted = data.map((match: any) => {
+        const formatted = list.map((match: any) => {
           const dateObj = new Date(`${match.date}T${match.time}`);
           const formatter = new Intl.DateTimeFormat('uk-UA', {
             day: 'numeric',
@@ -95,10 +113,10 @@ const Fixtures = () => {
 
         const now = new Date();
         const pastMatches = formatted
-          .filter(m => new Date(`${m.date}T${m.time}`) < now)
+          .filter(m => new Date(`${m.date}T${m.time || '00:00'}+03:00`) < now)
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         const upcomingMatches = formatted
-          .filter(m => new Date(`${m.date}T${m.time}`) >= now)
+          .filter(m => new Date(`${m.date}T${m.time || '00:00'}+03:00`) >= now)
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         const sliced = [pastMatches[0], upcomingMatches[0]].filter(Boolean);
         setFixtures(sliced);
@@ -107,7 +125,7 @@ const Fixtures = () => {
       }
     };
     fetchFixtures();
-  }, []);
+  }, [effectiveTournamentId]);
 
   return (
     <Section

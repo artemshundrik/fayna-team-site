@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import type { Database } from '../types/supabase';
 import { supabase } from '../supabase';
+import { useTournament } from '../context/TournamentContext';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
 
@@ -56,6 +57,8 @@ const NextMatch = () => {
   // ---------------------------------------------------------------------------
   const [matchIsOver, setMatchIsOver] = useState(false);
 
+  const { effectiveTournamentId } = useTournament();
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (!(matchDate instanceof Date) || isNaN(matchDate.getTime())) return;
@@ -94,7 +97,19 @@ const NextMatch = () => {
         .order('date', { ascending: true })
         .order('time', { ascending: true });
 
-      if (error || !matches || matches.length === 0) {
+      // Apply tournament filter if selected
+      let list = matches || [];
+      if (!error && effectiveTournamentId) {
+        const { data: filtered, error: err2 } = await supabase
+          .from('matches')
+          .select('*, team1:team1_ref(name, logo), team2:team2_ref(name, logo), tournament:tournament_id(logo_url, stadium, league_name, url, address)')
+          .eq('tournament_id', effectiveTournamentId)
+          .order('date', { ascending: true })
+          .order('time', { ascending: true });
+        if (!err2 && filtered) list = filtered;
+      }
+
+      if (error || !list || list.length === 0) {
         console.error('Match fetch error:', error);
         return;
       }
@@ -102,11 +117,11 @@ const NextMatch = () => {
       const now = new Date();
 
       // знайти всі майбутні матчі
-      const upcomingMatches = matches.filter(m => m.date && m.time && new Date(`${m.date}T${m.time}+03:00`) > now);
+      const upcomingMatches = list.filter(m => m.date && m.time && new Date(`${m.date}T${m.time}+03:00`) > now);
       let upcoming = upcomingMatches[0];
 
       // знайти останній завершений матч
-      const finishedMatches = matches.filter(m => m.date && m.time && new Date(`${m.date}T${m.time}+03:00`) <= now);
+      const finishedMatches = list.filter(m => m.date && m.time && new Date(`${m.date}T${m.time}+03:00`) <= now);
       let lastFinished = finishedMatches.length > 0 ? finishedMatches[finishedMatches.length - 1] : null;
 
       // Якщо є завершений матч < 48 годин тому — показуємо його
@@ -132,7 +147,7 @@ const NextMatch = () => {
     };
 
     fetchMatch();
-  }, []);
+  }, [effectiveTournamentId]);
 
   useEffect(() => {
     if (!matchDate) return;

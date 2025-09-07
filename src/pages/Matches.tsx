@@ -6,6 +6,8 @@ import { Box, Button, Container, Stack, Tabs, Tab } from '@mui/material';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import Layout from '../layout/Layout';
 import Table from '../components/Table';
+import TournamentSwitcher from '../components/TournamentSwitcher';
+import { useTournament } from '../context/TournamentContext';
 
 const formatDateWithTime = (dateStr: string, time: string) => {
   const date = new Date(dateStr);
@@ -93,6 +95,7 @@ const RightColumn = styled.div<{ expanded?: boolean }>`
 
 const Matches: React.FC = () => {
   const [matches, setMatches] = useState<any[]>([]);
+  const { effectiveTournamentId, selectedSeason, mode, tournaments } = useTournament();
   
   useEffect(() => {
     const fetchMatches = async () => {
@@ -105,11 +108,49 @@ const Matches: React.FC = () => {
           tournament:tournament_id ( logo_url, stadium, league_name, url ),
           round_number, highlight_link
         `)
-        .order('date', { ascending: true });
+        .order('date', { ascending: true })
+        ;
 
-      if (!error && data) {
-        const formatted = data.map((match: any) => {
-          const dateObj = new Date(`${match.date}T${match.time}`);
+      // If specific tournament selected, refetch with filter (Supabase doesn't allow conditional in builder easily)
+      let list = data || [];
+      if (!error && effectiveTournamentId) {
+        const { data: filtered, error: err2 } = await supabase
+          .from('matches')
+          .select(`
+            *,
+            team1:team1_ref ( name, logo ),
+            team2:team2_ref ( name, logo ),
+            tournament:tournament_id ( logo_url, stadium, league_name, url ),
+            round_number, highlight_link
+          `)
+          .eq('tournament_id', effectiveTournamentId)
+          .order('date', { ascending: true });
+        if (!err2 && filtered) list = filtered;
+      } else if (!error && mode === 'archive' && selectedSeason != null) {
+        // Season filter: fetch matches for tournaments that have this season
+        const ids = tournaments.filter(t => String(t.season) === selectedSeason).map(t => t.id);
+        if (ids.length > 0) {
+          const { data: bySeason, error: err3 } = await supabase
+            .from('matches')
+            .select(`
+              *,
+              team1:team1_ref ( name, logo ),
+              team2:team2_ref ( name, logo ),
+              tournament:tournament_id ( logo_url, stadium, league_name, url ),
+              round_number, highlight_link
+            `)
+            .in('tournament_id', ids)
+            .order('date', { ascending: true });
+          if (!err3 && bySeason) list = bySeason;
+        } else {
+          list = [];
+        }
+      }
+
+      if (!error && list) {
+        const formatted = list.map((match: any) => {
+          // Use date+time with UA offset to avoid misclassification
+          const dateObj = new Date(`${match.date}T${match.time || '00:00'}+03:00`);
           const formattedDate = formatDateWithTime(match.date, match.time);
           const score = match.score_team1 != null && match.score_team2 != null
             ? `${match.score_team1} - ${match.score_team2}`
@@ -118,6 +159,7 @@ const Matches: React.FC = () => {
           return {
             date: match.date,
             time: match.time ? match.time.slice(0, 5) : '',
+            dateTime: dateObj,
             dateFormatted: formattedDate,
             stadium: match.tournament?.stadium || '',
             score,
@@ -139,15 +181,22 @@ const Matches: React.FC = () => {
     };
 
     fetchMatches();
-  }, []);
+  }, [effectiveTournamentId, selectedSeason, mode, tournaments]);
 
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'table'>('upcoming');
 
   const matchData = matches;
 
   const now = new Date();
-  const futureMatches = matchData.filter(match => new Date(match.date) >= now);
-  const pastMatches = matchData.filter(match => new Date(match.date) < now);
+  const futureMatches = matchData.filter(match => match.dateTime && match.dateTime > now);
+  const pastMatches = matchData.filter(match => match.dateTime && match.dateTime <= now);
+
+  // If user switches to archive, focus on 'past' tab automatically
+  useEffect(() => {
+    if (mode === 'archive' && activeTab === 'upcoming') {
+      setActiveTab('past');
+    }
+  }, [mode]);
 
   
 
@@ -167,13 +216,16 @@ const Matches: React.FC = () => {
         })}
       >
         <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 2 }, mb: 2 }}>
+          <TournamentSwitcher />
           <Tabs
             value={activeTab}
             onChange={(_, newValue) => setActiveTab(newValue)}
             textColor="primary"
             indicatorColor="primary"
           >
-            <Tab label="МАЙБУТНІ" value="upcoming" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
+            {mode !== 'archive' && (
+              <Tab label="МАЙБУТНІ" value="upcoming" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
+            )}
             <Tab label="ЗІГРАНІ" value="past" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
             <Tab label="ТАБЛИЦЯ" value="table" sx={{ fontWeight: 600, fontFamily: 'FixelDisplay, sans-serif' }} />
           </Tabs>
@@ -353,6 +405,8 @@ const Matches: React.FC = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            whiteSpace: 'nowrap',
+                            wordBreak: 'keep-all',
                           })}
                         >
                           {match.time}
@@ -613,24 +667,26 @@ const Matches: React.FC = () => {
                                 color = theme.palette.common.white;
                               }
                             }
-                            return {
-                              backgroundColor: bg,
-                              color: color,
-                              padding: { xs: '0.2rem 0.3rem', sm: '0.4rem 0.8rem' },
-                              borderRadius: '0.4rem',
-                              fontSize: { xs: '1rem', sm: '1.1rem' },
-                              fontWeight: 600,
-                              width: { xs: '60px', sm: '64px' },
-                              minWidth: { xs: '60px', sm: '64px' },
-                              maxWidth: { xs: '60px', sm: '64px' },
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'background 0.2s'
-                            };
-                          }}
-                        >
-                          {match.score}
+                          return {
+                            backgroundColor: bg,
+                            color: color,
+                            padding: { xs: '0.2rem 0.3rem', sm: '0.4rem 0.8rem' },
+                            borderRadius: '0.4rem',
+                            fontSize: { xs: '1rem', sm: '1.1rem' },
+                            fontWeight: 600,
+                            width: { xs: '60px', sm: '64px' },
+                            minWidth: { xs: '60px', sm: '64px' },
+                            maxWidth: { xs: '60px', sm: '64px' },
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            whiteSpace: 'nowrap',
+                            wordBreak: 'keep-all',
+                            transition: 'background 0.2s'
+                          };
+                        }}
+                      >
+                        {match.score}
                         </Box>
                         {/* Team 2 */}
                         <Box

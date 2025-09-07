@@ -17,6 +17,7 @@ import {
   Skeleton
 } from '@mui/material';
 import ScreenRotationIcon from '@mui/icons-material/ScreenRotation';
+import { useTournament } from '../context/TournamentContext';
 
 type ExtendedTeam = Database['public']['Tables']['teams']['Row'] & {
   points: number;
@@ -92,14 +93,26 @@ const columns: Column[] = [
 
   // Store teams state
   const [teams, setTeams] = useState<ExtendedTeam[]>([]);
+  const { effectiveTournamentId, mode } = useTournament();
 
   useEffect(() => {
     const fetchTeams = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      // In archive mode without specific tournament selected, do not aggregate across tournaments
+      if (mode === 'archive' && !effectiveTournamentId) {
+        setTeams([]);
+        setLoading(false);
+        return;
+      }
+      let query = supabase
         .from('teams')
-        .select('id, name, logo, is_our_team, games_played, wins, draws, losses, goals_for, goals_against, form, url')
-        .returns<Database['public']['Tables']['teams']['Row'][]>();
+        .select('id, name, logo, is_our_team, games_played, wins, draws, losses, goals_for, goals_against, form, url');
+
+      if (effectiveTournamentId) {
+        query = query.eq('tournament_id', effectiveTournamentId);
+      }
+
+      const { data, error } = await query.returns<Database['public']['Tables']['teams']['Row'][]>();
       if (error) {
         console.error('Error fetching teams:', error);
         setLoading(false);
@@ -128,7 +141,7 @@ const columns: Column[] = [
     };
     fetchTeams();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [effectiveTournamentId, mode]);
 
   // Fade-in effect after loading
   useEffect(() => {
@@ -144,6 +157,21 @@ const columns: Column[] = [
   return (
     <Container maxWidth="lg" disableGutters sx={{ px: { xs: 0, sm: 0 } }}>
       <Paper elevation={0} square sx={{ border: 'none' }}>
+        {mode === 'archive' && !effectiveTournamentId && (
+          <Box sx={{
+            mb: 2,
+            p: 2,
+            borderRadius: '8px',
+            border: (theme) => `1px solid ${theme.palette.grey[200]}`,
+            backgroundColor: (theme) => theme.palette.background.default,
+            textAlign: 'center',
+            fontFamily: `'FixelDisplay', sans-serif`,
+            fontWeight: 600,
+            color: (theme) => theme.palette.text.secondary,
+          }}>
+            В архіві оберіть турнір, щоб побачити таблицю
+          </Box>
+        )}
         <Box
           sx={{
             display: { xs: 'flex', sm: 'none' },
@@ -575,9 +603,9 @@ const columns: Column[] = [
                                       .split(', ')
                                       .map(res => (res === 'w' ? 'В' : res === 'd' ? 'Н' : res === 'l' ? 'П' : ''));
 
+                                    // Show in the same order as provided (oldest -> newest), without reversing
                                     const sliced = mapped.slice(-5);
-                                    const reversed = sliced.reverse();
-                                    const filled = reversed.concat(Array(5 - reversed.length).fill(''));
+                                    const filled = sliced.concat(Array(5 - sliced.length).fill(''));
 
                                     return (
                                       <Box

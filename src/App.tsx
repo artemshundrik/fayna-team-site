@@ -12,6 +12,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
+import { TournamentProvider } from './context/TournamentContext';
 
 function ScrollToTop() {
   const location = useLocation();
@@ -27,21 +28,23 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <PasswordGate>
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/fanshop" element={<Fanshop />} />
-            <Route path="/matches" element={<Matches />} />
-            <Route path="/squad" element={<Squad />} />
-            <Route path="/styleguide" element={<Styleguide />} />
-            <Route path="/player/:number" element={<PlayerProfile />} />
-            <Route path="/product/:id" element={<ProductDetailPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </PasswordGate>
+      <TournamentProvider>
+        <PasswordGate>
+          <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/fanshop" element={<Fanshop />} />
+              <Route path="/matches" element={<Matches />} />
+              <Route path="/squad" element={<Squad />} />
+              <Route path="/styleguide" element={<Styleguide />} />
+              <Route path="/player/:number" element={<PlayerProfile />} />
+              <Route path="/product/:id" element={<ProductDetailPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </PasswordGate>
+      </TournamentProvider>
     </ThemeProvider>
   );
 }
