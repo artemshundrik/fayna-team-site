@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTournament } from '../context/TournamentContext';
 import { Box, Chip, Tabs, Tab, Avatar, Typography, useTheme, Badge, Tooltip } from '@mui/material';
 
@@ -26,11 +26,7 @@ const TournamentSwitcher: React.FC = () => {
     currentTournamentId,
   } = useTournament();
 
-  const archiveList = tournaments.filter((t) => !t.is_current && (
-    selectedSeason ? (String(t.season) === selectedSeason) : true
-  ));
-
-  // Upcoming tournaments to show under "ПОТОЧНИЙ"
+  // Helper: parse season start year, e.g. '2025/2026' -> 2025, '2025' -> 2025
   const seasonStartYear = (s?: string | null): number | null => {
     if (!s) return null;
     const str = String(s).trim();
@@ -42,6 +38,30 @@ const TournamentSwitcher: React.FC = () => {
     return Number.isFinite(y) ? y : null;
   };
   const currentYear = new Date().getFullYear();
+
+  const today = new Date();
+  const hasStarted = (t: { start_date?: string | null; season?: string | null; status?: string | null }) => {
+    // Explicit status takes precedence
+    if (t.status === 'upcoming') return false;
+    if (t.start_date) {
+      const d = new Date(t.start_date);
+      if (!isNaN(d.getTime())) return d <= today;
+    }
+    // Fallback: season start year <= current year considered started
+    const sy = seasonStartYear(t.season);
+    return sy != null ? sy <= today.getFullYear() : true;
+  };
+
+  const archiveList = tournaments.filter((t) =>
+    // not "current"
+    !t.is_current && (t.status !== 'current') &&
+    // match season filter if set
+    (selectedSeason ? String(t.season) === selectedSeason : true) &&
+    // exclude tournaments that haven't started yet
+    hasStarted(t)
+  );
+
+  // Upcoming tournaments to show under "ПОТОЧНИЙ"
   const currentTournament = tournaments.find(t => t.id === currentTournamentId) || null;
   const currentTitleKey = ((currentTournament?.title || '').trim().toUpperCase());
   const upcoming = tournaments.filter((t) => {
@@ -61,6 +81,24 @@ const TournamentSwitcher: React.FC = () => {
     if (isNaN(d.getTime())) return '';
     return new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
   };
+
+  // Seasons that already started (hide seasons with only future tournaments)
+  const startedSeasons = useMemo(() => {
+    const set = new Set<string>();
+    tournaments.forEach((t) => {
+      const s = (t.season || '').toString();
+      if (!s) return;
+      if (hasStarted(t)) set.add(s);
+    });
+    return Array.from(set).sort().reverse();
+  }, [tournaments]);
+
+  // If a not-started season was selected earlier, reset selection
+  useEffect(() => {
+    if (selectedSeason && !startedSeasons.includes(selectedSeason)) {
+      setSelectedSeason(null);
+    }
+  }, [selectedSeason, startedSeasons, setSelectedSeason]);
 
   return (
     <Box sx={{ width: '100%', mb: 2 }}>
@@ -198,7 +236,7 @@ const TournamentSwitcher: React.FC = () => {
                 '&:hover': { borderColor: theme.palette.primary.main },
               }}
             />
-            {seasons.map((s) => (
+            {startedSeasons.map((s) => (
               <Chip
                 key={s}
                 label={s}
