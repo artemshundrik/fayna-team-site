@@ -8,6 +8,7 @@ import Layout from '../layout/Layout';
 import Table from '../components/Table';
 import TournamentSwitcher from '../components/TournamentSwitcher';
 import { useTournament } from '../context/TournamentContext';
+import MatchEvents from '../components/MatchEvents';
 
 const formatDateWithTime = (dateStr: string, time: string) => {
   const date = new Date(dateStr);
@@ -95,42 +96,16 @@ const RightColumn = styled.div<{ expanded?: boolean }>`
 
 const Matches: React.FC = () => {
   const [matches, setMatches] = useState<any[]>([]);
+  const [eventsCount, setEventsCount] = useState<Record<string, number>>({});
+  const [openEvents, setOpenEvents] = useState<Record<string, boolean>>({});
   const { effectiveTournamentId, selectedSeason, mode, tournaments } = useTournament();
   
   useEffect(() => {
     const fetchMatches = async () => {
-      const { data, error } = await supabase
-        .from('matches')
-        .select(`
-          *,
-          team1:team1_ref ( name, logo ),
-          team2:team2_ref ( name, logo ),
-          tournament:tournament_id ( logo_url, stadium, league_name, url ),
-          round_number, highlight_link
-        `)
-        .order('date', { ascending: true })
-        ;
-
-      // If specific tournament selected, refetch with filter (Supabase doesn't allow conditional in builder easily)
-      let list = data || [];
-      if (!error && effectiveTournamentId) {
-        const { data: filtered, error: err2 } = await supabase
-          .from('matches')
-          .select(`
-            *,
-            team1:team1_ref ( name, logo ),
-            team2:team2_ref ( name, logo ),
-            tournament:tournament_id ( logo_url, stadium, league_name, url ),
-            round_number, highlight_link
-          `)
-          .eq('tournament_id', effectiveTournamentId)
-          .order('date', { ascending: true });
-        if (!err2 && filtered) list = filtered;
-      } else if (!error && mode === 'archive' && selectedSeason != null) {
-        // Season filter: fetch matches for tournaments that have this season
-        const ids = tournaments.filter(t => String(t.season) === selectedSeason).map(t => t.id);
-        if (ids.length > 0) {
-          const { data: bySeason, error: err3 } = await supabase
+      let list: any[] = [];
+      try {
+        if (effectiveTournamentId) {
+          const { data } = await supabase
             .from('matches')
             .select(`
               *,
@@ -139,15 +114,66 @@ const Matches: React.FC = () => {
               tournament:tournament_id ( logo_url, stadium, league_name, url ),
               round_number, highlight_link
             `)
-            .in('tournament_id', ids)
+            .eq('tournament_id', effectiveTournamentId)
             .order('date', { ascending: true });
-          if (!err3 && bySeason) list = bySeason;
+          list = data || [];
+        } else if (mode === 'archive') {
+          if (selectedSeason) {
+            const ids = tournaments
+              .filter(t => String(t.season) === selectedSeason)
+              .filter(t => !(t.status === 'current' || (t as any).is_current))
+              .map(t => t.id);
+            if (ids.length > 0) {
+              const { data } = await supabase
+                .from('matches')
+                .select(`
+                  *,
+                  team1:team1_ref ( name, logo ),
+                  team2:team2_ref ( name, logo ),
+                  tournament:tournament_id ( logo_url, stadium, league_name, url ),
+                  round_number, highlight_link
+                `)
+                .in('tournament_id', ids)
+                .order('date', { ascending: true });
+              list = data || [];
+            } else {
+              list = [];
+            }
+          } else {
+            // Archive with "All seasons" and no tournament selected: show nothing
+            list = [];
+          }
         } else {
+          // Current mode but no tournament resolved yet: empty to avoid mixing
           list = [];
         }
+      } catch (e) {
+        console.error(e);
       }
 
-      if (!error && list) {
+      if (list) {
+        // Build events count map to decide whether to show the Events button
+        try {
+          const ids = list.map((m: any) => m.id).filter(Boolean);
+          if (ids.length > 0) {
+            const { data: evRows } = await supabase
+              .from('match_events')
+              .select('match_id')
+              .in('match_id', ids);
+            const counts: Record<string, number> = {};
+            (evRows || []).forEach((r: any) => {
+              const k = r.match_id;
+              counts[k] = (counts[k] || 0) + 1;
+            });
+            setEventsCount(counts);
+          } else {
+            setEventsCount({});
+          }
+        } catch (e) {
+          // ignore counting errors — just hide the button by default
+          setEventsCount({});
+        }
+
         const formatted = list.map((match: any) => {
           // Use date+time with UA offset to avoid misclassification
           const dateObj = new Date(`${match.date}T${match.time || '00:00'}+03:00`);
@@ -165,6 +191,7 @@ const Matches: React.FC = () => {
             score,
             tournamentLogo: match.tournament?.logo_url || '',
             leagueName: match.tournament?.league_name || '',
+            id: match.id,
             tournamentUrl: match.tournament?.url || '',
             tour: match.round_number,
             team1Logo: match.team1?.logo || '',
@@ -197,6 +224,11 @@ const Matches: React.FC = () => {
       setActiveTab('past');
     }
   }, [mode]);
+
+  // no runtime measurements — align via grid row below
+
+  // Placeholder when archive has "All seasons" and no specific tournament
+  const showArchivePlaceholder = mode === 'archive' && !effectiveTournamentId && !selectedSeason;
 
   
 
@@ -265,6 +297,7 @@ const Matches: React.FC = () => {
               {futureMatches.map((match, index) => {
                 const [team1, team2] = match.teams.split(' проти ');
                 return (
+                  <>
                   <Box
                     component={motion.div}
                     variants={listItem}
@@ -485,6 +518,7 @@ const Matches: React.FC = () => {
                       )}
                     </Box>
                   </Box>
+                  </>
                 );
               })}
             </Stack>
@@ -500,6 +534,27 @@ const Matches: React.FC = () => {
               px: { xs: 0, sm: 2 },
             }}
           >
+            {showArchivePlaceholder ? (
+              <Box
+                sx={(theme) => ({
+                  border: `1px dashed ${theme.palette.grey[300]}`,
+                  borderRadius: '8px',
+                  background: theme.palette.background.default,
+                  p: { xs: 2, sm: 3 },
+                  textAlign: 'center',
+                  color: theme.palette.text.secondary,
+                  fontFamily: 'FixelDisplay, sans-serif',
+                })}
+              >
+                <Box sx={{ fontSize: { xs: '1rem', sm: '1.1rem' }, fontWeight: 700, mb: 0.5 }}>
+                  Оберіть сезон або турнір
+                </Box>
+                <Box sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                  Щоб побачити зіграні матчі в архіві, скористайтесь чіпсами
+                  «Сезони» та «Турніри» у верхній частині сторінки.
+                </Box>
+              </Box>
+            ) : (
             <Stack
               component={motion.div}
               initial="hidden"
@@ -522,7 +577,9 @@ const Matches: React.FC = () => {
                   opponentScore = parseInt(match.score?.split('-')[0]?.trim(), 10);
                 }
                 // --- END КОЛІР ДЛЯ SCORE ---
+                const eventsSide: 'left' | 'right' = (team2?.trim() === MY_TEAM_NAME) ? 'right' : 'left';
                 return (
+                  <>
                   <Box
                     component={motion.div}
                     variants={listItem}
@@ -728,7 +785,17 @@ const Matches: React.FC = () => {
                     </Box>
 
                     {/* RIGHT */}
-                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                      {eventsCount[match.id] > 0 && (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => setOpenEvents((s) => ({ ...s, [match.id]: !s[match.id] }))}
+                          sx={{ fontWeight: 700, textTransform: 'none' }}
+                        >
+                          {openEvents[match.id] ? 'Сховати події' : 'Події'}
+                        </Button>
+                      )}
                       {match.youtube_link && (
                         <a
                           href={match.youtube_link}
@@ -761,10 +828,23 @@ const Matches: React.FC = () => {
                         </a>
                       )}
                     </Box>
+                    {/* Events below, occupying full row within flex-wrap */}
+                    {match.id ? (
+                      <Box sx={{ flexBasis: '100%', width: '100%' }}>
+                        {/* center events under the card */}
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                          <Box sx={{ width: { xs: '100%', sm: 520 } }}>
+                            <MatchEvents matchId={match.id} open={!!openEvents[match.id]} side="full" />
+                          </Box>
+                        </Box>
+                      </Box>
+                    ) : null}
                   </Box>
+                  </>
                 );
               })}
             </Stack>
+            )}
           </Box>
         )}
       </Box>

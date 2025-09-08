@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Box, Button, Typography } from '@mui/material';
 import { useTournament } from '../context/TournamentContext';
 import { Box as MuiBox } from '@mui/material';
+import MatchEvents from './MatchEvents';
 
 const Section = motion(Box);
 
@@ -299,6 +300,8 @@ const Fixtures = () => {
                     wordBreak: 'break-word',
                   }}>{match.team2?.name}</Box>
                 </Box>
+
+                {/* Events intentionally hidden in past match card as requested */}
               </Box>
 
               <Box sx={{fontSize: { xs: '0.9rem', sm: '1rem' },opacity:0.9,lineHeight:1.8,mt:'0.5rem'}}>

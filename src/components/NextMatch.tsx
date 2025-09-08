@@ -3,6 +3,10 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
+import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import BlockIcon from '@mui/icons-material/Block';
+import StarIcon from '@mui/icons-material/Star';
 import type { Database } from '../types/supabase';
 import { supabase } from '../supabase';
 import { useTournament } from '../context/TournamentContext';
@@ -39,6 +43,17 @@ const NextMatch = () => {
   } | null>(null);
   const [form1, setForm1] = useState<string[]>([]);
   const [form2, setForm2] = useState<string[]>([]);
+  // --- Match events (for finished matches) -----------------------------------
+  type EventRow = {
+    match_id: string;
+    player?: string | null;
+    player_id?: string | null;
+    assist_player_id?: string | null;
+    type?: string | null; // goal | yellow | red | mvp
+    minute?: number | null;
+    time?: string | null;
+  };
+  const [events, setEvents] = useState<EventRow[]>([]);
   // --- Use form values that already exist in the "teams" table -----------------
   useEffect(() => {
     if (!data) return;
@@ -148,6 +163,21 @@ const NextMatch = () => {
 
     fetchMatch();
   }, [effectiveTournamentId]);
+
+  // Load events when a specific match is selected
+  useEffect(() => {
+    const run = async () => {
+      if (!data?.id) { setEvents([]); return; }
+      const { data: rows } = await supabase
+        .from('match_events')
+        .select('*')
+        .eq('match_id', data.id)
+        .order('minute', { ascending: true })
+        .order('date_created', { ascending: true });
+      setEvents((rows as any[]) || []);
+    };
+    run();
+  }, [data?.id]);
 
   useEffect(() => {
     if (!matchDate) return;
@@ -361,7 +391,6 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            // Remove flexWrap so items stay on one line
             gap: { xs: 1, sm: 2 },
             mb: 2,
             flexDirection: { xs: 'row', md: 'row' },
@@ -456,13 +485,13 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                           })}
                         </Box>
                       )}
-                      {data.team1.name?.toLowerCase().includes('fayna') && matchIsOver && (
+                      {false && data.team1.name?.toLowerCase().includes('fayna') && matchIsOver && events.length > 0 && (
                         <Box
                           className="team-extra"
                           sx={{
                             mt: '0.3rem',
-                            fontSize: '1.1rem',
-                            fontWeight: 300,
+                            fontSize: '1rem',
+                            fontWeight: 400,
                             color: 'white',
                             display: 'flex',
                             flexDirection: 'column',
@@ -471,10 +500,25 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                             textAlign: { xs: 'center', sm: 'right' },
                           }}
                         >
-                          {data?.mvp && <div>⭐ MVP {data.mvp.last_name}</div>}
-                          {data?.scorers_fayna && data.scorers_fayna.split(',').map((name, i) => (
-                            <div key={i}>⚽ {name.trim()}</div>
-                          ))}
+                          {events.map((ev, i) => {
+                            const t = (ev.type || '').toLowerCase();
+                            const minute = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
+                            const name = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
+                            return (
+                              <Box key={i} sx={{ display:'grid', gridTemplateColumns:'44px 20px 1fr', alignItems:'center', gap: 1 }}>
+                                <Typography sx={{ color:'#ddd', fontWeight:700, textAlign:'right' }}>{minute}</Typography>
+                                <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center' }}>
+                                  {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 18, color: '#fff' }} />}
+                                  {t==='yellow' && <Box sx={{ width:12, height:16, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
+                                  {t==='red' && <Box sx={{ width:12, height:16, borderRadius:'2px', backgroundColor:'#f44336' }} />}
+                                  {t==='mvp' && <StarIcon sx={{ fontSize: 18, color: '#ffb300' }} />}
+                                </Box>
+                                <Typography sx={{ fontWeight: 600 }}>
+                                  {name}{t==='goal' && ev.assist_player_id ? ` (${ev.assist_player_id})` : ''}
+                                </Typography>
+                              </Box>
+                            );
+                          })}
                         </Box>
                       )}
                     </Box>
@@ -491,10 +535,48 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                       mb: { xs: 0.5, sm: 1 },
                     }}
                   />
+                  {false && data.team1.name?.toLowerCase().includes('fayna') && matchIsOver && events.length > 0 && (
+                    <Box
+                      className="team-extra"
+                      sx={{
+                        mt: '0.3rem',
+                        fontSize: '1rem',
+                        fontWeight: 400,
+                        color: 'white',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.25rem',
+                        alignItems: { xs: 'center', sm: 'flex-end' },
+                        textAlign: { xs: 'center', sm: 'right' },
+                        width: '100%',
+                      }}
+                    >
+                      {events.map((ev, i) => {
+                        const t = (ev.type || '').toLowerCase();
+                        const minute = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
+                        const name = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
+                        return (
+                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'32px 12px 1fr', alignItems:'center', gap: 0.25 }}>
+                            <Typography sx={{ color:'#ddd', fontWeight:700, textAlign:'right' }}>{minute}</Typography>
+                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 12 }}>
+                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 16, color: '#fff' }} />}
+                              {t==='yellow' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
+                              {t==='red' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#f44336' }} />}
+                              {t==='mvp' && <StarIcon sx={{ fontSize: 18, color: '#ffb300' }} />}
+                            </Box>
+                            <Typography sx={{ fontWeight: 600, textAlign:'right' }}>
+                              {name}{t==='goal' && ev.assist_player_id ? ` (${ev.assist_player_id})` : ''}
+                            </Typography>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  )}
                 </>
               )}
             </Box>
           </Box>
+          {/* Score */}
           <Box
             sx={{
               position: 'relative',
@@ -528,6 +610,7 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                 })
               : isNowLive ? 'vs' : '--:--'}
           </Box>
+          {/* Right team */}
           <Box
             sx={{
               flex: 1,
@@ -620,13 +703,13 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                           })}
                         </Box>
                       )}
-                      {data.team2.name?.toLowerCase().includes('fayna') && matchIsOver && (
+                      {false && data.team2.name?.toLowerCase().includes('fayna') && matchIsOver && events.length > 0 && (
                         <Box
                           className="team-extra"
                           sx={{
                             mt: '0.3rem',
-                            fontSize: '1.1rem',
-                            fontWeight: 300,
+                            fontSize: '1rem',
+                            fontWeight: 400,
                             color: 'white',
                             display: 'flex',
                             flexDirection: 'column',
@@ -635,10 +718,25 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                             textAlign: { xs: 'center', sm: 'left' },
                           }}
                         >
-                          {data?.mvp && <div>⭐ MVP {data.mvp.last_name}</div>}
-                          {data?.scorers_fayna && data.scorers_fayna.split(',').map((name, i) => (
-                            <div key={i}>⚽ {name.trim()}</div>
-                          ))}
+                          {events.map((ev, i) => {
+                            const t = (ev.type || '').toLowerCase();
+                            const minute = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
+                            const name = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
+                            return (
+                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'32px 12px 1fr', alignItems:'center', gap: 0.25 }}>
+                            <Typography sx={{ color:'#ddd', fontWeight:700, textAlign:'right' }}>{minute}</Typography>
+                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 12 }}>
+                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 16, color: '#fff' }} />}
+                              {t==='yellow' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
+                              {t==='red' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#f44336' }} />}
+                              {t==='mvp' && <StarIcon sx={{ fontSize: 18, color: '#ffb300' }} />}
+                            </Box>
+                                <Typography sx={{ fontWeight: 600 }}>
+                                  {name}{t==='goal' && ev.assist_player_id ? ` (${ev.assist_player_id})` : ''}
+                                </Typography>
+                              </Box>
+                            );
+                          })}
                         </Box>
                       )}
                     </Box>
@@ -655,6 +753,43 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                       mb: { xs: 0.5, sm: 1 },
                     }}
                   />
+                  {data.team2.name?.toLowerCase().includes('fayna') && matchIsOver && events.length > 0 && (
+                    <Box
+                      className="team-extra"
+                      sx={{
+                        mt: '0.3rem',
+                        fontSize: '1rem',
+                        fontWeight: 400,
+                        color: 'white',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.25rem',
+                        alignItems: { xs: 'center', sm: 'flex-start' },
+                        textAlign: { xs: 'center', sm: 'left' },
+                        width: '100%',
+                      }}
+                    >
+                      {events.map((ev, i) => {
+                        const t = (ev.type || '').toLowerCase();
+                        const minute = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
+                        const name = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
+                        return (
+                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'32px 12px 1fr', alignItems:'center', gap: 0.25 }}>
+                            <Typography sx={{ color:'#ddd', fontWeight:700, textAlign:'left' }}>{minute}</Typography>
+                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 12 }}>
+                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 16, color: '#fff' }} />}
+                              {t==='yellow' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
+                              {t==='red' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#f44336' }} />}
+                              {t==='mvp' && <StarIcon sx={{ fontSize: 18, color: '#ffb300' }} />}
+                            </Box>
+                            <Typography sx={{ fontWeight: 600, textAlign:'left' }}>
+                              {name}{t==='goal' && ev.assist_player_id ? ` (${ev.assist_player_id})` : ''}
+                            </Typography>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  )}
                 </>
               )}
             </Box>
