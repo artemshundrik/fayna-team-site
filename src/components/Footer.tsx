@@ -8,12 +8,12 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 
 const sponsors = [
   {
-    name: 'Tosho agency',
+    name: 'Tosho Agency',
     href: 'https://tosho.agency/',
     src: '/images/sponsors/logo-sponsor-tosho-white.svg',
   },
   {
-    name: 'Wookie agency',
+    name: 'Wookie Studio',
     href: 'https://wookie.com.ua/ua/',
     src: '/images/sponsors/logo-sponsor-wookie-white.svg',
   },
@@ -97,8 +97,8 @@ const FooterLinks = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           <Link href="/" sx={(theme) => footerLinkStyle(theme)}>ГОЛОВНА</Link>
           <Link href="/squad" sx={(theme) => footerLinkStyle(theme)}>КОМАНДА</Link>
-          <Link href="/fanshop" sx={(theme) => footerLinkStyle(theme)}>ФАНШОП</Link>
           <Link href="/matches" sx={(theme) => footerLinkStyle(theme)}>МАТЧІ</Link>
+          <Link href="/fanshop" sx={(theme) => footerLinkStyle(theme)}>ФАНШОП</Link>
         </Box>
       </Box>
     </Box>

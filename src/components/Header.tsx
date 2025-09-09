@@ -31,11 +31,11 @@ const NavLinks = ({ onClick }: { onClick?: () => void }) => (
     <Link to="/squad" style={{ textDecoration: 'none' }} onClick={onClick}>
       <Typography variant="navLink">Команда</Typography>
     </Link>
-    <Link to="/fanshop" style={{ textDecoration: 'none' }} onClick={onClick}>
-      <Typography variant="navLink">Фаншоп</Typography>
-    </Link>
     <Link to="/matches" style={{ textDecoration: 'none' }} onClick={onClick}>
       <Typography variant="navLink">Матчі</Typography>
+    </Link>
+    <Link to="/fanshop" style={{ textDecoration: 'none' }} onClick={onClick}>
+      <Typography variant="navLink">Фаншоп</Typography>
     </Link>
   </>
 );
