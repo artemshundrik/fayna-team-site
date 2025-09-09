@@ -69,6 +69,140 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return Array.from(ss).sort().reverse();
   }, [tournaments]);
 
+  // Helper to parse season string and get a comparable numeric start year
+  const seasonStartYear = (s?: string | null): number | null => {
+    if (!s) return null;
+    const str = String(s).trim();
+    if (/^\d{4}\s*\/\s*\d{4}$/.test(str)) {
+      const [start] = str.split('/');
+      const n = parseInt(start, 10);
+      return Number.isFinite(n) ? n : null;
+    }
+    const n = parseInt(str, 10);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  // 1) Read initial state from URL or localStorage (deep-linkable archive)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlMode = params.get('mode');
+    const urlSeason = params.get('season');
+    const urlTournament = params.get('tournament');
+
+    const lsSeason = localStorage.getItem('archiveSeason');
+    const lsTournament = localStorage.getItem('archiveTournament');
+
+    if (urlMode === 'archive') setMode('archive');
+
+    if (urlSeason) setSelectedSeason(urlSeason);
+    else if (lsSeason) setSelectedSeason(lsSeason);
+
+    if (urlTournament) setSelectedTournamentId(urlTournament);
+    else if (lsTournament) setSelectedTournamentId(lsTournament);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 2) Keep URL and localStorage in sync with archive choices (no page reload)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (mode === 'archive') params.set('mode', 'archive');
+    else params.delete('mode');
+
+    if (selectedSeason) {
+      params.set('season', selectedSeason);
+      localStorage.setItem('archiveSeason', selectedSeason);
+    } else {
+      params.delete('season');
+      localStorage.removeItem('archiveSeason');
+    }
+
+    if (selectedTournamentId) {
+      params.set('tournament', selectedTournamentId);
+      localStorage.setItem('archiveTournament', selectedTournamentId);
+    } else {
+      params.delete('tournament');
+      localStorage.removeItem('archiveTournament');
+    }
+
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, '', newUrl);
+  }, [mode, selectedSeason, selectedTournamentId]);
+
+  const isArchivedTournament = (t: Tournament) => {
+    const now = new Date();
+    if (t.status === 'archived') return true;
+    if (t.status === 'current' || t.is_current) return false;
+    if (t.end_date) {
+      const d = new Date(t.end_date);
+      if (!isNaN(d.getTime())) return d < now;
+    }
+    // if no end_date — treat as not archived to avoid false positives
+    return false;
+  };
+
+  // Auto-select default season (latest with archived tournaments) and latest archived tournament within it
+  useEffect(() => {
+    if (loading) return;
+    if (mode !== 'archive') return;
+
+    // Determine latest season that has archived tournaments
+    const seasonsWithArchived = Array.from(
+      new Set(
+        tournaments.filter(isArchivedTournament).map(t => String(t.season || ''))
+      )
+    ).filter(Boolean) as string[];
+
+    let latestSeason: string | null = null;
+    if (seasonsWithArchived.length > 0) {
+      latestSeason = seasonsWithArchived
+        .slice()
+        .sort((a, b) => (seasonStartYear(b) ?? -Infinity) - (seasonStartYear(a) ?? -Infinity))[0] || null;
+    }
+
+    // If no season explicitly selected, pick the latest archived season
+    if (!selectedSeason && latestSeason) {
+      setSelectedSeason(latestSeason);
+    }
+
+    // If no tournament explicitly selected, pick the latest archived tournament in the chosen season
+    const seasonToUse = selectedSeason || latestSeason;
+    if (seasonToUse && !selectedTournamentId) {
+      const candidates = tournaments.filter(
+        t => String(t.season) === seasonToUse && isArchivedTournament(t)
+      );
+      if (candidates.length > 0) {
+        const sorted = candidates.slice().sort((a, b) => {
+          const ae = a.end_date ? new Date(a.end_date).getTime() : (a.start_date ? new Date(a.start_date).getTime() : -Infinity);
+          const be = b.end_date ? new Date(b.end_date).getTime() : (b.start_date ? new Date(b.start_date).getTime() : -Infinity);
+          return be - ae;
+        });
+        setSelectedTournamentId(sorted[0].id);
+      }
+    }
+  }, [mode, seasons, selectedSeason, selectedTournamentId, tournaments, loading]);
+
+  // When user changes season, preselect the latest tournament within that season
+  useEffect(() => {
+    if (!selectedSeason) return;
+    if (mode !== 'archive') return;
+    // If current selected tournament is not from this season, or none selected, choose latest archived in that season
+    const currentSel = tournaments.find(t => t.id === selectedTournamentId);
+    if (!currentSel || String(currentSel.season) !== String(selectedSeason) || !isArchivedTournament(currentSel)) {
+      const candidates = tournaments.filter(t => String(t.season) === String(selectedSeason) && isArchivedTournament(t));
+      if (candidates.length > 0) {
+        const sorted = candidates.slice().sort((a, b) => {
+          const ae = a.end_date ? new Date(a.end_date).getTime() : (a.start_date ? new Date(a.start_date).getTime() : -Infinity);
+          const be = b.end_date ? new Date(b.end_date).getTime() : (b.start_date ? new Date(b.start_date).getTime() : -Infinity);
+          return be - ae;
+        });
+        setSelectedTournamentId(sorted[0].id);
+      } else {
+        // No archived tournaments for this season — clear selection
+        setSelectedTournamentId(null);
+      }
+    }
+  }, [selectedSeason, mode, tournaments]);
+
   const effectiveTournamentId = useMemo(() => {
     if (mode === 'archive') return selectedTournamentId;
     return currentTournamentId;
@@ -79,9 +213,9 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     loading,
     mode,
     setMode,
-     seasons,
-     selectedSeason,
-     setSelectedSeason,
+    seasons,
+    selectedSeason,
+    setSelectedSeason,
     selectedTournamentId,
     setSelectedTournamentId,
     currentTournamentId,

@@ -53,25 +53,30 @@ const TournamentSwitcher: React.FC = () => {
   };
 
   const archiveList = tournaments.filter((t) =>
-    // not "current"
-    !t.is_current && (t.status !== 'current') &&
-    // match season filter if set
-    (selectedSeason ? String(t.season) === selectedSeason : true) &&
-    // exclude tournaments that haven't started yet
-    hasStarted(t)
+    !t.is_current && (t.status !== 'current') && hasStarted(t) &&
+    (selectedSeason ? String(t.season) === selectedSeason : false)
   );
 
   // Upcoming tournaments to show under "ПОТОЧНИЙ"
   const currentTournament = tournaments.find(t => t.id === currentTournamentId) || null;
   const currentTitleKey = ((currentTournament?.title || '').trim().toUpperCase());
+  const isUpcoming = (t: { status?: string | null; is_current?: boolean | null; start_date?: string | null; season?: string | null }) => {
+    if (t.status === 'upcoming') return true;
+    if (t.status === 'archived' || t.status === 'current' || t.is_current) return false;
+    if (t.start_date) {
+      const d = new Date(t.start_date);
+      if (!isNaN(d.getTime())) return d > today; // strictly in the future
+    }
+    const sy = seasonStartYear(t.season);
+    return sy != null ? sy > today.getFullYear() : false; // strictly next seasons
+  };
+
   const upcoming = tournaments.filter((t) => {
     const titleKey = (t.title || '').trim().toUpperCase();
-    const byStatus = t.status === 'upcoming';
-    const bySeason = (seasonStartYear(t.season) ?? 0) >= currentYear;
     return (
       t.id !== currentTournamentId &&
       titleKey !== currentTitleKey &&
-      (byStatus || (!t.is_current && bySeason))
+      isUpcoming(t)
     );
   });
 
@@ -82,23 +87,17 @@ const TournamentSwitcher: React.FC = () => {
     return new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
   };
 
-  // Seasons that already started (hide seasons with only future tournaments)
+  // Seasons list for archive filter — include seasons that have archived tournaments
   const startedSeasons = useMemo(() => {
     const set = new Set<string>();
     tournaments.forEach((t) => {
       const s = (t.season || '').toString();
       if (!s) return;
-      if (hasStarted(t)) set.add(s);
+      const isArchived = t.status === 'archived' || (!t.is_current && hasStarted(t) && (!!t.end_date && new Date(t.end_date) < new Date()));
+      if (isArchived) set.add(s);
     });
     return Array.from(set).sort().reverse();
   }, [tournaments]);
-
-  // If a not-started season was selected earlier, reset selection
-  useEffect(() => {
-    if (selectedSeason && !startedSeasons.includes(selectedSeason)) {
-      setSelectedSeason(null);
-    }
-  }, [selectedSeason, startedSeasons, setSelectedSeason]);
 
   return (
     <Box sx={{ width: '100%', mb: 2 }}>
@@ -206,7 +205,7 @@ const TournamentSwitcher: React.FC = () => {
 
       {mode === 'archive' && (
         <>
-          {/* Years filter */}
+          {/* Seasons picker */}
           <Box sx={{
             display: 'flex',
             gap: 1,
@@ -216,26 +215,6 @@ const TournamentSwitcher: React.FC = () => {
             mb: 1,
             '&::-webkit-scrollbar': { display: 'none' },
           }}>
-            <Chip
-              label="Всі сезони"
-              variant="outlined"
-              size="medium"
-              disableRipple
-              onClick={() => setSelectedSeason(null)}
-              sx={{
-                borderRadius: '24px',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                px: 1.5,
-                height: 40,
-                textTransform: 'none',
-                WebkitTapHighlightColor: 'transparent',
-                backgroundColor: selectedSeason == null ? theme.palette.common.white : undefined,
-                border: selectedSeason == null ? `1px solid ${theme.palette.primary.main}` : undefined,
-                color: selectedSeason == null ? theme.palette.text.primary : theme.palette.text.secondary,
-                '&:hover': { borderColor: theme.palette.primary.main },
-              }}
-            />
             {startedSeasons.map((s) => (
               <Chip
                 key={s}
@@ -261,7 +240,7 @@ const TournamentSwitcher: React.FC = () => {
             ))}
           </Box>
 
-          {/* Tournaments list (filtered by selected year) */}
+          {/* Tournaments list — visible only after season is selected */}
           <Box sx={{
             display: 'flex',
             gap: 1,
@@ -270,13 +249,14 @@ const TournamentSwitcher: React.FC = () => {
             px: 1,
             '&::-webkit-scrollbar': { display: 'none' },
           }}>
-            {loading && (
-              <Typography variant="body2" color="text.secondary">Завантаження турнірів…</Typography>
-            )}
-            {!loading && archiveList.length === 0 && (
+            {loading && <Typography variant="body2" color="text.secondary">Завантаження турнірів…</Typography>}
+            {!loading && !selectedSeason && startedSeasons.length === 0 && (
               <Typography variant="body2" color="text.secondary">Архів порожній</Typography>
             )}
-            {archiveList.map((t) => {
+            {!loading && selectedSeason && archiveList.length === 0 && (
+              <Typography variant="body2" color="text.secondary">Турніри сезону не знайдено</Typography>
+            )}
+            {selectedSeason && archiveList.map((t) => {
               const key = (t.title || '').trim().toUpperCase();
               const color = tournamentColors[key] || theme.palette.primary.main;
               const selected = selectedTournamentId === t.id;

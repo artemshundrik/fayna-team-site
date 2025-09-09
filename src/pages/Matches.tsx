@@ -102,6 +102,12 @@ const Matches: React.FC = () => {
   
   useEffect(() => {
     const fetchMatches = async () => {
+      // In archive mode, if no season or no tournament is selected, explicitly clear lists
+      if (mode === 'archive' && (!selectedSeason || !effectiveTournamentId)) {
+        setMatches([]);
+        setEventsCount({});
+        return;
+      }
       let list: any[] = [];
       try {
         if (effectiveTournamentId) {
@@ -118,29 +124,21 @@ const Matches: React.FC = () => {
             .order('date', { ascending: true });
           list = data || [];
         } else if (mode === 'archive') {
-          if (selectedSeason) {
-            const ids = tournaments
-              .filter(t => String(t.season) === selectedSeason)
-              .filter(t => !(t.status === 'current' || (t as any).is_current))
-              .map(t => t.id);
-            if (ids.length > 0) {
-              const { data } = await supabase
-                .from('matches')
-                .select(`
-                  *,
-                  team1:team1_ref ( name, logo ),
-                  team2:team2_ref ( name, logo ),
-                  tournament:tournament_id ( logo_url, stadium, league_name, url ),
-                  round_number, highlight_link
-                `)
-                .in('tournament_id', ids)
-                .order('date', { ascending: true });
-              list = data || [];
-            } else {
-              list = [];
-            }
+          // First pick season, then tournament; no mixing multiple tournaments
+          if (selectedSeason && effectiveTournamentId) {
+            const { data } = await supabase
+              .from('matches')
+              .select(`
+                *,
+                team1:team1_ref ( name, logo ),
+                team2:team2_ref ( name, logo ),
+                tournament:tournament_id ( logo_url, stadium, league_name, url ),
+                round_number, highlight_link
+              `)
+              .eq('tournament_id', effectiveTournamentId)
+              .order('date', { ascending: true });
+            list = data || [];
           } else {
-            // Archive with "All seasons" and no tournament selected: show nothing
             list = [];
           }
         } else {
@@ -228,7 +226,7 @@ const Matches: React.FC = () => {
   // no runtime measurements — align via grid row below
 
   // Placeholder when archive has "All seasons" and no specific tournament
-  const showArchivePlaceholder = mode === 'archive' && !effectiveTournamentId && !selectedSeason;
+  const showArchivePlaceholder = mode === 'archive' && (!selectedSeason || !effectiveTournamentId);
 
   
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
-import { Box, Collapse, Stack, Typography } from '@mui/material';
+import { Box, Collapse, Stack, Typography, Fade } from '@mui/material';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import StarIcon from '@mui/icons-material/Star';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -86,17 +86,14 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
   const filtered = rows;
 
   if (compact && open && !loading && rows.length === 0) return null;
+  const showContent = open && !loading && rows.length > 0;
 
   const invert = side === 'left';
 
   return (
     <Collapse in={open} timeout={200} unmountOnExit>
       <Box sx={{ mt: compact ? 0 : 0.5, pt: compact ? 0 : 0.5, pb: compact ? 0 : 0.25, px: { xs: compact ? 0.5 : 1, sm: compact ? 0.5 : 0 }, width: '100%' }}>
-        {loading ? (
-          <Typography variant="body2" color="text.secondary">Завантаження подій…</Typography>
-        ) : rows.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">Подій не знайдено</Typography>
-        ) : (
+        <Fade in={showContent} timeout={220} mountOnEnter unmountOnExit>
           <Stack spacing={compact ? 0.25 : 0.5} sx={{ width: '100%' }}>
             {filtered.map((ev, idx) => {
               const color = badgeColor(ev.type);
@@ -114,10 +111,10 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
                     width: '100%',
                     display: 'grid',
                     gridTemplateColumns: invert
-                      ? (compact ? '1fr 12px 32px' : '1fr 16px 40px')
-                      : (compact ? '32px 12px 1fr' : '40px 16px 1fr'),
+                      ? (compact ? '1fr 10px 28px' : '1fr 12px 34px')
+                      : (compact ? '28px 10px 1fr' : '34px 12px 1fr'),
                     alignItems: 'center',
-                    gap: compact ? '2px' : '4px',
+                    gap: compact ? '1px' : '3px',
                     px: { xs: compact ? 0 : 1, sm: compact ? 0 : 1 },
                   }}
                 >
@@ -126,11 +123,11 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
                     {minuteText}
                   </Typography>
                   {/* icon */}
-                  <Box sx={{ display:'flex', alignItems:'center', justifyContent:'center', width: compact ? 12 : 16 }}>
-                    {isGoal && <SportsSoccerIcon sx={{ fontSize: compact ? 14 : 16, color: '#111' }} />}
-                    {isYellow && <Box sx={{ width: compact ? 8 : 10, height: compact ? 12 : 14, borderRadius: '2px', backgroundColor: '#fbc02d' }} />}
-                    {isRed && <Box sx={{ width: compact ? 8 : 10, height: compact ? 12 : 14, borderRadius: '2px', backgroundColor: '#f44336' }} />}
-                    {!isGoal && !isYellow && !isRed && <StarIcon sx={{ fontSize: compact ? 14 : 16, color }} />}
+                  <Box sx={{ display:'flex', alignItems:'center', justifyContent:'center', width: compact ? 10 : 12 }}>
+                    {isGoal && <SportsSoccerIcon sx={{ fontSize: compact ? 13 : 15, color: '#111' }} />}
+                    {isYellow && <Box sx={{ width: compact ? 7 : 9, height: compact ? 10 : 12, borderRadius: '2px', backgroundColor: '#fbc02d' }} />}
+                    {isRed && <Box sx={{ width: compact ? 7 : 9, height: compact ? 10 : 12, borderRadius: '2px', backgroundColor: '#f44336' }} />}
+                    {!isGoal && !isYellow && !isRed && <StarIcon sx={{ fontSize: compact ? 13 : 15, color }} />}
                   </Box>
                   {/* text (to the outside) */}
                   <Box sx={{ display:'flex', alignItems:'center', gap: compact ? 0.25 : 0.5, minWidth: 0, justifyContent: invert ? 'flex-end' : 'flex-start' }}>
@@ -149,7 +146,7 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
               );
             })}
           </Stack>
-        )}
+        </Fade>
       </Box>
     </Collapse>
   );

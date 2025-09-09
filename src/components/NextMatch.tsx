@@ -556,12 +556,12 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                         const minute = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
                         const name = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
                         return (
-                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'32px 12px 1fr', alignItems:'center', gap: 0.25 }}>
+                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'28px 10px 1fr', alignItems:'center', gap: 0.25 }}>
                             <Typography sx={{ color:'#ddd', fontWeight:700, textAlign:'right' }}>{minute}</Typography>
-                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 12 }}>
-                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 16, color: '#fff' }} />}
-                              {t==='yellow' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
-                              {t==='red' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#f44336' }} />}
+                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 10 }}>
+                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 15, color: '#fff' }} />}
+                              {t==='yellow' && <Box sx={{ width:7, height:10, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
+                              {t==='red' && <Box sx={{ width:7, height:10, borderRadius:'2px', backgroundColor:'#f44336' }} />}
                               {t==='mvp' && <StarIcon sx={{ fontSize: 18, color: '#ffb300' }} />}
                             </Box>
                             <Typography sx={{ fontWeight: 600, textAlign:'right' }}>
@@ -723,12 +723,12 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                             const minute = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
                             const name = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
                             return (
-                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'32px 12px 1fr', alignItems:'center', gap: 0.25 }}>
+                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'28px 10px 1fr', alignItems:'center', gap: 0.25 }}>
                             <Typography sx={{ color:'#ddd', fontWeight:700, textAlign:'right' }}>{minute}</Typography>
-                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 12 }}>
-                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 16, color: '#fff' }} />}
-                              {t==='yellow' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
-                              {t==='red' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#f44336' }} />}
+                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 10 }}>
+                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 15, color: '#fff' }} />}
+                              {t==='yellow' && <Box sx={{ width:7, height:10, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
+                              {t==='red' && <Box sx={{ width:7, height:10, borderRadius:'2px', backgroundColor:'#f44336' }} />}
                               {t==='mvp' && <StarIcon sx={{ fontSize: 18, color: '#ffb300' }} />}
                             </Box>
                                 <Typography sx={{ fontWeight: 600 }}>
@@ -774,12 +774,12 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                         const minute = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
                         const name = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
                         return (
-                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'32px 12px 1fr', alignItems:'center', gap: 0.25 }}>
+                          <Box key={i} sx={{ display:'grid', gridTemplateColumns:'28px 10px 1fr', alignItems:'center', gap: 0.25 }}>
                             <Typography sx={{ color:'#ddd', fontWeight:700, textAlign:'left' }}>{minute}</Typography>
-                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 12 }}>
-                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 16, color: '#fff' }} />}
-                              {t==='yellow' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
-                              {t==='red' && <Box sx={{ width:8, height:12, borderRadius:'2px', backgroundColor:'#f44336' }} />}
+                            <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', width: 10 }}>
+                              {t==='goal' && <SportsSoccerIcon sx={{ fontSize: 15, color: '#fff' }} />}
+                              {t==='yellow' && <Box sx={{ width:7, height:10, borderRadius:'2px', backgroundColor:'#fbc02d' }} />}
+                              {t==='red' && <Box sx={{ width:7, height:10, borderRadius:'2px', backgroundColor:'#f44336' }} />}
                               {t==='mvp' && <StarIcon sx={{ fontSize: 18, color: '#ffb300' }} />}
                             </Box>
                             <Typography sx={{ fontWeight: 600, textAlign:'left' }}>
