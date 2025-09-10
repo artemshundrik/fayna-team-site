@@ -83,7 +83,7 @@ const Header = () => {
                 <img src="/images/sponsors/logo-sponsor-tosho.svg" alt="ToSho" height="24" className="sponsor-logo" />
               </a>
             </Tooltip>
-            <Tooltip title="Wookie Studio" arrow>
+            <Tooltip title="Wookie Store" arrow>
               <a href="https://wookie.com.ua/ua/" target="_blank" rel="noopener noreferrer">
                 <img src="/images/sponsors/logo-sponsor-wookie.svg" alt="Wookie" height="24" className="sponsor-logo" />
               </a>
@@ -163,7 +163,7 @@ const Header = () => {
                 <img src="/images/sponsors/logo-sponsor-tosho.svg" alt="ToSho" height="24" className="sponsor-logo" />
               </a>
             </Tooltip>
-            <Tooltip title="Wookie Studio" arrow>
+            <Tooltip title="Wookie Store" arrow>
               <a href="https://wookie.com.ua/ua/" target="_blank" rel="noopener noreferrer">
                 <img src="/images/sponsors/logo-sponsor-wookie.svg" alt="Wookie" height="24" className="sponsor-logo" />
               </a>

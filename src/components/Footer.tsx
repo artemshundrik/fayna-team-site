@@ -13,7 +13,7 @@ const sponsors = [
     src: '/images/sponsors/logo-sponsor-tosho-white.svg',
   },
   {
-    name: 'Wookie Studio',
+    name: 'Wookie Store',
     href: 'https://wookie.com.ua/ua/',
     src: '/images/sponsors/logo-sponsor-wookie-white.svg',
   },
