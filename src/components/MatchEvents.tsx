@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Box, Collapse, Stack, Typography, Fade } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import StarIcon from '@mui/icons-material/Star';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -60,6 +61,8 @@ const typeLabel = (type?: string | null) => {
 export default function MatchEvents({ matchId, open, side = 'full', compact = false }: MatchEventsProps) {
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState<EventRow[]>([]);
+  const [nameToNumber, setNameToNumber] = useState<Record<string, number>>({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!open) return;
@@ -82,6 +85,51 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
     };
   }, [matchId, open]);
 
+  // Load players to map names -> numbers for profile navigation
+  useEffect(() => {
+    if (!open) return;
+    let active = true;
+    const loadPlayers = async () => {
+      const { data, error } = await supabase
+        .from('players')
+        .select('first_name, last_name, number');
+      if (error || !data) return;
+      if (!active) return;
+      const map: Record<string, number> = {};
+      const lnCount: Record<string, number> = {};
+      data.forEach((p: any) => {
+        const fn = String(p.first_name || '').trim();
+        const ln = String(p.last_name || '').trim();
+        const num = Number(p.number);
+        if (!Number.isFinite(num)) return;
+        const lnKey = ln.toLowerCase();
+        if (lnKey) lnCount[lnKey] = (lnCount[lnKey] || 0) + 1;
+        const variants = [
+          `${fn} ${ln}`,
+          `${ln} ${fn}`,
+          `${fn} ${ln}`.toUpperCase(),
+          `${ln} ${fn}`.toUpperCase(),
+        ];
+        variants.forEach(v => {
+          const key = v.trim().toLowerCase();
+          if (key) map[key] = num;
+        });
+      });
+      // Add last-name-only mapping if unique
+      data.forEach((p: any) => {
+        const ln = String(p.last_name || '').trim();
+        const num = Number(p.number);
+        const key = ln.toLowerCase();
+        if (key && Number.isFinite(num) && lnCount[key] === 1) {
+          map[key] = num;
+        }
+      });
+      setNameToNumber(map);
+    };
+    loadPlayers();
+    return () => { active = false; };
+  }, [open]);
+
   // We keep it simple: a compact, seamless list that merges into the match card
   const filtered = rows;
 
@@ -103,6 +151,12 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
               const isRed = type === 'red';
               const minuteText = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
               const playerName = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
+              const assistName = ev.assist_player_id ? String(ev.assist_player_id).trim() : '';
+
+              const toNumber = (name: string) => {
+                const key = name.trim().toLowerCase();
+                return nameToNumber[key];
+              };
 
               return (
                 <Box
@@ -132,13 +186,43 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
                   {/* text (to the outside) */}
                   <Box sx={{ display:'flex', alignItems:'center', gap: compact ? 0.25 : 0.5, minWidth: 0, justifyContent: invert ? 'flex-end' : 'flex-start' }}>
                     {playerName && (
-                      <Typography sx={{ fontWeight: 600, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', fontSize: compact ? '0.95rem' : undefined, textAlign: invert ? 'right' : 'left' }}>
+                      <Typography
+                        onClick={() => {
+                          const n = toNumber(playerName);
+                          if (n) navigate(`/player/${n}`);
+                        }}
+                        sx={{
+                          fontWeight: 600,
+                          whiteSpace:'nowrap',
+                          overflow:'hidden',
+                          textOverflow:'ellipsis',
+                          fontSize: compact ? '0.95rem' : undefined,
+                          textAlign: invert ? 'right' : 'left',
+                          cursor: toNumber(playerName) ? 'pointer' : 'default',
+                          '&:hover': toNumber(playerName) ? { color: 'primary.main' } : undefined,
+                        }}
+                      >
                         {playerName}
                       </Typography>
                     )}
-                    {isGoal && ev.assist_player_id && (
-                      <Typography variant="body2" sx={{ color: 'text.secondary', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', fontSize: compact ? '0.85rem' : undefined }}>
-                        ({ev.assist_player_id})
+                    {isGoal && assistName && (
+                      <Typography
+                        variant="body2"
+                        onClick={() => {
+                          const n = toNumber(assistName);
+                          if (n) navigate(`/player/${n}`);
+                        }}
+                        sx={{
+                          color: 'text.secondary',
+                          whiteSpace:'nowrap',
+                          overflow:'hidden',
+                          textOverflow:'ellipsis',
+                          fontSize: compact ? '0.85rem' : undefined,
+                          cursor: toNumber(assistName) ? 'pointer' : 'default',
+                          '&:hover': toNumber(assistName) ? { color: 'primary.main' } : undefined,
+                        }}
+                      >
+                        ({assistName})
                       </Typography>
                     )}
                   </Box>

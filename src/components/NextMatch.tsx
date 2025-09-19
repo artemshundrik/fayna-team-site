@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
+import { useNavigate } from 'react-router-dom';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import BlockIcon from '@mui/icons-material/Block';
@@ -54,6 +55,8 @@ const NextMatch = () => {
     time?: string | null;
   };
   const [events, setEvents] = useState<EventRow[]>([]);
+  const [nameToNumber, setNameToNumber] = useState<Record<string, number>>({});
+  const navigate = useNavigate();
   // --- Use form values that already exist in the "teams" table -----------------
   useEffect(() => {
     if (!data) return;
@@ -178,6 +181,47 @@ const NextMatch = () => {
     };
     run();
   }, [data?.id]);
+
+  // Build a map from player full name to jersey number for navigation
+  useEffect(() => {
+    const loadPlayers = async () => {
+      const { data, error } = await supabase
+        .from('players')
+        .select('first_name, last_name, number');
+      if (error || !data) return;
+      const map: Record<string, number> = {};
+      const lnCount: Record<string, number> = {};
+      data.forEach((p: any) => {
+        const fn = String(p.first_name || '').trim();
+        const ln = String(p.last_name || '').trim();
+        const num = Number(p.number);
+        if (!Number.isFinite(num)) return;
+        const lnKey = ln.toLowerCase();
+        if (lnKey) lnCount[lnKey] = (lnCount[lnKey] || 0) + 1;
+        const variants = [
+          `${fn} ${ln}`,
+          `${ln} ${fn}`,
+          `${fn} ${ln}`.toUpperCase(),
+          `${ln} ${fn}`.toUpperCase(),
+        ];
+        variants.forEach(v => {
+          const key = v.trim().toLowerCase();
+          if (key) map[key] = num;
+        });
+      });
+      // Add last-name-only mapping if unique
+      data.forEach((p: any) => {
+        const ln = String(p.last_name || '').trim();
+        const num = Number(p.number);
+        const key = ln.toLowerCase();
+        if (key && Number.isFinite(num) && lnCount[key] === 1) {
+          map[key] = num;
+        }
+      });
+      setNameToNumber(map);
+    };
+    loadPlayers();
+  }, []);
 
   useEffect(() => {
     if (!matchDate) return;
@@ -555,6 +599,8 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                         const t = (ev.type || '').toLowerCase();
                         const minute = ev.minute != null ? `${ev.minute}'` : (ev.time ? ev.time.slice(0,5) : '');
                         const name = (ev.player && String(ev.player).trim()) || (ev.player_id && String(ev.player_id).trim()) || '';
+                        const assist = ev.assist_player_id ? String(ev.assist_player_id).trim() : '';
+                        const toNumber = (n: string) => nameToNumber[n.trim().toLowerCase()];
                         return (
                           <Box key={i} sx={{ display:'grid', gridTemplateColumns:'28px 10px 1fr', alignItems:'center', gap: 0.25 }}>
                             <Typography sx={{ color:'#ddd', fontWeight:700, textAlign:'right' }}>{minute}</Typography>
@@ -564,9 +610,23 @@ const isNowLive = matchDate && new Date() >= matchDate && new Date() < new Date(
                               {t==='red' && <Box sx={{ width:7, height:10, borderRadius:'2px', backgroundColor:'#f44336' }} />}
                               {t==='mvp' && <StarIcon sx={{ fontSize: 18, color: '#ffb300' }} />}
                             </Box>
-                            <Typography sx={{ fontWeight: 600, textAlign:'right' }}>
-                              {name}{t==='goal' && ev.assist_player_id ? ` (${ev.assist_player_id})` : ''}
-                            </Typography>
+                            <Box sx={{ display:'inline-flex', gap: 0.5, justifyContent:'flex-end', alignItems:'center' }}>
+                              <Typography
+                                onClick={() => { const n = toNumber(name); if (n) navigate(`/player/${n}`); }}
+                                sx={{ fontWeight: 600, textAlign:'right', cursor: toNumber(name) ? 'pointer' : 'default', '&:hover': toNumber(name) ? { color: 'primary.main' } : undefined }}
+                              >
+                                {name}
+                              </Typography>
+                              {t==='goal' && assist && (
+                                <Typography
+                                  variant="body2"
+                                  onClick={() => { const n = toNumber(assist); if (n) navigate(`/player/${n}`); }}
+                                  sx={{ color:'#ccc', cursor: toNumber(assist) ? 'pointer' : 'default', '&:hover': toNumber(assist) ? { color: 'primary.main' } : undefined }}
+                                >
+                                  ({assist})
+                                </Typography>
+                              )}
+                            </Box>
                           </Box>
                         );
                       })}
