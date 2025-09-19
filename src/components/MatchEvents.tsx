@@ -158,6 +158,64 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
                 return nameToNumber[key];
               };
 
+              const minuteEl = (
+                <Typography key="m" sx={{ color: 'text.secondary', fontWeight: 700, textAlign: invert ? 'right' : 'left', width: '100%', fontSize: compact ? '0.9rem' : undefined }}>
+                  {minuteText}
+                </Typography>
+              );
+              const iconEl = (
+                <Box key="i" sx={{ display:'flex', alignItems:'center', justifyContent:'center', width: compact ? 10 : 12 }}>
+                  {isGoal && <SportsSoccerIcon sx={{ fontSize: compact ? 13 : 15, color: '#111' }} />}
+                  {isYellow && <Box sx={{ width: compact ? 7 : 9, height: compact ? 10 : 12, borderRadius: '2px', backgroundColor: '#fbc02d' }} />}
+                  {isRed && <Box sx={{ width: compact ? 7 : 9, height: compact ? 10 : 12, borderRadius: '2px', backgroundColor: '#f44336' }} />}
+                  {!isGoal && !isYellow && !isRed && <StarIcon sx={{ fontSize: compact ? 13 : 15, color }} />}
+                </Box>
+              );
+              const textEl = (
+                <Box key="t" sx={{ display:'flex', alignItems:'center', gap: compact ? 0.25 : 0.5, minWidth: 0, justifyContent: invert ? 'flex-end' : 'flex-start' }}>
+                  {playerName && (
+                    <Typography
+                      onClick={() => {
+                        const n = toNumber(playerName);
+                        if (n) navigate(`/player/${n}`);
+                      }}
+                      sx={{
+                        fontWeight: 600,
+                        whiteSpace:'nowrap',
+                        overflow:'hidden',
+                        textOverflow:'ellipsis',
+                        fontSize: compact ? '0.95rem' : undefined,
+                        textAlign: invert ? 'right' : 'left',
+                        cursor: toNumber(playerName) ? 'pointer' : 'default',
+                        '&:hover': toNumber(playerName) ? { color: 'primary.main' } : undefined,
+                      }}
+                    >
+                      {playerName}
+                    </Typography>
+                  )}
+                  {isGoal && assistName && (
+                    <Typography
+                      variant="body2"
+                      onClick={() => {
+                        const n = toNumber(assistName);
+                        if (n) navigate(`/player/${n}`);
+                      }}
+                      sx={{
+                        color: 'text.secondary',
+                        whiteSpace:'nowrap',
+                        overflow:'hidden',
+                        textOverflow:'ellipsis',
+                        fontSize: compact ? '0.85rem' : undefined,
+                        cursor: toNumber(assistName) ? 'pointer' : 'default',
+                        '&:hover': toNumber(assistName) ? { color: 'primary.main' } : undefined,
+                      }}
+                    >
+                      ({assistName})
+                    </Typography>
+                  )}
+                </Box>
+              );
+
               return (
                 <Box
                   key={idx}
@@ -172,60 +230,19 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
                     px: { xs: compact ? 0 : 1, sm: compact ? 0 : 1 },
                   }}
                 >
-                  {/* minute (inside edge) */}
-                  <Typography sx={{ color: 'text.secondary', fontWeight: 700, textAlign: invert ? 'right' : 'left', width: '100%', fontSize: compact ? '0.9rem' : undefined }}>
-                    {minuteText}
-                  </Typography>
-                  {/* icon */}
-                  <Box sx={{ display:'flex', alignItems:'center', justifyContent:'center', width: compact ? 10 : 12 }}>
-                    {isGoal && <SportsSoccerIcon sx={{ fontSize: compact ? 13 : 15, color: '#111' }} />}
-                    {isYellow && <Box sx={{ width: compact ? 7 : 9, height: compact ? 10 : 12, borderRadius: '2px', backgroundColor: '#fbc02d' }} />}
-                    {isRed && <Box sx={{ width: compact ? 7 : 9, height: compact ? 10 : 12, borderRadius: '2px', backgroundColor: '#f44336' }} />}
-                    {!isGoal && !isYellow && !isRed && <StarIcon sx={{ fontSize: compact ? 13 : 15, color }} />}
-                  </Box>
-                  {/* text (to the outside) */}
-                  <Box sx={{ display:'flex', alignItems:'center', gap: compact ? 0.25 : 0.5, minWidth: 0, justifyContent: invert ? 'flex-end' : 'flex-start' }}>
-                    {playerName && (
-                      <Typography
-                        onClick={() => {
-                          const n = toNumber(playerName);
-                          if (n) navigate(`/player/${n}`);
-                        }}
-                        sx={{
-                          fontWeight: 600,
-                          whiteSpace:'nowrap',
-                          overflow:'hidden',
-                          textOverflow:'ellipsis',
-                          fontSize: compact ? '0.95rem' : undefined,
-                          textAlign: invert ? 'right' : 'left',
-                          cursor: toNumber(playerName) ? 'pointer' : 'default',
-                          '&:hover': toNumber(playerName) ? { color: 'primary.main' } : undefined,
-                        }}
-                      >
-                        {playerName}
-                      </Typography>
-                    )}
-                    {isGoal && assistName && (
-                      <Typography
-                        variant="body2"
-                        onClick={() => {
-                          const n = toNumber(assistName);
-                          if (n) navigate(`/player/${n}`);
-                        }}
-                        sx={{
-                          color: 'text.secondary',
-                          whiteSpace:'nowrap',
-                          overflow:'hidden',
-                          textOverflow:'ellipsis',
-                          fontSize: compact ? '0.85rem' : undefined,
-                          cursor: toNumber(assistName) ? 'pointer' : 'default',
-                          '&:hover': toNumber(assistName) ? { color: 'primary.main' } : undefined,
-                        }}
-                      >
-                        ({assistName})
-                      </Typography>
-                    )}
-                  </Box>
+                  {invert ? (
+                    <>
+                      {textEl}
+                      {iconEl}
+                      {minuteEl}
+                    </>
+                  ) : (
+                    <>
+                      {minuteEl}
+                      {iconEl}
+                      {textEl}
+                    </>
+                  )}
                 </Box>
               );
             })}
