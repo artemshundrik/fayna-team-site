@@ -826,13 +826,12 @@ const Matches: React.FC = () => {
                         </a>
                       )}
                     </Box>
-                    {/* Events below, occupying full row within flex-wrap */}
+                    {/* Events below, aligned under FAYNA TEAM side */}
                     {match.id ? (
                       <Box sx={{ flexBasis: '100%', width: '100%' }}>
-                        {/* center events under the card */}
-                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: eventsSide === 'left' ? 'flex-start' : 'flex-end' }}>
                           <Box sx={{ width: { xs: '100%', sm: 520 } }}>
-                            <MatchEvents matchId={match.id} open={!!openEvents[match.id]} side="full" />
+                            <MatchEvents matchId={match.id} open={!!openEvents[match.id]} side={eventsSide} />
                           </Box>
                         </Box>
                       </Box>
