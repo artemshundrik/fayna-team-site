@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
-import { Box, Collapse, Stack, Typography, Fade } from '@mui/material';
+import { Box, Collapse, Stack, Typography, Fade, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import StarIcon from '@mui/icons-material/Star';
@@ -63,6 +63,8 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
   const [rows, setRows] = useState<EventRow[]>([]);
   const [nameToNumber, setNameToNumber] = useState<Record<string, number>>({});
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
 
   useEffect(() => {
     if (!open) return;
@@ -136,7 +138,7 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
   if (compact && open && !loading && rows.length === 0) return null;
   const showContent = open && !loading && rows.length > 0;
 
-  const invert = side === 'left';
+  const invert = isSmUp ? side === 'left' : side === 'right';
 
   return (
     <Collapse in={open} timeout={200} unmountOnExit>
@@ -206,6 +208,7 @@ export default function MatchEvents({ matchId, open, side = 'full', compact = fa
                         overflow:'hidden',
                         textOverflow:'ellipsis',
                         fontSize: compact ? '0.85rem' : undefined,
+                        textAlign: invert ? 'right' : 'left',
                         cursor: toNumber(assistName) ? 'pointer' : 'default',
                         '&:hover': toNumber(assistName) ? { color: 'primary.main' } : undefined,
                       }}
